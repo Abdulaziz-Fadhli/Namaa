@@ -1,0 +1,4173 @@
+{
+ "persona": "khalid",
+ "name": "خالد",
+ "description": "مستثمر لديه حسابات في ثلاثة بنوك",
+ "accounts": [
+  {
+   "accountId": "K1",
+   "bank": "الإنماء",
+   "type": "current",
+   "currency": "SAR"
+  },
+  {
+   "accountId": "K2",
+   "bank": "بنك أ",
+   "type": "current",
+   "currency": "SAR"
+  },
+  {
+   "accountId": "K3",
+   "bank": "بنك ب",
+   "type": "savings",
+   "currency": "SAR"
+  },
+  {
+   "accountId": "K4",
+   "bank": "الإنماء",
+   "type": "investment",
+   "product": "نماء الاستثماري",
+   "currency": "SAR",
+   "zakatExempt": true
+  }
+ ],
+ "transactions": [
+  {
+   "accountId": "K1",
+   "date": "2025-04-01",
+   "amount": 25000,
+   "direction": "credit",
+   "desc": "رصيد افتتاحي"
+  },
+  {
+   "accountId": "K2",
+   "date": "2025-04-01",
+   "amount": 15000,
+   "direction": "credit",
+   "desc": "رصيد افتتاحي"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-04-01",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "رصيد افتتاحي"
+  },
+  {
+   "accountId": "K4",
+   "date": "2025-04-01",
+   "amount": 50000,
+   "direction": "credit",
+   "desc": "رصيد افتتاحي"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-02",
+   "amount": 379,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-03",
+   "amount": 446,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-04",
+   "amount": 427,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-04-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-06",
+   "amount": 728,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-07",
+   "amount": 629,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-08",
+   "amount": 491,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-09",
+   "amount": 275,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K2",
+   "date": "2025-04-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-10",
+   "amount": 817,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-11",
+   "amount": 904,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-12",
+   "amount": 327,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-13",
+   "amount": 1038,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-14",
+   "amount": 508,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-15",
+   "amount": 741,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-16",
+   "amount": 400,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-17",
+   "amount": 663,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-18",
+   "amount": 319,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-20",
+   "amount": 708,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-21",
+   "amount": 992,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-22",
+   "amount": 704,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-23",
+   "amount": 898,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-24",
+   "amount": 553,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-25",
+   "amount": 900,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-26",
+   "amount": 949,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-27",
+   "amount": 276,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-28",
+   "amount": 979,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-29",
+   "amount": 433,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-04-30",
+   "amount": 847,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-01",
+   "amount": 228,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-02",
+   "amount": 328,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-03",
+   "amount": 995,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-04",
+   "amount": 483,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-05-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-06",
+   "amount": 698,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-07",
+   "amount": 823,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-08",
+   "amount": 423,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-09",
+   "amount": 599,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-10",
+   "amount": 216,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-11",
+   "amount": 799,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-14",
+   "amount": 267,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-15",
+   "amount": 348,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-16",
+   "amount": 649,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-17",
+   "amount": 684,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-18",
+   "amount": 944,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-19",
+   "amount": 689,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-20",
+   "amount": 731,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-22",
+   "amount": 1058,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-23",
+   "amount": 499,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-24",
+   "amount": 277,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-25",
+   "amount": 635,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-26",
+   "amount": 1019,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-27",
+   "amount": 221,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-29",
+   "amount": 333,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-30",
+   "amount": 386,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-05-31",
+   "amount": 514,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-01",
+   "amount": 816,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-02",
+   "amount": 345,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-03",
+   "amount": 820,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-04",
+   "amount": 488,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-05",
+   "amount": 569,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-06-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-06",
+   "amount": 567,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-07",
+   "amount": 220,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-09",
+   "amount": 913,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-10",
+   "amount": 452,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-11",
+   "amount": 764,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-12",
+   "amount": 789,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-13",
+   "amount": 1023,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-14",
+   "amount": 920,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-15",
+   "amount": 513,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-16",
+   "amount": 746,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-17",
+   "amount": 629,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-18",
+   "amount": 831,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-19",
+   "amount": 798,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-21",
+   "amount": 839,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-22",
+   "amount": 411,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-27",
+   "amount": 819,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-28",
+   "amount": 299,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-29",
+   "amount": 758,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-06-30",
+   "amount": 482,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-02",
+   "amount": 621,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-03",
+   "amount": 609,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-04",
+   "amount": 285,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-07-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-07",
+   "amount": 678,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-09",
+   "amount": 196,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K2",
+   "date": "2025-07-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-10",
+   "amount": 1040,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-11",
+   "amount": 400,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-12",
+   "amount": 209,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-13",
+   "amount": 221,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-15",
+   "amount": 1044,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-16",
+   "amount": 677,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-17",
+   "amount": 545,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-18",
+   "amount": 792,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-19",
+   "amount": 748,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-20",
+   "amount": 850,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-22",
+   "amount": 301,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-24",
+   "amount": 348,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-25",
+   "amount": 897,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-26",
+   "amount": 417,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-27",
+   "amount": 634,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-07-31",
+   "amount": 708,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-02",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-03",
+   "amount": 1031,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-04",
+   "amount": 721,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-05",
+   "amount": 438,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-08-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-06",
+   "amount": 669,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-07",
+   "amount": 801,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-10",
+   "amount": 448,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-12",
+   "amount": 907,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-13",
+   "amount": 321,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-14",
+   "amount": 1020,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-15",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-16",
+   "amount": 255,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-17",
+   "amount": 341,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-19",
+   "amount": 904,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-21",
+   "amount": 935,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-22",
+   "amount": 970,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-23",
+   "amount": 429,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-25",
+   "amount": 199,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-27",
+   "amount": 773,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-29",
+   "amount": 723,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-08-30",
+   "amount": 720,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-01",
+   "amount": 490,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-02",
+   "amount": 535,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-03",
+   "amount": 701,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-04",
+   "amount": 782,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-05",
+   "amount": 550,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-09-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-06",
+   "amount": 636,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-07",
+   "amount": 901,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-08",
+   "amount": 975,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-10",
+   "amount": 217,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-11",
+   "amount": 214,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-12",
+   "amount": 674,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-13",
+   "amount": 364,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-14",
+   "amount": 926,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-15",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-16",
+   "amount": 436,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-17",
+   "amount": 772,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-18",
+   "amount": 895,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-20",
+   "amount": 672,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-21",
+   "amount": 723,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-22",
+   "amount": 679,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-23",
+   "amount": 208,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-24",
+   "amount": 690,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-25",
+   "amount": 800,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-26",
+   "amount": 338,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-27",
+   "amount": 310,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-28",
+   "amount": 958,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-29",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-09-30",
+   "amount": 607,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-01",
+   "amount": 488,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-02",
+   "amount": 765,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-03",
+   "amount": 809,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-04",
+   "amount": 476,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-05",
+   "amount": 974,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-10-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-06",
+   "amount": 1021,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-07",
+   "amount": 1039,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-08",
+   "amount": 439,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-09",
+   "amount": 341,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K2",
+   "date": "2025-10-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-10",
+   "amount": 896,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-11",
+   "amount": 619,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-12",
+   "amount": 369,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-15",
+   "amount": 763,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-16",
+   "amount": 595,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-17",
+   "amount": 726,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-18",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-19",
+   "amount": 1004,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-20",
+   "amount": 1044,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-22",
+   "amount": 526,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-24",
+   "amount": 990,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-25",
+   "amount": 441,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-26",
+   "amount": 519,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-27",
+   "amount": 328,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-28",
+   "amount": 983,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-29",
+   "amount": 271,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-30",
+   "amount": 712,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-10-31",
+   "amount": 530,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-01",
+   "amount": 659,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-02",
+   "amount": 662,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-03",
+   "amount": 538,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-05",
+   "amount": 762,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-11-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-07",
+   "amount": 932,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-08",
+   "amount": 954,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-11",
+   "amount": 529,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-12",
+   "amount": 632,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-14",
+   "amount": 432,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-15",
+   "amount": 506,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-16",
+   "amount": 874,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-17",
+   "amount": 702,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-19",
+   "amount": 511,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-20",
+   "amount": 418,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-21",
+   "amount": 669,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-22",
+   "amount": 611,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-23",
+   "amount": 766,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-24",
+   "amount": 674,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-26",
+   "amount": 846,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-27",
+   "amount": 314,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-11-29",
+   "amount": 458,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-01",
+   "amount": 1048,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-03",
+   "amount": 1041,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-05",
+   "amount": 962,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-12-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-06",
+   "amount": 256,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-07",
+   "amount": 207,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-08",
+   "amount": 570,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-09",
+   "amount": 938,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-10",
+   "amount": 664,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-11",
+   "amount": 1019,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-12",
+   "amount": 388,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-13",
+   "amount": 675,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-14",
+   "amount": 220,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K3",
+   "date": "2025-12-15",
+   "amount": 51902,
+   "direction": "debit",
+   "desc": "شراء ذهب 100 جم عيار 24"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-15",
+   "amount": 825,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-16",
+   "amount": 379,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-17",
+   "amount": 833,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-22",
+   "amount": 927,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-23",
+   "amount": 579,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-25",
+   "amount": 347,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-26",
+   "amount": 252,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-27",
+   "amount": 243,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-28",
+   "amount": 657,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2025-12-30",
+   "amount": 582,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-01",
+   "amount": 991,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-02",
+   "amount": 895,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-03",
+   "amount": 659,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-04",
+   "amount": 874,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-05",
+   "amount": 915,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-01-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-07",
+   "amount": 743,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-08",
+   "amount": 484,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-09",
+   "amount": 461,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K2",
+   "date": "2026-01-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-10",
+   "amount": 742,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-11",
+   "amount": 835,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-12",
+   "amount": 1002,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-14",
+   "amount": 438,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-15",
+   "amount": 291,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-17",
+   "amount": 846,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-18",
+   "amount": 239,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-19",
+   "amount": 601,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-20",
+   "amount": 353,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-22",
+   "amount": 884,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-23",
+   "amount": 764,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-24",
+   "amount": 418,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-25",
+   "amount": 1013,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-27",
+   "amount": 1031,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-28",
+   "amount": 747,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-29",
+   "amount": 498,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-01-31",
+   "amount": 958,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-02",
+   "amount": 569,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-03",
+   "amount": 296,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-04",
+   "amount": 305,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-05",
+   "amount": 622,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-02-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-06",
+   "amount": 1058,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-07",
+   "amount": 458,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-08",
+   "amount": 574,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-09",
+   "amount": 315,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-10",
+   "amount": 436,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-11",
+   "amount": 498,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-12",
+   "amount": 513,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-13",
+   "amount": 697,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-14",
+   "amount": 255,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-16",
+   "amount": 499,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-17",
+   "amount": 919,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-19",
+   "amount": 955,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-20",
+   "amount": 747,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-22",
+   "amount": 577,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-23",
+   "amount": 877,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-24",
+   "amount": 570,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-25",
+   "amount": 619,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-26",
+   "amount": 665,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-02-27",
+   "amount": 480,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-01",
+   "amount": 790,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-02",
+   "amount": 673,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-04",
+   "amount": 247,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-05",
+   "amount": 277,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-03-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-07",
+   "amount": 322,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-08",
+   "amount": 615,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-09",
+   "amount": 784,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-10",
+   "amount": 753,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-11",
+   "amount": 1013,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-13",
+   "amount": 896,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-14",
+   "amount": 352,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-16",
+   "amount": 299,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-17",
+   "amount": 884,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-18",
+   "amount": 246,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-20",
+   "amount": 1029,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-21",
+   "amount": 655,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-22",
+   "amount": 931,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-23",
+   "amount": 658,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-24",
+   "amount": 782,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-25",
+   "amount": 264,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-27",
+   "amount": 839,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-29",
+   "amount": 576,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-30",
+   "amount": 313,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-03-31",
+   "amount": 197,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-01",
+   "amount": 417,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-02",
+   "amount": 263,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-03",
+   "amount": 869,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-04",
+   "amount": 895,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-05",
+   "amount": 852,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-04-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-06",
+   "amount": 675,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-08",
+   "amount": 493,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-09",
+   "amount": 443,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K2",
+   "date": "2026-04-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-10",
+   "amount": 979,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-11",
+   "amount": 306,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-12",
+   "amount": 836,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-13",
+   "amount": 500,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-14",
+   "amount": 558,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-16",
+   "amount": 593,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-18",
+   "amount": 892,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-19",
+   "amount": 580,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-20",
+   "amount": 278,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-21",
+   "amount": 946,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-22",
+   "amount": 841,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-23",
+   "amount": 304,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-24",
+   "amount": 659,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-25",
+   "amount": 818,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-26",
+   "amount": 899,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-27",
+   "amount": 328,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-28",
+   "amount": 316,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-04-30",
+   "amount": 626,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-01",
+   "amount": 644,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-02",
+   "amount": 335,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-03",
+   "amount": 690,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-04",
+   "amount": 852,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-05",
+   "amount": 695,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-05-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-07",
+   "amount": 1062,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-08",
+   "amount": 720,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-09",
+   "amount": 188,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-10",
+   "amount": 240,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-12",
+   "amount": 226,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-13",
+   "amount": 564,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-14",
+   "amount": 886,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-15",
+   "amount": 231,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-16",
+   "amount": 763,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-17",
+   "amount": 551,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-18",
+   "amount": 991,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-19",
+   "amount": 304,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-21",
+   "amount": 435,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-22",
+   "amount": 1049,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-23",
+   "amount": 1019,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-24",
+   "amount": 551,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-25",
+   "amount": 648,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-26",
+   "amount": 338,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-05-27",
+   "amount": 887,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-02",
+   "amount": 521,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-04",
+   "amount": 446,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-05",
+   "amount": 649,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-06-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-06",
+   "amount": 658,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-09",
+   "amount": 532,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-10",
+   "amount": 236,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-11",
+   "amount": 573,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-12",
+   "amount": 190,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-13",
+   "amount": 998,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-15",
+   "amount": 531,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-16",
+   "amount": 997,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-17",
+   "amount": 1050,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-18",
+   "amount": 763,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-19",
+   "amount": 530,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-20",
+   "amount": 575,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-21",
+   "amount": 522,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-22",
+   "amount": 431,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-23",
+   "amount": 456,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-24",
+   "amount": 734,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-25",
+   "amount": 330,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-28",
+   "amount": 1056,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-06-30",
+   "amount": 901,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-01",
+   "amount": 777,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-02",
+   "amount": 567,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-03",
+   "amount": 974,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-05",
+   "amount": 321,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-07-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-06",
+   "amount": 725,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-08",
+   "amount": 730,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-09",
+   "amount": 987,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K2",
+   "date": "2026-07-10",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "إيجار عقار"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-10",
+   "amount": 416,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-11",
+   "amount": 526,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-13",
+   "amount": 711,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-14",
+   "amount": 398,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-15",
+   "amount": 455,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-16",
+   "amount": 286,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-17",
+   "amount": 789,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-18",
+   "amount": 227,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-19",
+   "amount": 810,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-21",
+   "amount": 280,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-22",
+   "amount": 209,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-23",
+   "amount": 426,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-25",
+   "amount": 844,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-29",
+   "amount": 284,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-30",
+   "amount": 609,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-07-31",
+   "amount": 316,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-01",
+   "amount": 256,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-02",
+   "amount": 872,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-04",
+   "amount": 990,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-05",
+   "amount": 739,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-08-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-06",
+   "amount": 672,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-07",
+   "amount": 442,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-08",
+   "amount": 608,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-09",
+   "amount": 756,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-10",
+   "amount": 843,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-11",
+   "amount": 1058,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-12",
+   "amount": 417,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-14",
+   "amount": 941,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-15",
+   "amount": 670,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-16",
+   "amount": 260,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-17",
+   "amount": 851,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-18",
+   "amount": 987,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-20",
+   "amount": 458,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-21",
+   "amount": 733,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-22",
+   "amount": 536,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-23",
+   "amount": 868,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-25",
+   "amount": 401,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-26",
+   "amount": 693,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-28",
+   "amount": 775,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-29",
+   "amount": 531,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-30",
+   "amount": 907,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-08-31",
+   "amount": 256,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-03",
+   "amount": 398,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-04",
+   "amount": 268,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-05",
+   "amount": 20000,
+   "direction": "credit",
+   "desc": "أرباح نشاط تجاري"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-05",
+   "amount": 654,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-06",
+   "amount": 5000,
+   "direction": "debit",
+   "desc": "تحويل ادخار إلى K3",
+   "internal": true,
+   "counterparty": "K3"
+  },
+  {
+   "accountId": "K3",
+   "date": "2026-09-06",
+   "amount": 5000,
+   "direction": "credit",
+   "desc": "تحويل ادخار من K1",
+   "internal": true,
+   "counterparty": "K1"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-07",
+   "amount": 562,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-08",
+   "amount": 705,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-09",
+   "amount": 759,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-10",
+   "amount": 1015,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-12",
+   "amount": 327,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-13",
+   "amount": 791,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-15",
+   "amount": 732,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-16",
+   "amount": 443,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-18",
+   "amount": 611,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-19",
+   "amount": 979,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-20",
+   "amount": 890,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-21",
+   "amount": 398,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-23",
+   "amount": 208,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-24",
+   "amount": 1025,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-25",
+   "amount": 345,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-26",
+   "amount": 292,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-28",
+   "amount": 283,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-09-30",
+   "amount": 412,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-10-01",
+   "amount": 1053,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-10-02",
+   "amount": 878,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "K1",
+   "date": "2026-10-03",
+   "amount": 493,
+   "direction": "debit",
+   "desc": "صيدلية"
+  }
+ ],
+ "holdings": [
+  {
+   "type": "gold",
+   "grams": 100,
+   "karat": 24,
+   "acquired": "2025-12-15",
+   "cost": 51902,
+   "paidFrom": "K3"
+  },
+  {
+   "type": "stocks",
+   "intent": "trading",
+   "name": "محفظة أسهم",
+   "values": {
+    "2025-04-01": 30000,
+    "2025-04-02": 30247,
+    "2025-04-03": 30031,
+    "2025-04-04": 29900,
+    "2025-04-05": 29504,
+    "2025-04-06": 29658,
+    "2025-04-07": 30068,
+    "2025-04-08": 30301,
+    "2025-04-09": 30667,
+    "2025-04-10": 31119,
+    "2025-04-11": 31347,
+    "2025-04-12": 31787,
+    "2025-04-13": 32103,
+    "2025-04-14": 31902,
+    "2025-04-15": 31631,
+    "2025-04-16": 31956,
+    "2025-04-17": 32251,
+    "2025-04-18": 32573,
+    "2025-04-19": 32366,
+    "2025-04-20": 32104,
+    "2025-04-21": 31626,
+    "2025-04-22": 32031,
+    "2025-04-23": 32341,
+    "2025-04-24": 32004,
+    "2025-04-25": 31686,
+    "2025-04-26": 32158,
+    "2025-04-27": 31821,
+    "2025-04-28": 32279,
+    "2025-04-29": 32155,
+    "2025-04-30": 32191,
+    "2025-05-01": 31885,
+    "2025-05-02": 32144,
+    "2025-05-03": 32123,
+    "2025-05-04": 32437,
+    "2025-05-05": 32900,
+    "2025-05-06": 33357,
+    "2025-05-07": 33016,
+    "2025-05-08": 33364,
+    "2025-05-09": 33723,
+    "2025-05-10": 34066,
+    "2025-05-11": 34493,
+    "2025-05-12": 34996,
+    "2025-05-13": 35048,
+    "2025-05-14": 35367,
+    "2025-05-15": 35373,
+    "2025-05-16": 34865,
+    "2025-05-17": 34544,
+    "2025-05-18": 34602,
+    "2025-05-19": 35102,
+    "2025-05-20": 34843,
+    "2025-05-21": 35344,
+    "2025-05-22": 35852,
+    "2025-05-23": 36238,
+    "2025-05-24": 36704,
+    "2025-05-25": 36966,
+    "2025-05-26": 37339,
+    "2025-05-27": 37452,
+    "2025-05-28": 37259,
+    "2025-05-29": 37795,
+    "2025-05-30": 38306,
+    "2025-05-31": 38062,
+    "2025-06-01": 37866,
+    "2025-06-02": 38206,
+    "2025-06-03": 37757,
+    "2025-06-04": 37289,
+    "2025-06-05": 37571,
+    "2025-06-06": 37092,
+    "2025-06-07": 36957,
+    "2025-06-08": 37161,
+    "2025-06-09": 37327,
+    "2025-06-10": 37503,
+    "2025-06-11": 36941,
+    "2025-06-12": 37287,
+    "2025-06-13": 37231,
+    "2025-06-14": 36865,
+    "2025-06-15": 36479,
+    "2025-06-16": 36274,
+    "2025-06-17": 35816,
+    "2025-06-18": 36264,
+    "2025-06-19": 36464,
+    "2025-06-20": 36117,
+    "2025-06-21": 35594,
+    "2025-06-22": 35937,
+    "2025-06-23": 35879,
+    "2025-06-24": 36072,
+    "2025-06-25": 35679,
+    "2025-06-26": 35740,
+    "2025-06-27": 36062,
+    "2025-06-28": 36494,
+    "2025-06-29": 36107,
+    "2025-06-30": 36321,
+    "2025-07-01": 36765,
+    "2025-07-02": 36531,
+    "2025-07-03": 36037,
+    "2025-07-04": 36533,
+    "2025-07-05": 36379,
+    "2025-07-06": 36718,
+    "2025-07-07": 36441,
+    "2025-07-08": 36956,
+    "2025-07-09": 37332,
+    "2025-07-10": 36797,
+    "2025-07-11": 36772,
+    "2025-07-12": 37052,
+    "2025-07-13": 37362,
+    "2025-07-14": 37545,
+    "2025-07-15": 37898,
+    "2025-07-16": 37913,
+    "2025-07-17": 37975,
+    "2025-07-18": 38188,
+    "2025-07-19": 38471,
+    "2025-07-20": 38402,
+    "2025-07-21": 38898,
+    "2025-07-22": 38693,
+    "2025-07-23": 38132,
+    "2025-07-24": 38421,
+    "2025-07-25": 38704,
+    "2025-07-26": 38174,
+    "2025-07-27": 38654,
+    "2025-07-28": 38308,
+    "2025-07-29": 38846,
+    "2025-07-30": 38636,
+    "2025-07-31": 39147,
+    "2025-08-01": 38925,
+    "2025-08-02": 38495,
+    "2025-08-03": 37919,
+    "2025-08-04": 37437,
+    "2025-08-05": 37018,
+    "2025-08-06": 36831,
+    "2025-08-07": 36422,
+    "2025-08-08": 36238,
+    "2025-08-09": 36692,
+    "2025-08-10": 36827,
+    "2025-08-11": 37146,
+    "2025-08-12": 36761,
+    "2025-08-13": 37102,
+    "2025-08-14": 36573,
+    "2025-08-15": 36162,
+    "2025-08-16": 36080,
+    "2025-08-17": 35947,
+    "2025-08-18": 36090,
+    "2025-08-19": 36075,
+    "2025-08-20": 35721,
+    "2025-08-21": 35332,
+    "2025-08-22": 34924,
+    "2025-08-23": 34849,
+    "2025-08-24": 34822,
+    "2025-08-25": 34733,
+    "2025-08-26": 34714,
+    "2025-08-27": 34494,
+    "2025-08-28": 33981,
+    "2025-08-29": 34453,
+    "2025-08-30": 34597,
+    "2025-08-31": 34459,
+    "2025-09-01": 34160,
+    "2025-09-02": 33992,
+    "2025-09-03": 33581,
+    "2025-09-04": 33079,
+    "2025-09-05": 33508,
+    "2025-09-06": 33721,
+    "2025-09-07": 33995,
+    "2025-09-08": 33909,
+    "2025-09-09": 34051,
+    "2025-09-10": 34196,
+    "2025-09-11": 34679,
+    "2025-09-12": 34823,
+    "2025-09-13": 34994,
+    "2025-09-14": 34734,
+    "2025-09-15": 34958,
+    "2025-09-16": 34976,
+    "2025-09-17": 35149,
+    "2025-09-18": 34823,
+    "2025-09-19": 34388,
+    "2025-09-20": 34395,
+    "2025-09-21": 34106,
+    "2025-09-22": 34541,
+    "2025-09-23": 34339,
+    "2025-09-24": 34298,
+    "2025-09-25": 34296,
+    "2025-09-26": 33876,
+    "2025-09-27": 33472,
+    "2025-09-28": 33002,
+    "2025-09-29": 33393,
+    "2025-09-30": 33036,
+    "2025-10-01": 32700,
+    "2025-10-02": 32904,
+    "2025-10-03": 32788,
+    "2025-10-04": 32664,
+    "2025-10-05": 32562,
+    "2025-10-06": 33048,
+    "2025-10-07": 33317,
+    "2025-10-08": 33306,
+    "2025-10-09": 33633,
+    "2025-10-10": 33611,
+    "2025-10-11": 33868,
+    "2025-10-12": 33708,
+    "2025-10-13": 34176,
+    "2025-10-14": 33770,
+    "2025-10-15": 34249,
+    "2025-10-16": 34708,
+    "2025-10-17": 34463,
+    "2025-10-18": 34544,
+    "2025-10-19": 34246,
+    "2025-10-20": 33812,
+    "2025-10-21": 33699,
+    "2025-10-22": 34188,
+    "2025-10-23": 34635,
+    "2025-10-24": 34443,
+    "2025-10-25": 34474,
+    "2025-10-26": 34438,
+    "2025-10-27": 34507,
+    "2025-10-28": 34925,
+    "2025-10-29": 34731,
+    "2025-10-30": 34373,
+    "2025-10-31": 34197,
+    "2025-11-01": 34182,
+    "2025-11-02": 34422,
+    "2025-11-03": 34049,
+    "2025-11-04": 34544,
+    "2025-11-05": 34043,
+    "2025-11-06": 33779,
+    "2025-11-07": 33477,
+    "2025-11-08": 33599,
+    "2025-11-09": 33398,
+    "2025-11-10": 33259,
+    "2025-11-11": 33325,
+    "2025-11-12": 33347,
+    "2025-11-13": 33066,
+    "2025-11-14": 32779,
+    "2025-11-15": 32886,
+    "2025-11-16": 32770,
+    "2025-11-17": 32753,
+    "2025-11-18": 32792,
+    "2025-11-19": 33042,
+    "2025-11-20": 33252,
+    "2025-11-21": 33719,
+    "2025-11-22": 33547,
+    "2025-11-23": 33579,
+    "2025-11-24": 34047,
+    "2025-11-25": 33879,
+    "2025-11-26": 33377,
+    "2025-11-27": 33000,
+    "2025-11-28": 32641,
+    "2025-11-29": 33008,
+    "2025-11-30": 33322,
+    "2025-12-01": 33177,
+    "2025-12-02": 32807,
+    "2025-12-03": 33187,
+    "2025-12-04": 33609,
+    "2025-12-05": 33789,
+    "2025-12-06": 33791,
+    "2025-12-07": 33378,
+    "2025-12-08": 33484,
+    "2025-12-09": 33432,
+    "2025-12-10": 32991,
+    "2025-12-11": 32653,
+    "2025-12-12": 32200,
+    "2025-12-13": 31871,
+    "2025-12-14": 31577,
+    "2025-12-15": 31991,
+    "2025-12-16": 31570,
+    "2025-12-17": 31573,
+    "2025-12-18": 31765,
+    "2025-12-19": 31356,
+    "2025-12-20": 31544,
+    "2025-12-21": 31858,
+    "2025-12-22": 31713,
+    "2025-12-23": 31722,
+    "2025-12-24": 31860,
+    "2025-12-25": 31897,
+    "2025-12-26": 31660,
+    "2025-12-27": 31808,
+    "2025-12-28": 31718,
+    "2025-12-29": 32151,
+    "2025-12-30": 32223,
+    "2025-12-31": 32270,
+    "2026-01-01": 32696,
+    "2026-01-02": 32780,
+    "2026-01-03": 32884,
+    "2026-01-04": 33099,
+    "2026-01-05": 33199,
+    "2026-01-06": 33589,
+    "2026-01-07": 33805,
+    "2026-01-08": 33632,
+    "2026-01-09": 33182,
+    "2026-01-10": 33272,
+    "2026-01-11": 33542,
+    "2026-01-12": 33968,
+    "2026-01-13": 33988,
+    "2026-01-14": 34346,
+    "2026-01-15": 34121,
+    "2026-01-16": 34026,
+    "2026-01-17": 34025,
+    "2026-01-18": 33830,
+    "2026-01-19": 33354,
+    "2026-01-20": 33835,
+    "2026-01-21": 33597,
+    "2026-01-22": 33277,
+    "2026-01-23": 32860,
+    "2026-01-24": 33109,
+    "2026-01-25": 33572,
+    "2026-01-26": 33774,
+    "2026-01-27": 34272,
+    "2026-01-28": 34563,
+    "2026-01-29": 34237,
+    "2026-01-30": 34133,
+    "2026-01-31": 33828,
+    "2026-02-01": 33836,
+    "2026-02-02": 33373,
+    "2026-02-03": 33328,
+    "2026-02-04": 33678,
+    "2026-02-05": 33942,
+    "2026-02-06": 34004,
+    "2026-02-07": 33690,
+    "2026-02-08": 33830,
+    "2026-02-09": 34271,
+    "2026-02-10": 34592,
+    "2026-02-11": 35071,
+    "2026-02-12": 34901,
+    "2026-02-13": 35300,
+    "2026-02-14": 34876,
+    "2026-02-15": 34957,
+    "2026-02-16": 35454,
+    "2026-02-17": 35057,
+    "2026-02-18": 34681,
+    "2026-02-19": 34898,
+    "2026-02-20": 35346,
+    "2026-02-21": 34886,
+    "2026-02-22": 35084,
+    "2026-02-23": 35378,
+    "2026-02-24": 35838,
+    "2026-02-25": 35599,
+    "2026-02-26": 35353,
+    "2026-02-27": 35223,
+    "2026-02-28": 35069,
+    "2026-03-01": 35146,
+    "2026-03-02": 34762,
+    "2026-03-03": 34606,
+    "2026-03-04": 35118,
+    "2026-03-05": 35181,
+    "2026-03-06": 35067,
+    "2026-03-07": 35413,
+    "2026-03-08": 35643,
+    "2026-03-09": 35532,
+    "2026-03-10": 35269,
+    "2026-03-11": 35770,
+    "2026-03-12": 36117,
+    "2026-03-13": 36366,
+    "2026-03-14": 36219,
+    "2026-03-15": 36721,
+    "2026-03-16": 36354,
+    "2026-03-17": 36049,
+    "2026-03-18": 35541,
+    "2026-03-19": 35355,
+    "2026-03-20": 35648,
+    "2026-03-21": 36115,
+    "2026-03-22": 36419,
+    "2026-03-23": 36763,
+    "2026-03-24": 36967,
+    "2026-03-25": 36810,
+    "2026-03-26": 36931,
+    "2026-03-27": 36511,
+    "2026-03-28": 36249,
+    "2026-03-29": 35840,
+    "2026-03-30": 36353,
+    "2026-03-31": 36041,
+    "2026-04-01": 36339,
+    "2026-04-02": 35894,
+    "2026-04-03": 36006,
+    "2026-04-04": 35672,
+    "2026-04-05": 35452,
+    "2026-04-06": 35710,
+    "2026-04-07": 35486,
+    "2026-04-08": 35147,
+    "2026-04-09": 35632,
+    "2026-04-10": 35788,
+    "2026-04-11": 35452,
+    "2026-04-12": 35407,
+    "2026-04-13": 35892,
+    "2026-04-14": 35929,
+    "2026-04-15": 35922,
+    "2026-04-16": 36140,
+    "2026-04-17": 35778,
+    "2026-04-18": 35948,
+    "2026-04-19": 35955,
+    "2026-04-20": 35581,
+    "2026-04-21": 35188,
+    "2026-04-22": 35232,
+    "2026-04-23": 34817,
+    "2026-04-24": 34916,
+    "2026-04-25": 34873,
+    "2026-04-26": 35269,
+    "2026-04-27": 35785,
+    "2026-04-28": 35598,
+    "2026-04-29": 35131,
+    "2026-04-30": 35006,
+    "2026-05-01": 34678,
+    "2026-05-02": 34249,
+    "2026-05-03": 34123,
+    "2026-05-04": 33617,
+    "2026-05-05": 33661,
+    "2026-05-06": 33180,
+    "2026-05-07": 32920,
+    "2026-05-08": 32768,
+    "2026-05-09": 32833,
+    "2026-05-10": 32717,
+    "2026-05-11": 33091,
+    "2026-05-12": 33225,
+    "2026-05-13": 33369,
+    "2026-05-14": 33228,
+    "2026-05-15": 33484,
+    "2026-05-16": 33446,
+    "2026-05-17": 33636,
+    "2026-05-18": 33287,
+    "2026-05-19": 32918,
+    "2026-05-20": 33303,
+    "2026-05-21": 33416,
+    "2026-05-22": 33355,
+    "2026-05-23": 33630,
+    "2026-05-24": 33633,
+    "2026-05-25": 34036,
+    "2026-05-26": 34510,
+    "2026-05-27": 34203,
+    "2026-05-28": 34678,
+    "2026-05-29": 34620,
+    "2026-05-30": 35065,
+    "2026-05-31": 35050,
+    "2026-06-01": 34718,
+    "2026-06-02": 35013,
+    "2026-06-03": 34769,
+    "2026-06-04": 34531,
+    "2026-06-05": 34332,
+    "2026-06-06": 34795,
+    "2026-06-07": 34367,
+    "2026-06-08": 33875,
+    "2026-06-09": 33378,
+    "2026-06-10": 33267,
+    "2026-06-11": 33716,
+    "2026-06-12": 33985,
+    "2026-06-13": 33754,
+    "2026-06-14": 34124,
+    "2026-06-15": 34316,
+    "2026-06-16": 34544,
+    "2026-06-17": 34433,
+    "2026-06-18": 34528,
+    "2026-06-19": 34762,
+    "2026-06-20": 34651,
+    "2026-06-21": 34745,
+    "2026-06-22": 34722,
+    "2026-06-23": 35082,
+    "2026-06-24": 34840,
+    "2026-06-25": 35028,
+    "2026-06-26": 34629,
+    "2026-06-27": 34265,
+    "2026-06-28": 34715,
+    "2026-06-29": 34888,
+    "2026-06-30": 35028,
+    "2026-07-01": 34558,
+    "2026-07-02": 34820,
+    "2026-07-03": 34772,
+    "2026-07-04": 34980,
+    "2026-07-05": 35387,
+    "2026-07-06": 35359,
+    "2026-07-07": 35525,
+    "2026-07-08": 35127,
+    "2026-07-09": 34840,
+    "2026-07-10": 34336,
+    "2026-07-11": 34291,
+    "2026-07-12": 34560,
+    "2026-07-13": 34908,
+    "2026-07-14": 35269,
+    "2026-07-15": 34756,
+    "2026-07-16": 34724,
+    "2026-07-17": 34646,
+    "2026-07-18": 35005,
+    "2026-07-19": 35472,
+    "2026-07-20": 35736,
+    "2026-07-21": 35253,
+    "2026-07-22": 35099,
+    "2026-07-23": 34838,
+    "2026-07-24": 34948,
+    "2026-07-25": 35090,
+    "2026-07-26": 34838,
+    "2026-07-27": 35120,
+    "2026-07-28": 35486,
+    "2026-07-29": 35504,
+    "2026-07-30": 35974,
+    "2026-07-31": 36315,
+    "2026-08-01": 36823,
+    "2026-08-02": 37256,
+    "2026-08-03": 37215,
+    "2026-08-04": 37001,
+    "2026-08-05": 37434,
+    "2026-08-06": 37443,
+    "2026-08-07": 36928,
+    "2026-08-08": 36844,
+    "2026-08-09": 36529,
+    "2026-08-10": 37051,
+    "2026-08-11": 36536,
+    "2026-08-12": 36432,
+    "2026-08-13": 36472,
+    "2026-08-14": 36746,
+    "2026-08-15": 37115,
+    "2026-08-16": 37637,
+    "2026-08-17": 37793,
+    "2026-08-18": 38333,
+    "2026-08-19": 38688,
+    "2026-08-20": 38339,
+    "2026-08-21": 38507,
+    "2026-08-22": 38830,
+    "2026-08-23": 38937,
+    "2026-08-24": 38957,
+    "2026-08-25": 38466,
+    "2026-08-26": 38757,
+    "2026-08-27": 39221,
+    "2026-08-28": 39658,
+    "2026-08-29": 39204,
+    "2026-08-30": 38982,
+    "2026-08-31": 38432,
+    "2026-09-01": 38784,
+    "2026-09-02": 38877,
+    "2026-09-03": 38514,
+    "2026-09-04": 38704,
+    "2026-09-05": 38885,
+    "2026-09-06": 38409,
+    "2026-09-07": 38900,
+    "2026-09-08": 38704,
+    "2026-09-09": 38760,
+    "2026-09-10": 38761,
+    "2026-09-11": 38429,
+    "2026-09-12": 37976,
+    "2026-09-13": 38356,
+    "2026-09-14": 38062,
+    "2026-09-15": 38182,
+    "2026-09-16": 38220,
+    "2026-09-17": 38059,
+    "2026-09-18": 38332,
+    "2026-09-19": 38872,
+    "2026-09-20": 39224,
+    "2026-09-21": 39477,
+    "2026-09-22": 39993,
+    "2026-09-23": 39765,
+    "2026-09-24": 40225,
+    "2026-09-25": 39701,
+    "2026-09-26": 40164,
+    "2026-09-27": 39982,
+    "2026-09-28": 40030,
+    "2026-09-29": 39880,
+    "2026-09-30": 40200,
+    "2026-10-01": 39795,
+    "2026-10-02": 40320,
+    "2026-10-03": 40750
+   }
+  }
+ ],
+ "manual": [],
+ "period": {
+  "start": "2025-04-01",
+  "end": "2026-10-03"
+ }
+}

@@ -1,0 +1,3276 @@
+{
+ "persona": "noura",
+ "name": "نورة",
+ "description": "مصممة مستقلة بدخل غير منتظم",
+ "accounts": [
+  {
+   "accountId": "N1",
+   "bank": "الإنماء",
+   "type": "current",
+   "currency": "SAR"
+  }
+ ],
+ "transactions": [
+  {
+   "accountId": "N1",
+   "date": "2025-04-01",
+   "amount": 1800,
+   "direction": "credit",
+   "desc": "رصيد افتتاحي"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-01",
+   "amount": 178,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-02",
+   "amount": 100,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-03",
+   "amount": 100,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-04",
+   "amount": 139,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-05",
+   "amount": 124,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-06",
+   "amount": 40,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-07",
+   "amount": 117,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-08",
+   "amount": 10000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-08",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-09",
+   "amount": 90,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-10",
+   "amount": 46,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-11",
+   "amount": 162,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-12",
+   "amount": 148,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-13",
+   "amount": 123,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-14",
+   "amount": 62,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-16",
+   "amount": 182,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-17",
+   "amount": 179,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-19",
+   "amount": 103,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-20",
+   "amount": 141,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-21",
+   "amount": 140,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-22",
+   "amount": 64,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-23",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-24",
+   "amount": 99,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-25",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-26",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-27",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-29",
+   "amount": 203,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-04-30",
+   "amount": 168,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-01",
+   "amount": 191,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-02",
+   "amount": 51,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-03",
+   "amount": 128,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-04",
+   "amount": 40,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-05",
+   "amount": 51,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-06",
+   "amount": 136,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-07",
+   "amount": 98,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-08",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-09",
+   "amount": 96,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-10",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-12",
+   "amount": 16000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-12",
+   "amount": 46,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-14",
+   "amount": 191,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-15",
+   "amount": 133,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-16",
+   "amount": 114,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-17",
+   "amount": 177,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-19",
+   "amount": 173,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-20",
+   "amount": 174,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-21",
+   "amount": 65,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-22",
+   "amount": 64,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-23",
+   "amount": 67,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-24",
+   "amount": 185,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-26",
+   "amount": 155,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-27",
+   "amount": 157,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-28",
+   "amount": 52,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-29",
+   "amount": 148,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-30",
+   "amount": 175,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-05-31",
+   "amount": 160,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-01",
+   "amount": 147,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-02",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-03",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-04",
+   "amount": 168,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-06",
+   "amount": 73,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-07",
+   "amount": 201,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-08",
+   "amount": 83,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-09",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-11",
+   "amount": 114,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-12",
+   "amount": 185,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-13",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-14",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-15",
+   "amount": 113,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-17",
+   "amount": 199,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-18",
+   "amount": 146,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-19",
+   "amount": 67,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-20",
+   "amount": 6000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-20",
+   "amount": 157,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-22",
+   "amount": 140,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-23",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-24",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-25",
+   "amount": 41,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-26",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-27",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-28",
+   "amount": 212,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-29",
+   "amount": 141,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-06-30",
+   "amount": 38,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-01",
+   "amount": 109,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-02",
+   "amount": 182,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-03",
+   "amount": 137,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-04",
+   "amount": 182,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-05",
+   "amount": 151,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-06",
+   "amount": 63,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-07",
+   "amount": 199,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-08",
+   "amount": 164,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-09",
+   "amount": 79,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-10",
+   "amount": 56,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-11",
+   "amount": 122,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-12",
+   "amount": 137,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-13",
+   "amount": 171,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-15",
+   "amount": 11000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-15",
+   "amount": 74,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-16",
+   "amount": 114,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-17",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-18",
+   "amount": 123,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-19",
+   "amount": 95,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-21",
+   "amount": 50,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-25",
+   "amount": 49,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-26",
+   "amount": 209,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-28",
+   "amount": 139,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-07-30",
+   "amount": 38,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-04",
+   "amount": 109,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-06",
+   "amount": 91,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-08",
+   "amount": 113,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-09",
+   "amount": 158,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-10",
+   "amount": 197,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-11",
+   "amount": 148,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-12",
+   "amount": 183,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-13",
+   "amount": 169,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-14",
+   "amount": 107,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-16",
+   "amount": 90,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-17",
+   "amount": 65,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-18",
+   "amount": 7000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-19",
+   "amount": 190,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-20",
+   "amount": 143,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-22",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-23",
+   "amount": 64,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-24",
+   "amount": 188,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-25",
+   "amount": 116,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-27",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-28",
+   "amount": 139,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-29",
+   "amount": 140,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-30",
+   "amount": 171,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-08-31",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-01",
+   "amount": 105,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-02",
+   "amount": 200,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-03",
+   "amount": 123,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-05",
+   "amount": 63,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-06",
+   "amount": 206,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-07",
+   "amount": 138,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-08",
+   "amount": 204,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-10",
+   "amount": 9000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-10",
+   "amount": 75,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-11",
+   "amount": 109,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-12",
+   "amount": 190,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-14",
+   "amount": 121,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-15",
+   "amount": 201,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-16",
+   "amount": 193,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-17",
+   "amount": 176,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-18",
+   "amount": 108,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-19",
+   "amount": 93,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-20",
+   "amount": 51,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-23",
+   "amount": 51,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-24",
+   "amount": 78,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-25",
+   "amount": 196,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-26",
+   "amount": 86,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-27",
+   "amount": 188,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-09-30",
+   "amount": 78,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-01",
+   "amount": 135,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-02",
+   "amount": 99,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-03",
+   "amount": 151,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-05",
+   "amount": 212,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-07",
+   "amount": 94,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-08",
+   "amount": 72,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-10",
+   "amount": 152,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-12",
+   "amount": 73,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-13",
+   "amount": 146,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-14",
+   "amount": 45,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-15",
+   "amount": 162,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-16",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-17",
+   "amount": 187,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-18",
+   "amount": 151,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-19",
+   "amount": 94,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-20",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-21",
+   "amount": 129,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-22",
+   "amount": 120,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-23",
+   "amount": 49,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-24",
+   "amount": 137,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-25",
+   "amount": 82,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-26",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-28",
+   "amount": 39,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-29",
+   "amount": 133,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-30",
+   "amount": 90,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-10-31",
+   "amount": 89,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-01",
+   "amount": 80,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-02",
+   "amount": 51,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-03",
+   "amount": 155,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-04",
+   "amount": 87,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-05",
+   "amount": 102,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-07",
+   "amount": 178,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-08",
+   "amount": 209,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-10",
+   "amount": 196,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-11",
+   "amount": 76,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-12",
+   "amount": 66,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-14",
+   "amount": 40,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-15",
+   "amount": 116,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-16",
+   "amount": 181,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-17",
+   "amount": 128,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-19",
+   "amount": 154,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-20",
+   "amount": 108,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-21",
+   "amount": 75,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-22",
+   "amount": 190,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-25",
+   "amount": 79,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-26",
+   "amount": 85,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-27",
+   "amount": 76,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-28",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-29",
+   "amount": 97,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-11-30",
+   "amount": 122,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-01",
+   "amount": 131,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-02",
+   "amount": 199,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-05",
+   "amount": 83,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-06",
+   "amount": 62,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-07",
+   "amount": 164,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-08",
+   "amount": 180,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-09",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-10",
+   "amount": 62,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-11",
+   "amount": 165,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-12",
+   "amount": 105,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-13",
+   "amount": 98,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-14",
+   "amount": 42,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-15",
+   "amount": 67,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-18",
+   "amount": 64,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-19",
+   "amount": 164,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-20",
+   "amount": 106,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-21",
+   "amount": 181,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-22",
+   "amount": 185,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-23",
+   "amount": 42,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-25",
+   "amount": 49,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-26",
+   "amount": 137,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-27",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-28",
+   "amount": 149,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-30",
+   "amount": 54,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2025-12-31",
+   "amount": 172,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-02",
+   "amount": 68,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-03",
+   "amount": 166,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-05",
+   "amount": 44,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-06",
+   "amount": 110,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-07",
+   "amount": 146,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-08",
+   "amount": 138,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-09",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-10",
+   "amount": 118,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-11",
+   "amount": 168,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-12",
+   "amount": 74,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-13",
+   "amount": 129,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-14",
+   "amount": 123,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-17",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-19",
+   "amount": 63,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-20",
+   "amount": 132,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-21",
+   "amount": 22000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-21",
+   "amount": 180,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-23",
+   "amount": 142,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-24",
+   "amount": 65,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-25",
+   "amount": 43,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-26",
+   "amount": 72,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-27",
+   "amount": 89,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-28",
+   "amount": 77,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-29",
+   "amount": 38,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-01-30",
+   "amount": 122,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-02",
+   "amount": 122,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-03",
+   "amount": 140,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-04",
+   "amount": 162,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-05",
+   "amount": 149,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-06",
+   "amount": 107,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-07",
+   "amount": 56,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-08",
+   "amount": 193,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-09",
+   "amount": 205,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-10",
+   "amount": 75,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-11",
+   "amount": 125,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-12",
+   "amount": 53,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-14",
+   "amount": 72,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-15",
+   "amount": 162,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-16",
+   "amount": 152,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-18",
+   "amount": 144,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-19",
+   "amount": 173,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-20",
+   "amount": 49,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-23",
+   "amount": 157,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-24",
+   "amount": 118,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-26",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-27",
+   "amount": 69,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-02-28",
+   "amount": 163,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-01",
+   "amount": 183,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-02",
+   "amount": 173,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-03",
+   "amount": 142,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-04",
+   "amount": 99,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-05",
+   "amount": 78,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-06",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-07",
+   "amount": 132,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-08",
+   "amount": 71,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-09",
+   "amount": 201,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-10",
+   "amount": 172,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-11",
+   "amount": 198,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-12",
+   "amount": 128,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-13",
+   "amount": 128,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-14",
+   "amount": 41,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-15",
+   "amount": 10000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-15",
+   "amount": 179,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-16",
+   "amount": 178,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-17",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-18",
+   "amount": 176,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-19",
+   "amount": 87,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-20",
+   "amount": 158,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-21",
+   "amount": 146,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-22",
+   "amount": 212,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-23",
+   "amount": 181,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-24",
+   "amount": 112,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-26",
+   "amount": 124,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-27",
+   "amount": 156,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-29",
+   "amount": 169,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-03-30",
+   "amount": 78,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-01",
+   "amount": 198,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-03",
+   "amount": 198,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-04",
+   "amount": 174,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-05",
+   "amount": 45,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-06",
+   "amount": 156,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-07",
+   "amount": 95,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-10",
+   "amount": 207,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-11",
+   "amount": 71,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-12",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-13",
+   "amount": 125,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-14",
+   "amount": 64,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-15",
+   "amount": 171,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-16",
+   "amount": 187,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-18",
+   "amount": 65,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-19",
+   "amount": 121,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-20",
+   "amount": 15000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-20",
+   "amount": 202,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-22",
+   "amount": 58,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-23",
+   "amount": 53,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-25",
+   "amount": 187,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-26",
+   "amount": 170,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-27",
+   "amount": 108,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-28",
+   "amount": 81,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-04-30",
+   "amount": 203,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-02",
+   "amount": 185,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-03",
+   "amount": 170,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-06",
+   "amount": 188,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-07",
+   "amount": 118,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-08",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-09",
+   "amount": 192,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-10",
+   "amount": 110,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-11",
+   "amount": 71,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-12",
+   "amount": 106,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-13",
+   "amount": 183,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-14",
+   "amount": 156,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-15",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-16",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-17",
+   "amount": 186,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-18",
+   "amount": 120,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-19",
+   "amount": 125,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-21",
+   "amount": 161,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-23",
+   "amount": 151,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-24",
+   "amount": 208,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-25",
+   "amount": 133,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-26",
+   "amount": 174,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-27",
+   "amount": 182,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-29",
+   "amount": 52,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-05-30",
+   "amount": 168,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-01",
+   "amount": 8000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-01",
+   "amount": 169,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-02",
+   "amount": 104,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-03",
+   "amount": 170,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-05",
+   "amount": 71,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-06",
+   "amount": 201,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-07",
+   "amount": 145,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-09",
+   "amount": 137,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-10",
+   "amount": 67,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-12",
+   "amount": 113,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-13",
+   "amount": 92,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-15",
+   "amount": 54,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-16",
+   "amount": 108,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-17",
+   "amount": 203,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-18",
+   "amount": 181,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-19",
+   "amount": 148,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-20",
+   "amount": 161,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-23",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-24",
+   "amount": 79,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-25",
+   "amount": 76,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-26",
+   "amount": 134,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-27",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-06-30",
+   "amount": 79,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-01",
+   "amount": 59,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-02",
+   "amount": 179,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-03",
+   "amount": 94,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-04",
+   "amount": 116,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-05",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-06",
+   "amount": 107,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-08",
+   "amount": 150,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-10",
+   "amount": 16000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-10",
+   "amount": 108,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-13",
+   "amount": 53,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-14",
+   "amount": 106,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-15",
+   "amount": 206,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-16",
+   "amount": 131,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-23",
+   "amount": 162,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-24",
+   "amount": 140,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-25",
+   "amount": 153,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-26",
+   "amount": 154,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-27",
+   "amount": 114,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-07-31",
+   "amount": 183,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-02",
+   "amount": 207,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-03",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-04",
+   "amount": 161,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-07",
+   "amount": 132,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-08",
+   "amount": 164,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-09",
+   "amount": 43,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-10",
+   "amount": 65,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-11",
+   "amount": 175,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-12",
+   "amount": 149,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-13",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-15",
+   "amount": 63,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-16",
+   "amount": 59,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-17",
+   "amount": 205,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-18",
+   "amount": 160,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-20",
+   "amount": 9000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-20",
+   "amount": 101,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-21",
+   "amount": 104,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-22",
+   "amount": 77,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-23",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-24",
+   "amount": 85,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-25",
+   "amount": 118,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-26",
+   "amount": 199,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-28",
+   "amount": 116,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-29",
+   "amount": 143,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-30",
+   "amount": 193,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-08-31",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-01",
+   "amount": 210,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-02",
+   "amount": 195,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-06",
+   "amount": 171,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-07",
+   "amount": 207,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-09",
+   "amount": 178,
+   "direction": "debit",
+   "desc": "قهوة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-10",
+   "amount": 122,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-11",
+   "amount": 80,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-12",
+   "amount": 121,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-13",
+   "amount": 39,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-15",
+   "amount": 12000,
+   "direction": "credit",
+   "desc": "دفعة مشروع تصميم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-15",
+   "amount": 211,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-16",
+   "amount": 85,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-17",
+   "amount": 139,
+   "direction": "debit",
+   "desc": "وقود"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-18",
+   "amount": 63,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-19",
+   "amount": 147,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-22",
+   "amount": 70,
+   "direction": "debit",
+   "desc": "مشتريات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-24",
+   "amount": 80,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-25",
+   "amount": 72,
+   "direction": "debit",
+   "desc": "مطاعم"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-26",
+   "amount": 46,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-27",
+   "amount": 85,
+   "direction": "debit",
+   "desc": "توصيل طلبات"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-28",
+   "amount": 59,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-29",
+   "amount": 152,
+   "direction": "debit",
+   "desc": "فواتير"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-09-30",
+   "amount": 115,
+   "direction": "debit",
+   "desc": "صيدلية"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-10-01",
+   "amount": 3000,
+   "direction": "debit",
+   "desc": "إيجار"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-10-02",
+   "amount": 47,
+   "direction": "debit",
+   "desc": "بقالة"
+  },
+  {
+   "accountId": "N1",
+   "date": "2026-10-03",
+   "amount": 181,
+   "direction": "debit",
+   "desc": "مطاعم"
+  }
+ ],
+ "holdings": [],
+ "manual": [],
+ "period": {
+  "start": "2025-04-01",
+  "end": "2026-10-03"
+ }
+}
