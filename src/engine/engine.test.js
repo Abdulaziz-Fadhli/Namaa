@@ -265,5 +265,72 @@ describe('Additional robustness checks', () => {
     expect(month).toBe(2);
     expect(day).toBeLessThanOrEqual(30);
   });
+  test('lot keeps its original depositDate when hawl starts later', () => {
+  const january = dateFromHijri(1447, 1, 1);
+  const march = dateFromHijri(1447, 3, 1);
+
+  const days = range(january, march, {
+    [key(january)]: {
+      deposits: [2000],
+      nisab: 5000
+    },
+    [key(march)]: {
+      deposits: [4000],
+      nisab: 5000
+    }
+  });
+
+  const result = runEngineDetailed(days, defaultSettings);
+
+  expect(result.lots).toHaveLength(2);
+
+  expect(result.lots[0].depositDate).toEqual(january);
+  expect(result.lots[0].start).toEqual(march);
+
+  expect(result.lots[1].depositDate).toEqual(march);
+  expect(result.lots[1].start).toEqual(march);
+});
+test('nextDue includes expected zakat amount', () => {
+  const start = dateFromHijri(1446, 5, 1);
+
+  const days = range(start, start, {
+    [key(start)]: {
+      deposits: [10000],
+      nisab: 5000
+    }
+  });
+
+  const result = runEngineDetailed(days, defaultSettings);
+
+  expect(result.nextDue).not.toBeNull();
+  expect(result.nextDue.dueDate).toBeInstanceOf(Date);
+  expect(result.nextDue.zakat).toBe(250);
+});
+
+test('decimal amounts do not cause floating point withdrawal errors', () => {
+  const day1 = new Date(Date.UTC(2026, 0, 1));
+  const day2 = new Date(Date.UTC(2026, 0, 2));
+  const day3 = new Date(Date.UTC(2026, 0, 3));
+
+  const days = range(day1, day3, {
+    [key(day1)]: {
+      deposits: [0.3],
+      nisab: 1
+    },
+    [key(day2)]: {
+      withdrawals: [0.1],
+      nisab: 1
+    },
+    [key(day3)]: {
+      withdrawals: [0.2],
+      nisab: 1
+    }
+  });
+
+  const result = runEngineDetailed(days, defaultSettings);
+
+  expect(result.lots).toHaveLength(0);
+});
+
 
 });

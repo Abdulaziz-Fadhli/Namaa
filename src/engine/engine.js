@@ -65,15 +65,32 @@ function assertFiniteNonNegative(value, label) {
 
 function consume(lots, amount, order) {
   assertFiniteNonNegative(amount, 'withdrawal');
-  const available = sum(lots);
-  if (amount > available) throw new RangeError(`withdrawal ${amount} exceeds available balance ${available}`);
+
+  const roundMoney = value => Math.round((value + Number.EPSILON) * 100) / 100;
+
+  amount = roundMoney(amount);
+  const available = roundMoney(sum(lots));
+
+  if (amount > available) {
+    throw new RangeError(`withdrawal ${amount} exceeds available balance ${available}`);
+  }
+
   const list = order === 'FIFO' ? lots : [...lots].reverse();
+
   for (const l of list) {
-    const take = Math.min(l.amount, amount);
-    l.amount -= take; amount -= take;
+    const take = Math.min(roundMoney(l.amount), amount);
+
+    l.amount = roundMoney(l.amount - take);
+    amount = roundMoney(amount - take);
+
     if (amount <= 0) break;
   }
-  for (let i = lots.length - 1; i >= 0; i--) if (lots[i].amount <= 0) lots.splice(i, 1);
+
+  for (let i = lots.length - 1; i >= 0; i--) {
+    if (roundMoney(lots[i].amount) <= 0) {
+      lots.splice(i, 1);
+    }
+  }
 }
 
 export const defaultSettings = {
@@ -96,8 +113,7 @@ export function runEngineDetailed(days, settings = defaultSettings) {
 
   for (const d of days) {
     validateDay(d);
-    for (const x of (d.deposits ?? [])) lots.push({ amount: x, start: wasAbove ? d.date : null });
-    for (const y of (d.withdrawals ?? [])) consume(lots, y, settings.spendOrder);
+for (const x of (d.deposits ?? [])) lots.push({ amount: x, depositDate: d.date, start: wasAbove ? d.date : null });    for (const y of (d.withdrawals ?? [])) consume(lots, y, settings.spendOrder);
 
     const total = sum(lots), above = total >= d.nisab;
     if (!above && wasAbove) {
@@ -134,6 +150,15 @@ export function runEngineDetailed(days, settings = defaultSettings) {
   if (nextDue) {
   nextDue.dueDate = resolveHawlDueDate(nextDue.start);
   nextDue.targetHijri = hijri(nextDue.dueDate);
+
+  const dueLots = lots.filter(
+    l => l.start && l.start.getTime() === nextDue.start.getTime()
+  );
+
+  const expectedBase =
+    settings.mode === 'EASY' ? sum(lots) : sum(dueLots);
+
+  nextDue.zakat = expectedBase / 40;
 }
 
 return {
@@ -142,8 +167,9 @@ return {
   lots: cloneLots(lots),
   nextDue: nextDue && {
     start: nextDue.start,
-    targetHijri: nextDue.targetHijri,
-    dueDate: nextDue.dueDate
+  targetHijri: nextDue.targetHijri,
+  dueDate: nextDue.dueDate,
+  zakat: nextDue.zakat
   }
 };}
 
