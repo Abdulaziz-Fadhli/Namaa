@@ -24,7 +24,38 @@ export function isHawlComplete(start, today) {
   const [ny, nm] = hijri(tomorrow);
   return ny === cy && nm !== cm; // today is the last day of the target Hijri month
 }
+function resolveHawlDueDate(start) {
+  const [sy, sm, sd] = hijri(start);
+  const targetYear = sy + 1;
 
+  let candidate = null;
+
+  for (
+    let t = start.getTime();
+    t <= start.getTime() + 370 * 86400000;
+    t += 86400000
+  ) {
+    const date = new Date(t);
+    const [y, m, d] = hijri(date);
+
+    if (y === targetYear && m === sm) {
+      candidate = date;
+
+      if (d === sd) {
+        return date;
+      }
+    }
+
+    if (
+      candidate &&
+      (y > targetYear || (y === targetYear && m > sm))
+    ) {
+      break;
+    }
+  }
+
+  return candidate;
+}
 const sum = lots => lots.reduce((s, l) => s + l.amount, 0);
 const cloneLots = lots => lots.map(l => ({ ...l }));
 
@@ -100,9 +131,21 @@ export function runEngineDetailed(days, settings = defaultSettings) {
     const key = (h[0] + 1) * 10000 + h[1] * 100 + h[2];
     return !best || key < best.key ? { key, start: l.start, targetHijri: [h[0] + 1, h[1], h[2]] } : best;
   }, null) : null;
-
-  return { events, series, lots: cloneLots(lots), nextDue: nextDue && { start: nextDue.start, targetHijri: nextDue.targetHijri } };
+  if (nextDue) {
+  nextDue.dueDate = resolveHawlDueDate(nextDue.start);
+  nextDue.targetHijri = hijri(nextDue.dueDate);
 }
+
+return {
+  events,
+  series,
+  lots: cloneLots(lots),
+  nextDue: nextDue && {
+    start: nextDue.start,
+    targetHijri: nextDue.targetHijri,
+    dueDate: nextDue.dueDate
+  }
+};}
 
 export function runEngine(days, settings = defaultSettings) {
   return runEngineDetailed(days, settings).events;

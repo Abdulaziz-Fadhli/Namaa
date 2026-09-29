@@ -241,4 +241,29 @@ describe('Additional robustness checks', () => {
     const date = dateFromHijri(1447, 1, 1);
     expect(() => runEngine([{ date, deposits: [1000], withdrawals: [5000], nisab: 5000 }], defaultSettings)).toThrow(/exceeds available balance/);
   });
+
+
+  test('nextDue resolves Hijri day 30 to the last valid day of the target month', () => {
+    const start = dateFromHijri(1446, 2, 30);
+
+    const days = range(start, start, {
+      [key(start)]: {
+        deposits: [10000]
+      }
+    });
+
+    const result = runEngineDetailed(days, defaultSettings);
+
+    expect(result.nextDue).not.toBeNull();
+    expect(result.nextDue.targetHijri[0]).toBe(1447);
+    expect(result.nextDue.targetHijri[1]).toBe(2);
+    expect(result.nextDue.dueDate).toBeInstanceOf(Date);
+
+    const [year, month, day] = hijri(result.nextDue.dueDate);
+
+    expect(year).toBe(1447);
+    expect(month).toBe(2);
+    expect(day).toBeLessThanOrEqual(30);
+  });
+
 });
