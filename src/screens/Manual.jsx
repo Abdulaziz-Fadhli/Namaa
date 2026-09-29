@@ -1,7 +1,10 @@
 // الشاشة 2: أموال لا تراها البنوك.
 // الإدخال الوحيد اليدوي في الميزة. ويرفض المواشي والمحاصيل اللي ما بلغت نصابها.
 // النقد والذهب والفضة والعقار ما تنرفض: تُضم لأرصدة البنوك لتكميل النصاب (الملحق أ).
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+
+// دليل الأسهم (1600+ ورقة) يُحمَّل عند فتح هذه الشاشة فقط، حتى لا يثقل التطبيق
+const StockZakatCheck = lazy(() => import('../components/StockZakatCheck.jsx'));
 
 // أنصبة المواشي: كل نوع بنصابه، ولا يُضم نوع إلى آخر (الضأن والماعز نوع واحد)
 const LIVESTOCK = {
@@ -190,6 +193,10 @@ export default function Manual({ go, back }) {
           </button>
           <span style={NOTE}>النصاب: 5 من الإبل · 30 من البقر · 40 من الغنم. ولا يُضم نوع إلى آخر، والضأن والماعز نوع واحد. ولو تكرر النوع يُجمع عدده.</span>
         </Card>
+
+        <Suspense fallback={<div className="card small muted">جارٍ تحميل دليل الأسهم...</div>}>
+          <StockZakatCheck />
+        </Suspense>
 
         <button className="btn primary" onClick={() => go('offbank')}>حفظ</button>
       </div>

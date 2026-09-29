@@ -1,0 +1,73 @@
+code|market|type|category|name_ar|name_en|aliases|verified
+4330|TASI|REIT|REIT|الرياض ريت|Riyad REIT Fund||yes
+4331|TASI|REIT|REIT|الجزيرة ريت|Aljazira Mawten REIT Fund|الجزيرة موطن ريت;موطن ريت|yes
+4332|TASI|REIT|REIT|جدوى ريت الحرمين|Jadwa REIT Al Haramain Fund||yes
+4333|TASI|REIT|REIT|تعليم ريت|Taleem REIT Fund||yes
+4334|TASI|REIT|REIT|المعذر ريت|Al Maather REIT Fund||yes
+4335|TASI|REIT|REIT|مشاركة ريت|Musharaka REIT Fund||yes
+4336|TASI|REIT|REIT|ملكية ريت|Mulkia Gulf Real Estate REIT||yes
+4337|TASI|REIT|REIT|العزيزية ريت|Alaziziah REIT Fund||yes
+4338|TASI|REIT|REIT|الأهلي ريت 1|AlAhli REIT Fund 1||yes
+4339|TASI|REIT|REIT|دراية ريت|Derayah REIT Fund||yes
+4340|TASI|REIT|REIT|الراجحي ريت|Al Rajhi REIT Fund||yes
+4342|TASI|REIT|REIT|جدوى ريت السعودية|Jadwa REIT Saudi Fund||yes
+4344|TASI|REIT|REIT|سدكو كابيتال ريت|SEDCO Capital REIT Fund||yes
+4345|TASI|REIT|REIT|الإنماء ريت للتجزئة|Alinma Retail REIT Fund||yes
+4346|TASI|REIT|REIT|ميفك ريت|MEFIC REIT Fund||yes
+4347|TASI|REIT|REIT|بنيان ريت|Bonyan REIT Fund||yes
+4348|TASI|REIT|REIT|الخبير ريت|Alkhabeer REIT Fund||yes
+4349|TASI|REIT|REIT|الإنماء ريت الفندقي|Alinma Hospitality REIT Fund||yes
+4350|TASI|REIT|REIT|الاستثمار ريت|Alistithmar AREIC Diversified REIT Fund||yes
+9300|NOMU|REIT|REIT|الواحة ريت|Alwaha REIT Fund||yes
+4700|TASI|CEF|MULTI_ASSET|الخبير للدخل المتنوع|Al Khabeer Diversified Income Traded Fund||yes
+4703|TASI|CEF|MULTI_ASSET|سدكو كابيتال متعدد الأصول المتداول|SEDCO Capital Multi Asset Traded Fund||yes
+9400|TASI|ETF|SAUDI_EQUITY|يقين 30|Yaqeen (FALCOM) Saudi Equity ETF|فالكم 30;فالكم|yes
+9401|TASI|ETF|SAUDI_EQUITY|يقين للبتروكيماويات|Yaqeen (Falcom) Petrochemical ETF|فالكم للبتروكيماويات|yes
+9402|TASI|ETF|SAUDI_EQUITY|الأول للاستثمار الكمي المتداول|SAB Invest Saudi Quant ETF|ساب إنفست الكمي|yes
+9403|TASI|ETF|SUKUK|البلاد للصكوك السيادية|Albilad Saudi Sovereign Sukuk ETF||yes
+9404|TASI|ETF|SUKUK|الإنماء للصكوك الحكومية قصيرة الأجل|Alinma Saudi Government Sukuk ETF - Short Maturity||yes
+9405|TASI|ETF|GOLD|البلاد للذهب|Albilad Gold ETF|صندوق الذهب|yes
+9406|TASI|ETF|US_EQUITY|البلاد الأمريكي|Albilad MSCI US Equity ETF|البلاد للأسهم الأمريكية|yes
+9407|TASI|ETF|US_EQUITY|البلاد التقني الأمريكي|Albilad MSCI US Tech ETF|البلاد للتقنية الأمريكية|yes
+9408|TASI|ETF|SAUDI_EQUITY|البلاد للنمو السعودي|Albilad MSCI Saudi Growth ETF||yes
+9409|TASI|ETF|FOREIGN_EQUITY|يقين إي إس جي|Yaqeen S&P ESG MENA ETF||yes
+9410|TASI|ETF|FOREIGN_EQUITY|البلاد هونج كونج الصين|Albilad CSOP MSCI Hong Kong China Equity ETF||yes
+9411|TASI|ETF|FOREIGN_EQUITY|الأول للاستثمار هونج كونج|SAB Invest Hang Seng Hong Kong ETF||yes
+9412|TASI|ETF|SAUDI_EQUITY|البلاد للأسهم السعودية|Albilad MSCI Saudi Equity ETF||yes
+9413|TASI|ETF|SAUDI_EQUITY|الراجحي للأسهم السعودية المتداول|Al Rajhi Saudi Equity ETF|صندوق الراجحي للأسهم السعودية|yes
+SPY|US|ETF|US_EQUITY|صندوق إس آند بي 500 (SPDR)|SPDR S&P 500 ETF Trust|اس اند بي;S&P 500|yes
+VOO|US|ETF|US_EQUITY|فانقارد إس آند بي 500|Vanguard S&P 500 ETF|فانقارد|yes
+IVV|US|ETF|US_EQUITY|آي شيرز إس آند بي 500|iShares Core S&P 500 ETF||yes
+VTI|US|ETF|US_EQUITY|فانقارد للسوق الأمريكي كاملاً|Vanguard Total Stock Market ETF||yes
+QQQ|US|ETF|US_EQUITY|ناسداك 100 (إنفسكو)|Invesco QQQ Trust|ناسداك|yes
+SCHD|US|ETF|US_EQUITY|شواب للتوزيعات الأمريكية|Schwab US Dividend Equity ETF||yes
+VGT|US|ETF|US_EQUITY|فانقارد لقطاع التقنية|Vanguard Information Technology ETF||yes
+SPUS|US|ETF|US_EQUITY|إس بي فندز إس آند بي 500 المتوافق مع الشريعة|SP Funds S&P 500 Sharia Industry Exclusions ETF|الشرعي;سبس|yes
+HLAL|US|ETF|US_EQUITY|واحد فوتسي للأسهم الأمريكية الشرعية|Wahed FTSE USA Shariah ETF|واحد;حلال|yes
+UMMA|US|ETF|FOREIGN_EQUITY|واحد داو جونز الإسلامي العالمي|Wahed Dow Jones Islamic World ETF||yes
+SPSK|US|ETF|SUKUK|إس بي فندز للصكوك العالمية|SP Funds Dow Jones Global Sukuk ETF||yes
+SPRE|US|ETF|REIT|إس بي فندز للريت العالمي الشرعي|SP Funds S&P Global REIT Sharia ETF||yes
+GLD|US|ETF|GOLD|إس بي دي آر للذهب|SPDR Gold Shares||yes
+IAU|US|ETF|GOLD|آي شيرز للذهب|iShares Gold Trust||yes
+QQQM|US|ETF|US_EQUITY|ناسداك 100 (إنفسكو QQQM)|Invesco NASDAQ 100 ETF||yes
+DIA|US|ETF|US_EQUITY|داو جونز (SPDR)|SPDR Dow Jones Industrial Average ETF|داو جونز|yes
+IWM|US|ETF|US_EQUITY|راسل 2000 (آي شيرز)|iShares Russell 2000 ETF|راسل|yes
+VT|US|ETF|FOREIGN_EQUITY|فانقارد للأسهم العالمية|Vanguard Total World Stock ETF||yes
+VXUS|US|ETF|FOREIGN_EQUITY|فانقارد للأسهم خارج أمريكا|Vanguard Total International Stock ETF||yes
+VEA|US|ETF|FOREIGN_EQUITY|فانقارد للأسواق المتقدمة|Vanguard FTSE Developed Markets ETF||yes
+VWO|US|ETF|FOREIGN_EQUITY|فانقارد للأسواق الناشئة|Vanguard FTSE Emerging Markets ETF||yes
+VYM|US|ETF|US_EQUITY|فانقارد للتوزيعات العالية|Vanguard High Dividend Yield ETF||yes
+VUG|US|ETF|US_EQUITY|فانقارد للنمو|Vanguard Growth ETF||yes
+XLK|US|ETF|US_EQUITY|قطاع التقنية (SPDR)|Technology Select Sector SPDR Fund||yes
+XLF|US|ETF|US_EQUITY|قطاع المالية (SPDR)|Financial Select Sector SPDR Fund||yes
+XLE|US|ETF|US_EQUITY|قطاع الطاقة (SPDR)|Energy Select Sector SPDR Fund||yes
+SMH|US|ETF|US_EQUITY|أشباه الموصلات (فان إيك)|VanEck Semiconductor ETF||yes
+SOXX|US|ETF|US_EQUITY|أشباه الموصلات (آي شيرز)|iShares Semiconductor ETF||yes
+ARKK|US|ETF|US_EQUITY|آرك للابتكار|ARK Innovation ETF|آرك|yes
+SLV|US|ETF|SILVER|آي شيرز للفضة|iShares Silver Trust|فضة|yes
+TLT|US|ETF|BONDS|سندات الخزانة الأمريكية 20+ سنة|iShares 20+ Year Treasury Bond ETF||yes
+BND|US|ETF|BONDS|فانقارد للسندات|Vanguard Total Bond Market ETF||yes
+AGG|US|ETF|BONDS|آي شيرز للسندات الأمريكية|iShares Core US Aggregate Bond ETF||yes
+IBIT|US|ETF|CRYPTO|آي شيرز بيتكوين|iShares Bitcoin Trust ETF|بيتكوين|yes
+FBTC|US|ETF|CRYPTO|فيديليتي بيتكوين|Fidelity Wise Origin Bitcoin Fund||yes
+ETHA|US|ETF|CRYPTO|آي شيرز إيثيريوم|iShares Ethereum Trust ETF|إيثيريوم|yes
