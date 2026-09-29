@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { defaultSettings, hijri, runEngine, traditionalCalc } from './engine.js';
-
+import { defaultSettings, hijri, runEngine, traditionalCalc, calculateAssetValue } from './engine.js';
 const DAY = 86400000;
 
 function dateFromHijri(y, m, d) {
@@ -332,5 +331,56 @@ test('decimal amounts do not cause floating point withdrawal errors', () => {
   expect(result.lots).toHaveLength(0);
 });
 
+describe('Asset value calculation', () => {
+  test('calculates zakatable assets correctly', () => {
+    const data = {
+      gold: [
+        {
+          grams: 10,
+          karat: 24,
+          pricePerGram: 300,
+          purpose: 'INVESTMENT'
+        },
+        {
+          grams: 5,
+          karat: 24,
+          pricePerGram: 300,
+          purpose: 'PERSONAL_USE'
+        }
+      ],
+
+      silver: [
+        {
+          grams: 100,
+          pricePerGram: 4
+        }
+      ],
+
+      stocks: [
+        {
+          type: 'TRADING',
+          marketValue: 2000
+        }
+      ],
+
+      investmentProducts: [
+        {
+          zakatableValue: 1000
+        }
+      ],
+
+      manualAssets: [
+        {
+          value: 500,
+          zakatable: true
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(6900);
+  });
+});
 
 });

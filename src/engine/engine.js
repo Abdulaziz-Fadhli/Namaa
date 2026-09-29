@@ -93,6 +93,68 @@ function consume(lots, amount, order) {
   }
 }
 
+export function calculateAssetValue(d) {  let total = 0;
+
+  // Gold
+  for (const gold of (d.gold ?? [])) {
+    assertFiniteNonNegative(gold.grams, 'gold grams');
+    assertFiniteNonNegative(gold.pricePerGram, 'gold price per gram');
+
+    // Used/personal jewelry is excluded.
+    // Other gold is included in the zakat base.
+    if (gold.purpose !== 'PERSONAL_USE') {
+      const purity = gold.karat == null ? 1 : gold.karat / 24;
+      assertFiniteNonNegative(purity, 'gold purity');
+
+      total += gold.grams * purity * gold.pricePerGram;
+    }
+  }
+
+  // Silver
+  for (const silver of (d.silver ?? [])) {
+    assertFiniteNonNegative(silver.grams, 'silver grams');
+    assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
+
+    total += silver.grams * silver.pricePerGram;
+  }
+
+  // Stocks
+  for (const stock of (d.stocks ?? [])) {
+    assertFiniteNonNegative(stock.marketValue, 'stock market value');
+
+    // Trading shares are treated as trade goods.
+    if (stock.type === 'TRADING') {
+      total += stock.marketValue;
+    }
+
+    // For long-term investments, only a supplied zakatable value
+    // is included. We do not invent that value automatically.
+    if (stock.type === 'LONG_TERM' && stock.zakatableValue != null) {
+      assertFiniteNonNegative(stock.zakatableValue, 'stock zakatable value');
+      total += stock.zakatableValue;
+    }
+  }
+
+  // Investment products
+  for (const product of (d.investmentProducts ?? [])) {
+    if (product.zakatableValue != null) {
+      assertFiniteNonNegative(product.zakatableValue, 'product zakatable value');
+      total += product.zakatableValue;
+    }
+  }
+
+  // Manually entered zakatable assets
+  for (const asset of (d.manualAssets ?? [])) {
+    assertFiniteNonNegative(asset.value, 'manual asset value');
+
+    if (asset.zakatable !== false) {
+      total += asset.value;
+    }
+  }
+
+  return total;
+}
+
 export const defaultSettings = {
   nisabBasis: 'MIN', goldGrams: 85, silverGrams: 595,
   mode: 'PRECISE', spendOrder: 'LIFO', jewelry: true,
