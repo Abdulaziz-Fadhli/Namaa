@@ -115,13 +115,14 @@ function useDragScroll(ref, scale) {
 }
 
 // chrome={false} للشاشات اللي ما فيها شريط التطبيق، مثل شاشة قفل الجوال (الإشعار)
-export default function PhoneFrame({ children, chrome = true }) {
+// figma: شاشات فيجما لها شريط حالة خاص فيها، فالإطار يأخذ زواياها وظلها فقط
+export default function PhoneFrame({ children, chrome = true, figma = false }) {
   const scale = useFitScale();
   const phoneRef = useRef(null);
   useDragScroll(phoneRef, scale);
   return (
     <div className="stage">
-      <div className="phone" ref={phoneRef} style={{ transform: `scale(${scale})` }}>
+      <div className={figma ? 'phone figma' : 'phone'} ref={phoneRef} style={{ transform: `scale(${scale})` }}>
         {children}
         {chrome && <div className="footer-note">نموذج أولي، بيانات محاكاة</div>}
         {chrome && <TabBar />}
