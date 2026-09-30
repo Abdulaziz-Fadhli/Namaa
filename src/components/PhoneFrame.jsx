@@ -90,7 +90,7 @@ export default function PhoneFrame({ children }) {
   return (
     <div className="stage">
       <div className="phone figma" ref={phoneRef} style={{ transform: `scale(${scale})` }}>
-        {children}
+        <div className="nm-host">{children}</div>
       </div>
     </div>
   );
