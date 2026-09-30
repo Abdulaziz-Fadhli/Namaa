@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { defaultSettings, hijri, runEngine, traditionalCalc, evaluatePropertyZakat , validateShariaSettings , evaluateLivestockZakat  , calculateAssetValue, evaluateCropZakat } from './engine.js';
+import { defaultSettings, hijri,calculateZakatableSnapshot , runEngine, traditionalCalc, evaluatePropertyZakat , validateShariaSettings , evaluateLivestockZakat  , calculateAssetValue, evaluateCropZakat } from './engine.js';
 const DAY = 86400000;
 
 function dateFromHijri(y, m, d) {
@@ -676,5 +676,84 @@ describe('Gold zakat calculation', () => {
   });
 });
 
+test('trading property is included in total asset value', () => {
+  const data = {
+    properties: [
+      {
+        intent: 'TRADING',
+        marketValue: 600000
+      }
+    ]
+  };
 
+  const result = calculateAssetValue(data);
 
+  expect(result).toBe(600000);
+});
+
+test('personal-use property is excluded from total asset value', () => {
+  const data = {
+    properties: [
+      {
+        intent: 'USE',
+        marketValue: 600000
+      }
+    ]
+  };
+
+  const result = calculateAssetValue(data);
+
+  expect(result).toBe(0);
+});
+
+describe('Zakatable snapshot calculation', () => {
+  test('combines cash and all supported monetary assets correctly', () => {
+    const data = {
+      cashBalance: 20000,
+
+      gold: [
+        {
+          grams: 10,
+          karat: 24,
+          pricePerGram: 300,
+          purpose: 'INVESTMENT'
+        }
+      ],
+
+      silver: [
+        {
+          grams: 100,
+          purity: 925,
+          pricePerGram: 4
+        }
+      ],
+
+      stocks: [
+        {
+          type: 'TRADING',
+          marketValue: 5000
+        }
+      ],
+
+      investmentProducts: [
+        {
+          type: 'LONG_TERM',
+          zakatableValue: 2000
+        }
+      ],
+
+      properties: [
+        {
+          intent: 'TRADING',
+          marketValue: 100000
+        }
+      ]
+    };
+
+    const result = calculateZakatableSnapshot(data);
+
+    expect(result.cashBalance).toBe(20000);
+    expect(result.otherAssets).toBeCloseTo(110370, 2);
+    expect(result.total).toBeCloseTo(130370, 2);
+  });
+});

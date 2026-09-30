@@ -159,6 +159,14 @@ for (const product of (d.investmentProducts ?? [])) {
   // If a long-term product has no known zakatable value,
   // Namaa does not invent a default value or automatically treat it as exempt.
 }
+// Properties
+for (const property of (d.properties ?? [])) {
+  const result = evaluatePropertyZakat(property);
+
+  // Only property held for trading contributes
+  // its market value directly to the zakatable asset base.
+  total += result.zakatablePropertyValue;
+}
   // Manually entered zakatable assets
   for (const asset of (d.manualAssets ?? [])) {
     assertFiniteNonNegative(asset.value, 'manual asset value');
@@ -169,6 +177,20 @@ for (const product of (d.investmentProducts ?? [])) {
   }
 
   return total;
+}
+
+export function calculateZakatableSnapshot(d) {
+  const cashBalance = d.cashBalance ?? 0;
+
+  assertFiniteNonNegative(cashBalance, 'cash balance');
+
+  const otherAssets = calculateAssetValue(d);
+
+  return {
+    cashBalance,
+    otherAssets,
+    total: cashBalance + otherAssets
+  };
 }
 
 export const defaultSettings = {
