@@ -219,12 +219,12 @@ describe('Additional robustness checks', () => {
       try {
         const start = dateFromHijri(1445, m, 30);
         try { dateFromHijri(1446, m, 30); } catch { candidate = { start, m }; break; }
-      } catch {}
+      } catch { /* The requested Hijri day does not exist in this month. */ }
     }
     expect(candidate).not.toBeNull();
     let last = null;
     for (let d = 29; d >= 1; d--) {
-      try { last = dateFromHijri(1446, candidate.m, d); break; } catch {}
+      try { last = dateFromHijri(1446, candidate.m, d); break; } catch { /* The requested Hijri day does not exist in this month. */ }
     }
     expect(isHawlComplete(candidate.start, last)).toBe(true);
   });
