@@ -40,12 +40,12 @@ function resolveHawlDueDate(start) {
     t += 86400000
   ) {
     const date = new Date(t);
-    const [y, m, data] = hijri(date);
+    const [y, m, day] = hijri(date);
 
     if (y === targetYear && m === sm) {
       candidate = date;
 
-      if (data === sd) {
+      if (day === sd) {
         return date;
       }
     }
@@ -63,6 +63,24 @@ const cloneLots = (lots) => lots.map((l) => ({ ...l }));
 function assertFiniteNonNegative(value, label) {
   if (!Number.isFinite(value) || value < 0)
     throw new RangeError(`${label} must be a finite non-negative number`);
+}
+
+export class IncompleteAssetDataError extends Error {
+  constructor(label) {
+    super(
+      `${label}: القيمة الزكوية غير متاحة؛ لا يمكن إكمال الحساب أو اعتبار الأصل معفى`,
+    );
+    this.name = 'IncompleteAssetDataError';
+  }
+}
+
+function assertInvestmentType(asset, label) {
+  if (!['TRADING', 'LONG_TERM'].includes(asset.type)) {
+    throw new TypeError(`unsupported ${label} type`);
+  }
+  if (asset.type === 'LONG_TERM' && asset.zakatableValue == null) {
+    throw new IncompleteAssetDataError(label);
+  }
 }
 
 function consume(lots, amount, order) {
@@ -103,6 +121,7 @@ export function calculateAssetValue(data) {
 
   // Gold
   for (const gold of data.gold ?? []) {
+    if (gold.zakatExempt) continue;
     assertFiniteNonNegative(gold.grams, 'gold grams');
     assertFiniteNonNegative(gold.pricePerGram, 'gold price per gram');
 
@@ -111,6 +130,7 @@ export function calculateAssetValue(data) {
     if (gold.purpose !== 'PERSONAL_USE') {
       const purity = gold.karat == null ? 1 : gold.karat / 24;
       assertFiniteNonNegative(purity, 'gold purity');
+      if (purity > 1) throw new RangeError('gold karat must not exceed 24');
 
       total += gold.grams * purity * gold.pricePerGram;
     }
@@ -118,21 +138,25 @@ export function calculateAssetValue(data) {
 
   // Silver
   for (const silver of data.silver ?? []) {
+    if (silver.zakatExempt) continue;
     assertFiniteNonNegative(silver.grams, 'silver grams');
     assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
 
     // Purity is expressed as 999, 925, 800, etc.
     const purity = silver.purity == null ? 1 : silver.purity / 1000;
     assertFiniteNonNegative(purity, 'silver purity');
+    if (purity > 1) throw new RangeError('silver purity must not exceed 1000');
 
     total += silver.grams * purity * silver.pricePerGram;
   }
   // Stocks
   for (const stock of data.stocks ?? []) {
-    assertFiniteNonNegative(stock.marketValue, 'stock market value');
+    if (stock.zakatExempt) continue;
+    assertInvestmentType(stock, 'stock');
 
     // Trading shares are treated as trade goods.
     if (stock.type === 'TRADING') {
+      assertFiniteNonNegative(stock.marketValue, 'stock market value');
       total += stock.marketValue;
     }
 
@@ -146,6 +170,8 @@ export function calculateAssetValue(data) {
 
   // Investment products
   for (const product of data.investmentProducts ?? []) {
+    if (product.zakatExempt) continue;
+    assertInvestmentType(product, 'investment product');
     // Products held for trading are treated like trade goods:
     // use the full current market value.
     if (product.type === 'TRADING') {
@@ -163,12 +189,10 @@ export function calculateAssetValue(data) {
       );
       total += product.zakatableValue;
     }
-
-    // If a long-term product has no known zakatable value,
-    // Namaa does not invent a default value or automatically treat it as exempt.
   }
   // Properties
   for (const property of data.properties ?? []) {
+    if (property.zakatExempt) continue;
     const result = evaluatePropertyZakat(property);
 
     // Only property held for trading contributes
@@ -177,6 +201,7 @@ export function calculateAssetValue(data) {
   }
   // Manually entered zakatable assets
   for (const asset of data.manualAssets ?? []) {
+    if (asset.zakatExempt) continue;
     assertFiniteNonNegative(asset.value, 'manual asset value');
 
     if (asset.zakatable !== false) {
@@ -248,6 +273,14 @@ export function validateShariaSettings(settings) {
 
   if (!allowedNisabBasis.includes(settings.nisabBasis)) {
     throw new TypeError('unsupported nisab basis');
+  }
+
+  // This implementation supports the approved weights only.
+  // Equality also rejects missing, negative, non-numeric and non-finite values.
+  if (settings.goldGrams !== 85 || settings.silverGrams !== 595) {
+    throw new RangeError(
+      'approved nisab weights must be 85g gold and 595g silver',
+    );
   }
 
   if (!allowedSpendOrders.includes(settings.spendOrder)) {
@@ -393,16 +426,110 @@ const explanationDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
 });
 const moneyText = (amount) => `${explanationMoney.format(amount)} ريال`;
 
-// Future-facing detailed result for UI integration. Monday's runEngine remains backward compatible.
+// Each day supplies a complete inventory of dated assets. Values are current
+// valuations, never synthetic cash deposits. Cash withdrawals consume cash only.
+const assetCategories = {
+  gold: 'gold',
+  silver: 'silver',
+  stocks: 'stocks',
+  investmentProducts: 'investmentProducts',
+  properties: 'properties',
+  cash: 'manualAssets',
+};
+
+function reconcileAssets(inventory, assetLots, date, wasAbove) {
+  if (!Array.isArray(inventory))
+    throw new TypeError('assets must be a complete daily array');
+  const seen = new Set();
+  for (const asset of inventory) {
+    if (!asset || typeof asset.id !== 'string' || !asset.id) {
+      throw new TypeError('each asset requires a stable non-empty id');
+    }
+    if (seen.has(asset.id))
+      throw new TypeError(`duplicate asset id: ${asset.id}`);
+    seen.add(asset.id);
+    if (!Object.hasOwn(assetCategories, asset.kind))
+      throw new TypeError('unsupported asset kind');
+    if (
+      !(asset.acquired instanceof Date) ||
+      Number.isNaN(asset.acquired.getTime())
+    ) {
+      throw new TypeError('each asset requires a valid acquisition date');
+    }
+    const previous = assetLots.get(asset.id);
+    if (
+      previous &&
+      (previous.kind !== asset.kind ||
+        previous.depositDate.getTime() !== asset.acquired.getTime())
+    ) {
+      throw new TypeError(
+        'asset identity and acquisition date cannot change; use a new lot id',
+      );
+    }
+    if (asset.acquired > date) {
+      assetLots.delete(asset.id);
+      continue;
+    }
+    const exempt =
+      asset.zakatExempt ||
+      (asset.kind === 'gold' && asset.purpose === 'PERSONAL_USE') ||
+      (asset.kind === 'properties' &&
+        ['USE', 'RENTAL'].includes(asset.intent)) ||
+      (asset.kind === 'cash' && asset.zakatable === false);
+    const value = calculateAssetValue({
+      [assetCategories[asset.kind]]: [asset],
+    });
+    if (exempt) {
+      assetLots.delete(asset.id);
+      continue;
+    }
+    const quantity = ['gold', 'silver'].includes(asset.kind)
+      ? asset.grams
+      : asset.quantity;
+    if (quantity != null) assertFiniteNonNegative(quantity, 'asset quantity');
+    if (previous) {
+      if (
+        (quantity != null &&
+          previous.quantity != null &&
+          quantity > previous.quantity) ||
+        (asset.kind === 'cash' && value > previous.amount)
+      ) {
+        throw new TypeError(
+          'new purchases or cash additions require a new lot id and acquisition date',
+        );
+      }
+      previous.amount = value;
+      previous.quantity = quantity;
+    } else {
+      assetLots.set(asset.id, {
+        id: asset.id,
+        kind: asset.kind,
+        amount: value,
+        quantity,
+        depositDate: asset.acquired,
+        observedDate: date,
+        start: wasAbove ? date : null,
+      });
+    }
+  }
+  for (const id of assetLots.keys()) if (!seen.has(id)) assetLots.delete(id);
+}
+
 export function runEngineDetailed(days, settings = defaultSettings) {
   validateShariaSettings(settings);
   const lots = [],
     events = [],
     series = [];
+  const assetLots = new Map();
+  let assetMode = false;
+  let previousDate = null;
   let wasAbove = false;
 
   for (const day of days) {
     validateDay(day);
+    if (previousDate && day.date <= previousDate)
+      throw new TypeError('days must be in strictly increasing date order');
+    previousDate = day.date;
     for (const deposit of day.deposits ?? [])
       lots.push({
         amount: deposit,
@@ -412,36 +539,41 @@ export function runEngineDetailed(days, settings = defaultSettings) {
     for (const withdrawal of day.withdrawals ?? [])
       consume(lots, withdrawal, settings.spendOrder);
 
-    const total = sum(lots),
+    if (Object.hasOwn(day, 'assets')) assetMode = true;
+    if (assetMode) reconcileAssets(day.assets, assetLots, day.date, wasAbove);
+    const currentAssets = [...assetLots.values()];
+    const trackedLots = [...lots, ...currentAssets];
+    const cashBalance = sum(lots),
+      otherAssets = sum(currentAssets);
+    const total = cashBalance + otherAssets,
       above = total >= day.nisab;
     if (!above && wasAbove) {
-      lots.forEach((lot) => (lot.start = null));
+      trackedLots.forEach((lot) => (lot.start = null));
       events.push({
         type: 'BREAK',
         date: day.date,
-        explanation: `في ${explanationDate.format(day.date)}، انخفض الرصيد إلى ${moneyText(total)}، دون النصاب البالغ ${moneyText(day.nisab)}، فانقطع الحول. يبدأ حول جديد عند بلوغ النصاب مجددًا.`,
+        explanation: `في ${explanationDate.format(day.date)}، أصبح الوعاء البالغ ${moneyText(total)} دون النصاب البالغ ${moneyText(day.nisab)}، فانقطع الحول. يبدأ حول جديد عند بلوغ النصاب مجددًا.`,
       });
     }
     if (above && !wasAbove) {
-      lots.forEach((lot) => (lot.start ??= day.date));
+      trackedLots.forEach((lot) => (lot.start ??= day.date));
       events.push({
         type: 'START',
         date: day.date,
-        explanation: `في ${explanationDate.format(day.date)}، بلغ الرصيد ${moneyText(total)}، وبلغ النصاب البالغ ${moneyText(day.nisab)}، فبدأ تتبع الحول الهجري.`,
+        explanation: `في ${explanationDate.format(day.date)}، بلغ الوعاء ${moneyText(total)}، وبلغ النصاب البالغ ${moneyText(day.nisab)}، فبدأ تتبع الحول الهجري.`,
       });
     }
     wasAbove = above;
 
     if (above) {
-      const due = lots.filter(
+      const due = trackedLots.filter(
         (lot) => lot.start && isHawlComplete(lot.start, day.date),
       );
       if (due.length) {
         const annualAdvance = settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
-
-        const base = annualAdvance ? total : sum(due);
-
-        events.push({
+        const included = annualAdvance ? trackedLots : due;
+        const base = sum(included);
+        const event = {
           type: 'DUE',
           date: day.date,
           base,
@@ -449,57 +581,53 @@ export function runEngineDetailed(days, settings = defaultSettings) {
           explanation: annualAdvance
             ? `في ${explanationDate.format(day.date)}، اكتمل الحول الهجري للمبلغ المستحق، وأُدرج المال الأحدث تعجيلًا للزكاة. الوعاء ${moneyText(base)}، والزكاة ${moneyText(base / 40)} بنسبة ٢٫٥٪.`
             : `في ${explanationDate.format(day.date)}، اكتمل الحول الهجري للمبلغ المستحق البالغ ${moneyText(base)}، فوجبت زكاة قدرها ${moneyText(base / 40)} بنسبة ٢٫٥٪.`,
-        });
-
-        (annualAdvance ? lots : due).forEach((lot) => (lot.start = day.date));
+        };
+        if (assetMode) {
+          event.assets = included
+            .filter((lot) => lot.id)
+            .map((lot) => ({ id: lot.id, kind: lot.kind, value: lot.amount }));
+          event.otherAssetsBase = event.assets.reduce(
+            (value, asset) => value + asset.value,
+            0,
+          );
+          event.cashBase = base - event.otherAssetsBase;
+        }
+        events.push(event);
+        included.forEach((lot) => (lot.start = day.date));
       }
     }
-    series.push({ date: day.date, total, nisab: day.nisab, above });
+    const row = { date: day.date, total, nisab: day.nisab, above };
+    if (assetMode) Object.assign(row, { cashBalance, otherAssets });
+    series.push(row);
   }
 
-  const futureLots = lots
+  const trackedLots = [...lots, ...assetLots.values()];
+  const futureLots = trackedLots
     .filter((lot) => lot.start)
     .map((lot) => ({
       ...lot,
-      // Hijri anniversary used to select the earliest due lot.
-      startHijri: hijri(lot.start),
+      dueDate: resolveHawlDueDate(lot.start),
     }));
-  const nextDue = futureLots.length
-    ? futureLots.reduce((best, lot) => {
-        const h = lot.startHijri;
-        const key = (h[0] + 1) * 10000 + h[1] * 100 + h[2];
-        return !best || key < best.key
-          ? { key, start: lot.start, targetHijri: [h[0] + 1, h[1], h[2]] }
-          : best;
-      }, null)
-    : null;
-  if (nextDue) {
-    nextDue.dueDate = resolveHawlDueDate(nextDue.start);
-    nextDue.targetHijri = hijri(nextDue.dueDate);
-
-    const dueLots = lots.filter(
-      (lot) => lot.start && lot.start.getTime() === nextDue.start.getTime(),
-    );
-
-    const expectedBase =
-      settings.acquiredMoneyMode === 'ANNUAL_ADVANCE'
-        ? sum(lots)
-        : sum(dueLots);
-
-    nextDue.zakat = expectedBase / 40;
-  }
-
-  return {
-    events,
-    series,
-    lots: cloneLots(lots),
-    nextDue: nextDue && {
-      start: nextDue.start,
-      targetHijri: nextDue.targetHijri,
-      dueDate: nextDue.dueDate,
-      zakat: nextDue.zakat,
-    },
+  const earliest = futureLots.reduce(
+    (best, lot) => (!best || lot.dueDate < best.dueDate ? lot : best),
+    null,
+  );
+  const nextDue = earliest && {
+    start: earliest.start,
+    targetHijri: hijri(earliest.dueDate),
+    dueDate: earliest.dueDate,
+    zakat:
+      (settings.acquiredMoneyMode === 'ANNUAL_ADVANCE'
+        ? sum(trackedLots)
+        : sum(
+            futureLots.filter(
+              (lot) => lot.dueDate.getTime() === earliest.dueDate.getTime(),
+            ),
+          )) / 40,
   };
+  const result = { events, series, lots: cloneLots(lots), nextDue };
+  if (assetMode) result.assetLots = cloneLots([...assetLots.values()]);
+  return result;
 }
 
 export function runEngine(days, settings = defaultSettings) {
