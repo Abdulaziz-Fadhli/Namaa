@@ -1,7 +1,10 @@
 // نقطة البداية: تحدد الشاشة المعروضة، والتنقل بينها بمتغير حالة واحد (بدون مكتبة توجيه).
 // التطبيق يتذكر الشاشات اللي مريت فيها، حتى يرجعك زر الرجوع للمكان اللي جيت منه.
+// والانتقال بين الشاشات متحرك مثل تطبيقات الجوال (View Transitions في المتصفح):
+// الدخول لشاشة أعمق ينزلقها من اليسار (عربي)، والرجوع يعكسها، والتبديل بين تبويبات الرئيسية يتلاشى.
 // الشاشات مبنية من ملف فيجما (src/figma) وتنقلها مطابق لروابط النموذج في فيجما.
 import { Suspense, lazy, useState } from 'react';
+import { flushSync } from 'react-dom';
 import PhoneFrame from './components/PhoneFrame.jsx';
 import { StoreProvider } from './figma/store.jsx';
 import * as Onb from './figma/screens/Onboarding.jsx';
@@ -35,12 +38,27 @@ const FIGMA = {
   success: { name: 'نجاح الإخراج والإيصال', Component: Zk.Success },
 };
 
+// تبويبات الشريط السفلي في الرئيسية: التنقل بينها تلاشٍ، مو انزلاق
+const TABS = new Set(['home', 'details', 'settings']);
+
+const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+// kind: push (دخول لشاشة أعمق) · pop (رجوع) · fade (تبويب أو قفزة من القائمة)
+// المتصفحات اللي ما تدعم الانتقالات تتنقل فورًا مثل قبل
+function animate(kind, update) {
+  if (!document.startViewTransition || reducedMotion()) { update(); return; }
+  const root = document.documentElement;
+  root.dataset.nav = kind;
+  const t = document.startViewTransition(() => flushSync(update));
+  t.finished.finally(() => { if (root.dataset.nav === kind) delete root.dataset.nav; });
+}
+
 export default function App() {
   const [history, setHistory] = useState(['start']);
   const screen = history.at(-1);
-  const go = next => setHistory(h => [...h, next]);
-  const back = () => setHistory(h => (h.length > 1 ? h.slice(0, -1) : h));
-  const reset = () => setHistory(['home']);
+  const go = next => animate(TABS.has(screen) && TABS.has(next) ? 'fade' : 'push', () => setHistory(h => [...h, next]));
+  const back = () => animate('pop', () => setHistory(h => (h.length > 1 ? h.slice(0, -1) : h)));
+  const reset = () => animate('fade', () => setHistory(['home']));
 
   const current = FIGMA[screen] ?? FIGMA.start;
   const Screen = current.Component;
@@ -50,7 +68,7 @@ export default function App() {
       {/* أداة تطوير مؤقتة للتنقل بين الشاشات، نخفيها قبل العرض */}
       <select
         value={screen}
-        onChange={e => setHistory(e.target.value === 'start' ? ['start'] : ['home', e.target.value])}
+        onChange={e => { const v = e.target.value; animate('fade', () => setHistory(v === 'start' ? ['start'] : ['home', v])); }}
         aria-label="الانتقال إلى شاشة"
         style={{ position: 'fixed', top: 12, right: 12, zIndex: 10, height: 36, borderRadius: 8 }}
       >

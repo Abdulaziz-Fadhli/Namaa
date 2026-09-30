@@ -59,3 +59,39 @@ input, select { font-family: inherit; }
 }
 .screen::-webkit-scrollbar { display: none; } /* كروم وإيدج وسفاري */
 .screen input, .screen select, .screen textarea { user-select: text; }
+
+/* ---------- الانتقال بين الشاشات ---------- */
+.nm-host { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* الاسم يتفعّل أثناء الانتقال فقط، حتى ما يتغير رسم الشاشات وهي ثابتة */
+html[data-nav] .nm-host { view-transition-name: nm-screen; }
+/* الشاشة داخل الإطار هي اللي تتحرك، والباقي ثابت */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+
+/* الحركة تبقى داخل حدود الجوال وزواياه */
+::view-transition-group(nm-screen) { overflow: clip; border-radius: 34px; }
+::view-transition-group(nm-screen),
+::view-transition-old(nm-screen),
+::view-transition-new(nm-screen) {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); /* بداية سريعة ونهاية ناعمة مثل iOS */
+}
+::view-transition-old(nm-screen), ::view-transition-new(nm-screen) { mix-blend-mode: normal; height: 100%; }
+
+/* دخول لشاشة أعمق: الجديدة تنزلق من اليسار فوق القديمة، والقديمة تتراجع قليلًا وتغمق */
+html[data-nav="push"]::view-transition-new(nm-screen) { animation-name: nm-push-in; box-shadow: 0 0 28px rgba(0, 16, 28, 0.28); }
+html[data-nav="push"]::view-transition-old(nm-screen) { animation-name: nm-push-out; }
+/* رجوع: الحالية تنسحب لليسار، واللي قبلها تتقدم من تحتها */
+html[data-nav="pop"]::view-transition-old(nm-screen) { animation-name: nm-pop-out; z-index: 1; box-shadow: 0 0 28px rgba(0, 16, 28, 0.28); }
+html[data-nav="pop"]::view-transition-new(nm-screen) { animation-name: nm-pop-in; }
+/* تبويب أو قفزة: تلاشٍ سريع */
+html[data-nav="fade"]::view-transition-old(nm-screen),
+html[data-nav="fade"]::view-transition-new(nm-screen) { animation-duration: 220ms; }
+
+@keyframes nm-push-in { from { transform: translateX(-100%); } }
+@keyframes nm-push-out { to { transform: translateX(28%); filter: brightness(0.82); } }
+@keyframes nm-pop-out { to { transform: translateX(-100%); } }
+@keyframes nm-pop-in { from { transform: translateX(28%); filter: brightness(0.82); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
