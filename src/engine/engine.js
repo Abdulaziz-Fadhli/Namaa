@@ -1,11 +1,15 @@
 const fmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-  year: 'numeric', month: 'numeric', day: 'numeric', timeZone: 'UTC'
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  timeZone: 'UTC',
 });
 
 export function hijri(date) {
-  if (!(date instanceof Date) || Number.isNaN(date.getTime())) throw new TypeError('date must be a valid Date');
+  if (!(date instanceof Date) || Number.isNaN(date.getTime()))
+    throw new TypeError('date must be a valid Date');
   const p = fmt.formatToParts(date);
-  const g = t => +p.find(x => x.type === t).value;
+  const g = (t) => +p.find((x) => x.type === t).value;
   return [g('year'), g('month'), g('day')];
 }
 
@@ -36,43 +40,44 @@ function resolveHawlDueDate(start) {
     t += 86400000
   ) {
     const date = new Date(t);
-    const [y, m, d] = hijri(date);
+    const [y, m, data] = hijri(date);
 
     if (y === targetYear && m === sm) {
       candidate = date;
 
-      if (d === sd) {
+      if (data === sd) {
         return date;
       }
     }
 
-    if (
-      candidate &&
-      (y > targetYear || (y === targetYear && m > sm))
-    ) {
+    if (candidate && (y > targetYear || (y === targetYear && m > sm))) {
       break;
     }
   }
 
   return candidate;
 }
-const sum = lots => lots.reduce((s, l) => s + l.amount, 0);
-const cloneLots = lots => lots.map(l => ({ ...l }));
+const sum = (lots) => lots.reduce((s, l) => s + l.amount, 0);
+const cloneLots = (lots) => lots.map((l) => ({ ...l }));
 
 function assertFiniteNonNegative(value, label) {
-  if (!Number.isFinite(value) || value < 0) throw new RangeError(`${label} must be a finite non-negative number`);
+  if (!Number.isFinite(value) || value < 0)
+    throw new RangeError(`${label} must be a finite non-negative number`);
 }
 
 function consume(lots, amount, order) {
   assertFiniteNonNegative(amount, 'withdrawal');
 
-  const roundMoney = value => Math.round((value + Number.EPSILON) * 100) / 100;
+  const roundMoney = (value) =>
+    Math.round((value + Number.EPSILON) * 100) / 100;
 
   amount = roundMoney(amount);
   const available = roundMoney(sum(lots));
 
   if (amount > available) {
-    throw new RangeError(`withdrawal ${amount} exceeds available balance ${available}`);
+    throw new RangeError(
+      `withdrawal ${amount} exceeds available balance ${available}`,
+    );
   }
 
   const list = order === 'FIFO' ? lots : [...lots].reverse();
@@ -93,10 +98,11 @@ function consume(lots, amount, order) {
   }
 }
 
-export function calculateAssetValue(d) {  let total = 0;
+export function calculateAssetValue(data) {
+  let total = 0;
 
   // Gold
-  for (const gold of (d.gold ?? [])) {
+  for (const gold of data.gold ?? []) {
     assertFiniteNonNegative(gold.grams, 'gold grams');
     assertFiniteNonNegative(gold.pricePerGram, 'gold price per gram');
 
@@ -111,19 +117,18 @@ export function calculateAssetValue(d) {  let total = 0;
   }
 
   // Silver
-  // Silver
-for (const silver of (d.silver ?? [])) {
-  assertFiniteNonNegative(silver.grams, 'silver grams');
-  assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
+  for (const silver of data.silver ?? []) {
+    assertFiniteNonNegative(silver.grams, 'silver grams');
+    assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
 
-  // Purity is expressed as 999, 925, 800, etc.
-  const purity = silver.purity == null ? 1 : silver.purity / 1000;
-  assertFiniteNonNegative(purity, 'silver purity');
+    // Purity is expressed as 999, 925, 800, etc.
+    const purity = silver.purity == null ? 1 : silver.purity / 1000;
+    assertFiniteNonNegative(purity, 'silver purity');
 
-  total += silver.grams * purity * silver.pricePerGram;
-}
+    total += silver.grams * purity * silver.pricePerGram;
+  }
   // Stocks
-  for (const stock of (d.stocks ?? [])) {
+  for (const stock of data.stocks ?? []) {
     assertFiniteNonNegative(stock.marketValue, 'stock market value');
 
     // Trading shares are treated as trade goods.
@@ -139,36 +144,39 @@ for (const silver of (d.silver ?? [])) {
     }
   }
 
-// Investment products
-for (const product of (d.investmentProducts ?? [])) {
-  // Products held for trading are treated like trade goods:
-  // use the full current market value.
-  if (product.type === 'TRADING') {
-    assertFiniteNonNegative(product.marketValue, 'product market value');
-    total += product.marketValue;
-    continue;
+  // Investment products
+  for (const product of data.investmentProducts ?? []) {
+    // Products held for trading are treated like trade goods:
+    // use the full current market value.
+    if (product.type === 'TRADING') {
+      assertFiniteNonNegative(product.marketValue, 'product market value');
+      total += product.marketValue;
+      continue;
+    }
+
+    // Long-term investment products use the zakatable value
+    // disclosed or calculated from the fund/company information.
+    if (product.type === 'LONG_TERM' && product.zakatableValue != null) {
+      assertFiniteNonNegative(
+        product.zakatableValue,
+        'product zakatable value',
+      );
+      total += product.zakatableValue;
+    }
+
+    // If a long-term product has no known zakatable value,
+    // Namaa does not invent a default value or automatically treat it as exempt.
   }
+  // Properties
+  for (const property of data.properties ?? []) {
+    const result = evaluatePropertyZakat(property);
 
-  // Long-term investment products use the zakatable value
-  // disclosed or calculated from the fund/company information.
-  if (product.type === 'LONG_TERM' && product.zakatableValue != null) {
-    assertFiniteNonNegative(product.zakatableValue, 'product zakatable value');
-    total += product.zakatableValue;
+    // Only property held for trading contributes
+    // its market value directly to the zakatable asset base.
+    total += result.zakatablePropertyValue;
   }
-
-  // If a long-term product has no known zakatable value,
-  // Namaa does not invent a default value or automatically treat it as exempt.
-}
-// Properties
-for (const property of (d.properties ?? [])) {
-  const result = evaluatePropertyZakat(property);
-
-  // Only property held for trading contributes
-  // its market value directly to the zakatable asset base.
-  total += result.zakatablePropertyValue;
-}
   // Manually entered zakatable assets
-  for (const asset of (d.manualAssets ?? [])) {
+  for (const asset of data.manualAssets ?? []) {
     assertFiniteNonNegative(asset.value, 'manual asset value');
 
     if (asset.zakatable !== false) {
@@ -179,17 +187,17 @@ for (const property of (d.properties ?? [])) {
   return total;
 }
 
-export function calculateZakatableSnapshot(d) {
-  const cashBalance = d.cashBalance ?? 0;
+export function calculateZakatableSnapshot(data) {
+  const cashBalance = data.cashBalance ?? 0;
 
   assertFiniteNonNegative(cashBalance, 'cash balance');
 
-  const otherAssets = calculateAssetValue(d);
+  const otherAssets = calculateAssetValue(data);
 
   return {
     cashBalance,
     otherAssets,
-    total: cashBalance + otherAssets
+    total: cashBalance + otherAssets,
   };
 }
 
@@ -202,9 +210,7 @@ export const defaultSettings = {
   goldGrams: 85,
   silverGrams: 595,
 
-  // Calculation mode for cash flows.
-
-  // Spending order for lots.
+  // Operational spending order for lots.
   spendOrder: 'LIFO',
 
   // Personal-use jewelry is excluded.
@@ -224,7 +230,7 @@ export const defaultSettings = {
 
   // According to the approved guide,
   // debts owed by the user are not deducted from the zakat base.
-  deductDebts: false
+  deductDebts: false,
 };
 
 export function validateShariaSettings(settings) {
@@ -244,7 +250,6 @@ export function validateShariaSettings(settings) {
     throw new TypeError('unsupported nisab basis');
   }
 
-  
   if (!allowedSpendOrders.includes(settings.spendOrder)) {
     throw new TypeError('unsupported spend order');
   }
@@ -276,7 +281,6 @@ export function validateShariaSettings(settings) {
   return true;
 }
 
-
 export const CROP_NISAB_KG = 612;
 
 export function evaluateCropZakat(crop) {
@@ -294,14 +298,14 @@ export function evaluateCropZakat(crop) {
     nisabKg: CROP_NISAB_KG,
     eligible,
     requiresHawl: false,
-    dueAtHarvest: eligible
+    dueAtHarvest: eligible,
   };
 }
 
 export const LIVESTOCK_NISAB = {
   camels: 5,
   cattle: 30,
-  sheep: 40
+  sheep: 40,
 };
 
 export function evaluateLivestockZakat(livestock) {
@@ -325,7 +329,7 @@ export function evaluateLivestockZakat(livestock) {
     count,
     nisab,
     eligible,
-    requiresHawl: true
+    requiresHawl: true,
   };
 }
 
@@ -348,7 +352,7 @@ export function evaluatePropertyZakat(property) {
       intent,
       zakatablePropertyValue: 0,
       rentalIncome,
-      treatment: 'EXEMPT_PROPERTY_ASSET'
+      treatment: 'EXEMPT_PROPERTY_ASSET',
     };
   }
 
@@ -357,7 +361,7 @@ export function evaluatePropertyZakat(property) {
       intent,
       zakatablePropertyValue: 0,
       rentalIncome,
-      treatment: 'RENTAL_INCOME_AS_CASH'
+      treatment: 'RENTAL_INCOME_AS_CASH',
     };
   }
 
@@ -365,104 +369,114 @@ export function evaluatePropertyZakat(property) {
     intent,
     zakatablePropertyValue: marketValue,
     rentalIncome,
-    treatment: 'TRADE_GOODS'
+    treatment: 'TRADE_GOODS',
   };
 }
 
-
-
-
-
-function validateDay(d) {
-  if (!d || !(d.date instanceof Date) || Number.isNaN(d.date.getTime())) throw new TypeError('each day must contain a valid date');
-  assertFiniteNonNegative(d.nisab, 'nisab');
-  for (const x of (d.deposits ?? [])) assertFiniteNonNegative(x, 'deposit');
-  for (const y of (d.withdrawals ?? [])) assertFiniteNonNegative(y, 'withdrawal');
+function validateDay(day) {
+  if (!day || !(day.date instanceof Date) || Number.isNaN(day.date.getTime()))
+    throw new TypeError('each day must contain a valid date');
+  assertFiniteNonNegative(day.nisab, 'nisab');
+  for (const deposit of day.deposits ?? []) assertFiniteNonNegative(deposit, 'deposit');
+  for (const withdrawal of day.withdrawals ?? []) assertFiniteNonNegative(withdrawal, 'withdrawal');
 }
 
 // Future-facing detailed result for UI integration. Monday's runEngine remains backward compatible.
 export function runEngineDetailed(days, settings = defaultSettings) {
   validateShariaSettings(settings);
-  const lots = [], events = [], series = [];
+  const lots = [],
+    events = [],
+    series = [];
   let wasAbove = false;
 
-  for (const d of days) {
-    validateDay(d);
-for (const x of (d.deposits ?? [])) lots.push({ amount: x, depositDate: d.date, start: wasAbove ? d.date : null });    for (const y of (d.withdrawals ?? [])) consume(lots, y, settings.spendOrder);
+  for (const day of days) {
+    validateDay(day);
+    for (const deposit of day.deposits ?? [])
+      lots.push({
+        amount: deposit,
+        depositDate: day.date,
+        start: wasAbove ? day.date : null,
+      });
+    for (const withdrawal of day.withdrawals ?? []) consume(lots, withdrawal, settings.spendOrder);
 
-    const total = sum(lots), above = total >= d.nisab;
+    const total = sum(lots),
+      above = total >= day.nisab;
     if (!above && wasAbove) {
-      lots.forEach(l => (l.start = null));
-      events.push({ type: 'BREAK', date: d.date });
+      lots.forEach((lot) => (lot.start = null));
+      events.push({ type: 'BREAK', date: day.date });
     }
     if (above && !wasAbove) {
-      lots.forEach(l => (l.start ??= d.date));
-      events.push({ type: 'START', date: d.date });
+      lots.forEach((lot) => (lot.start ??= day.date));
+      events.push({ type: 'START', date: day.date });
     }
     wasAbove = above;
 
     if (above) {
-      const due = lots.filter(l => l.start && isHawlComplete(l.start, d.date));
+      const due = lots.filter(
+        (lot) => lot.start && isHawlComplete(lot.start, day.date),
+      );
       if (due.length) {
-  const annualAdvance =
-    settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
+        const annualAdvance = settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
 
-  const base = annualAdvance
-    ? total
-    : sum(due);
+        const base = annualAdvance ? total : sum(due);
 
-  events.push({
-    type: 'DUE',
-    date: d.date,
-    base,
-    zakat: base / 40
-  });
+        events.push({
+          type: 'DUE',
+          date: day.date,
+          base,
+          zakat: base / 40,
+        });
 
-  (annualAdvance ? lots : due).forEach(
-    l => (l.start = d.date)
-  );
-}
+        (annualAdvance ? lots : due).forEach((lot) => (lot.start = day.date));
+      }
     }
-    series.push({ date: d.date, total, nisab: d.nisab, above });
+    series.push({ date: day.date, total, nisab: day.nisab, above });
   }
 
-  const futureLots = lots.filter(l => l.start).map(l => ({
-    ...l,
-    // Exact due date is intentionally left for the UI/date helper to resolve from Umm al-Qura.
-    startHijri: hijri(l.start)
-  }));
-  const nextDue = futureLots.length ? futureLots.reduce((best, l) => {
-    const h = l.startHijri;
-    const key = (h[0] + 1) * 10000 + h[1] * 100 + h[2];
-    return !best || key < best.key ? { key, start: l.start, targetHijri: [h[0] + 1, h[1], h[2]] } : best;
-  }, null) : null;
+  const futureLots = lots
+    .filter((lot) => lot.start)
+    .map((lot) => ({
+      ...lot,
+      // Hijri anniversary used to select the earliest due lot.
+      startHijri: hijri(lot.start),
+    }));
+  const nextDue = futureLots.length
+    ? futureLots.reduce((best, lot) => {
+        const h = lot.startHijri;
+        const key = (h[0] + 1) * 10000 + h[1] * 100 + h[2];
+        return !best || key < best.key
+          ? { key, start: lot.start, targetHijri: [h[0] + 1, h[1], h[2]] }
+          : best;
+      }, null)
+    : null;
   if (nextDue) {
-  nextDue.dueDate = resolveHawlDueDate(nextDue.start);
-  nextDue.targetHijri = hijri(nextDue.dueDate);
+    nextDue.dueDate = resolveHawlDueDate(nextDue.start);
+    nextDue.targetHijri = hijri(nextDue.dueDate);
 
-  const dueLots = lots.filter(
-    l => l.start && l.start.getTime() === nextDue.start.getTime()
-  );
+    const dueLots = lots.filter(
+      (lot) => lot.start && lot.start.getTime() === nextDue.start.getTime(),
+    );
 
-  const expectedBase =
-  settings.acquiredMoneyMode === 'ANNUAL_ADVANCE'
-    ? sum(lots)
-    : sum(dueLots);
+    const expectedBase =
+      settings.acquiredMoneyMode === 'ANNUAL_ADVANCE'
+        ? sum(lots)
+        : sum(dueLots);
 
-  nextDue.zakat = expectedBase / 40;
-}
-
-return {
-  events,
-  series,
-  lots: cloneLots(lots),
-  nextDue: nextDue && {
-    start: nextDue.start,
-  targetHijri: nextDue.targetHijri,
-  dueDate: nextDue.dueDate,
-  zakat: nextDue.zakat
+    nextDue.zakat = expectedBase / 40;
   }
-};}
+
+  return {
+    events,
+    series,
+    lots: cloneLots(lots),
+    nextDue: nextDue && {
+      start: nextDue.start,
+      targetHijri: nextDue.targetHijri,
+      dueDate: nextDue.dueDate,
+      zakat: nextDue.zakat,
+    },
+  };
+}
 
 export function runEngine(days, settings = defaultSettings) {
   return runEngineDetailed(days, settings).events;
@@ -471,8 +485,13 @@ export function runEngine(days, settings = defaultSettings) {
 export const nisabFor = (p, s = defaultSettings) => {
   assertFiniteNonNegative(p?.gold, 'gold price');
   assertFiniteNonNegative(p?.silver, 'silver price');
-  const g = s.goldGrams * p.gold, v = s.silverGrams * p.silver;
-  return s.nisabBasis === 'GOLD' ? g : s.nisabBasis === 'SILVER' ? v : Math.min(g, v);
+  const g = s.goldGrams * p.gold,
+    v = s.silverGrams * p.silver;
+  return s.nisabBasis === 'GOLD'
+    ? g
+    : s.nisabBasis === 'SILVER'
+      ? v
+      : Math.min(g, v);
 };
 
 export function traditionalCalc(total, nisab) {
@@ -483,10 +502,14 @@ export function traditionalCalc(total, nisab) {
 
 // Appendix B-5 comparison helper: use the balance on 1 Ramadan of the requested Hijri year.
 export function ramadanCalc(series, year) {
-  const row = series.find(x => {
+  const row = series.find((x) => {
     const [y, m, d] = hijri(x.date);
     return y === year && m === 9 && d === 1;
   });
   if (!row) throw new Error(`1 Ramadan ${year} is not present in series`);
-  return { date: row.date, base: row.total, zakat: traditionalCalc(row.total, row.nisab) };
+  return {
+    date: row.date,
+    base: row.total,
+    zakat: traditionalCalc(row.total, row.nisab),
+  };
 }
