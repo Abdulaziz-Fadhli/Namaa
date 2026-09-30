@@ -13,6 +13,7 @@ import logo from '../../assets/namaa-logo.png';
 
 
 export function Start({ go }) {
+  const { setMode } = useStore();
   return (
     <Frame theme="dark" gradient label="بداية نماء">
       <div className="nm-start">
@@ -29,7 +30,8 @@ export function Start({ go }) {
           </div>
         </div>
         <div className="nm-start-cta">
-          <Button variant="primary" icon={ArrowLeft} onClick={() => go('link')}>ابدأ</Button>
+          <Button variant="primary" icon={ArrowLeft} onClick={() => { setMode('story'); go('link'); }}>ابدأ</Button>
+          <Button icon={RefreshCw} onClick={() => { setMode('live'); go('link'); }}>تجربة مباشرة بأسعار السوق الآن</Button>
           <p>بياناتك مشفّرة ولا نملك صلاحية التحويل</p>
         </div>
       </div>

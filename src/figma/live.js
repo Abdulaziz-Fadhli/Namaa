@@ -1,6 +1,6 @@
 // الأسعار الحية في الواجهة: تسأل /api/prices (خدمة Vercel في api/prices.js) وترجع للأسعار المحفوظة
 // من بيانات المحرك إذا ما ردّت الخدمة، حتى ما تتعطل الشاشة وقت العرض.
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import view from '../data/ahmad-view.json';
 
 const cache = new Map();   // نفس الطلب ما يتكرر لو رجع المستخدم للشاشة
@@ -56,3 +56,66 @@ export const timeOf = iso => {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? null : d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Riyadh' });
 };
+
+// ---------------------------------------------------------------------------
+// الوضع المباشر: طلب عند الدخول، وزر للتحديث
+// ---------------------------------------------------------------------------
+
+// تاريخ اليوم بتوقيت الرياض بصيغة YYYY-MM-DD
+export const riyadhToday = (now = new Date()) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Riyadh' }).format(now);
+
+// يجلب الأسعار (الذهب والفضة + الرموز الأمريكية) مرة واحدة لما يدخل المستخدم الوضع المباشر،
+// ومرة لما يضيف سهمًا أمريكيًا جديدًا، وبعدها يوقف. وللتحديث زر يستدعي refresh().
+// يتذكر الرد السابق حتى نعرف اتجاه كل سعر (صعود أو نزول) ونومّضه في الواجهة.
+// لو ما ردّت الخدمة نكمل بالأسعار المحفوظة، وما تتعطل الشاشة.
+// delayMs: انتظار قبل الطلب، حتى ما نرسل طلبًا مع كل حرف يكتبه المستخدم في البحث.
+export function useLiveFeed({ enabled = true, us = [], delayMs = 0 } = {}) {
+  const key = [...new Set(us.filter(Boolean).map(s => s.toUpperCase()))].sort().join(',');
+  const [state, setState] = useState({ data: null, prev: null, error: null, receivedAt: null, loading: false });
+  const [nonce, setNonce] = useState(0); // كل ضغطة على زر التحديث تزيده فيُعاد الطلب
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+    let alive = true;
+    const ctrl = new AbortController();
+    const start = setTimeout(async () => {
+      setState(s => ({ ...s, loading: true }));
+      const abort = setTimeout(() => ctrl.abort(), 8000);
+      try {
+        const res = await fetch(`/api/prices${key ? `?us=${key}` : ''}`, { signal: ctrl.signal, cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (alive) setState(s => ({ data, prev: s.data ?? data, error: null, receivedAt: Date.now(), loading: false }));
+      } catch (e) {
+        if (alive) setState(s => ({ ...s, error: e.name === 'AbortError' ? 'timeout' : String(e.message ?? e), loading: false }));
+      } finally {
+        clearTimeout(abort);
+      }
+    }, delayMs);
+    return () => { alive = false; clearTimeout(start); ctrl.abort(); };
+  }, [enabled, key, delayMs, nonce]);
+
+  const refresh = useCallback(() => setNonce(n => n + 1), []);
+
+  const { data, prev } = state;
+  const metalsLive = data?.metals && data.metals.source !== 'fallback';
+  const metals = metalsLive ? data.metals : FALLBACK_METALS;
+  const quotes = data?.us?.quotes ?? {};
+  const sign = (a, b) => (a == null || b == null || a === b ? 0 : a > b ? 1 : -1);
+  return {
+    refresh,
+    loading: state.loading,
+    ready: Boolean(data),
+    metalsLive,
+    metals,
+    quotes,
+    market: data?.market ?? null,
+    fetchedAt: data?.fetchedAt ?? null,
+    receivedAt: state.receivedAt,
+    error: state.error,
+    // اتجاه آخر حركة: 1 صعود، -1 نزول، 0 بدون تغيير
+    metalDir: m => sign(data?.metals?.[`${m}PerGram`], prev?.metals?.[`${m}PerGram`]),
+    quoteDir: s => sign(quotes[s]?.price, prev?.us?.quotes?.[s]?.price),
+  };
+}

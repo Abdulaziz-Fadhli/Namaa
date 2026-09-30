@@ -83,6 +83,8 @@ export function Metals({ back }) {
   const add = () => {
     addAsset({
       kind: metal, engine, value, acquired,
+      // للوضع المباشر: يعاد تقييمه مع كل تحديث لسعر المعدن
+      live: gold ? { metal: 'gold', grams: g, karat } : { metal: 'silver', grams: g, purity },
       title: gold ? `ذهب ${karat} قيراط` : `فضة ${purity}`,
       short: `${num(g)} غرام ${gold ? 'ذهب' : 'فضة'}`,
       detail: `${num(g)} غرام • ${isLive ? 'سعر السوق الآن' : `سعر ${gregText(metals.at)}`}`,
