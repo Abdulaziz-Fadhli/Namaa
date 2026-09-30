@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import {
-  calculateZakatableSnapshot,
   defaultSettings,
   hijri,
   nisabFor,
@@ -11,22 +10,73 @@ import {
 } from '../src/engine/engine.js';
 
 const iso = (date) => date.toISOString().slice(0, 10);
-const dateOf = (value) => new Date(`${value}T00:00:00Z`);
+const dateOf = (value) => {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value))
+    throw new TypeError('Dates must use YYYY-MM-DD');
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime()) || iso(date) !== value)
+    throw new TypeError(`Invalid date: ${value}`);
+  return date;
+};
 const readData = (name) =>
   JSON.parse(
     readFileSync(new URL(`../src/data/${name}.json`, import.meta.url), 'utf8'),
   );
 
-// Keep asset valuation separate: the existing hawl engine accepts cash flows only.
-// Treating market-price changes as cash deposits would fabricate acquisition dates.
+// Adapt the saved account/holding schema to a daily cash ledger and complete
+// asset inventory. Internal bank transfers never create new acquisition lots.
+function holdingAt(holding, id, key, prices, periodStart, requireDate) {
+  const kind = {
+    gold: 'gold',
+    silver: 'silver',
+    stocks: 'stocks',
+    fund: 'investmentProducts',
+    investmentProducts: 'investmentProducts',
+    property: 'properties',
+    cash: 'cash',
+  }[holding.type];
+  if (!kind) throw new TypeError(`Unsupported holding schema: ${holding.type}`);
+  if (holding.zakatExempt) return null;
+  const acquired = holding.acquired ?? holding.date;
+  if (!acquired && requireDate)
+    throw new TypeError('Manual assets require an acquisition date');
+  // Opening holdings without earlier history are explicitly reported as such.
+  const observedAcquired = dateOf(acquired ?? periodStart);
+  if (observedAcquired > dateOf(key)) return null;
+  if (holding.disposed && dateOf(holding.disposed) <= dateOf(key)) return null;
+  const asset = { ...holding, id, kind, acquired: observedAcquired };
+  if (kind === 'gold' || kind === 'silver') {
+    asset.pricePerGram = prices[key][kind];
+  }
+  if (kind === 'stocks' || kind === 'investmentProducts') {
+    asset.type = holding.intent?.toUpperCase();
+    asset.marketValue = holding.values
+      ? holding.values[key]
+      : holding.marketValue;
+    asset.zakatableValue = holding.zakatableValues
+      ? holding.zakatableValues[key]
+      : holding.zakatableValue;
+  }
+  if (kind === 'properties') {
+    asset.intent = holding.intent?.toUpperCase();
+    asset.marketValue = holding.values
+      ? holding.values[key]
+      : holding.marketValue;
+    if (asset.intent === 'TRADING' && asset.marketValue == null)
+      throw new Error(`Missing property value: ${key}`);
+  }
+  if (kind === 'cash')
+    asset.value = holding.values ? holding.values[key] : holding.value;
+  return asset;
+}
+
 export function personaDays(persona, prices, settings = defaultSettings) {
-  if (persona.manual.length)
-    throw new Error('Manual asset schema requires an explicit adapter');
   const accounts = new Map(
     persona.accounts.map((account) => [account.accountId, account]),
   );
   const byDate = new Map();
   for (const transaction of persona.transactions) {
+    dateOf(transaction.date);
     const account = accounts.get(transaction.accountId);
     if (!account) throw new Error(`Unknown account: ${transaction.accountId}`);
     if (transaction.internal) {
@@ -58,50 +108,55 @@ export function personaDays(persona, prices, settings = defaultSettings) {
     );
     byDate.set(transaction.date, day);
   }
+  const inputs = [
+    ...persona.holdings.map((holding, index) => ({
+      holding,
+      id: `holding:${holding.id ?? index}`,
+      requireDate: false,
+    })),
+    ...persona.manual.map((holding, index) => ({
+      holding,
+      id: `manual:${holding.id ?? index}`,
+      requireDate: true,
+    })),
+  ];
   const days = [];
+  const end = dateOf(persona.period.end);
   for (
     let date = dateOf(persona.period.start);
-    date <= dateOf(persona.period.end);
+    date <= end;
     date = new Date(date.getTime() + 86400000)
   ) {
     const key = iso(date);
     if (!prices[key]) throw new Error(`Missing prices: ${key}`);
+    const assets = inputs
+      .map(({ holding, id, requireDate }) =>
+        holdingAt(holding, id, key, prices, persona.period.start, requireDate),
+      )
+      .filter(Boolean);
     days.push({
       date,
       ...byDate.get(key),
       nisab: nisabFor(prices[key], settings),
+      assets,
     });
   }
   return days;
 }
 
-function snapshotAt(persona, prices, row) {
-  const key = iso(row.date);
-  const gold = [],
-    stocks = [];
-  for (const holding of persona.holdings) {
-    if (holding.zakatExempt || (holding.acquired && holding.acquired > key))
-      continue;
-    if (holding.type === 'gold') {
-      gold.push({
-        ...holding,
-        purpose: holding.purpose ?? 'INVESTMENT',
-        pricePerGram: prices[key].gold,
-      });
-    } else if (holding.type === 'stocks' && holding.intent === 'trading') {
-      if (holding.values[key] == null)
-        throw new Error(`Missing stock value: ${key}`);
-      stocks.push({ type: 'TRADING', marketValue: holding.values[key] });
-    } else {
-      throw new Error(`Unsupported holding schema: ${holding.type}`);
-    }
-  }
-  return calculateZakatableSnapshot({ cashBalance: row.total, gold, stocks });
-}
-
 export function comparePersona(persona, prices, settings = defaultSettings) {
   const days = personaDays(persona, prices, settings);
   const result = runEngineDetailed(days, settings);
+  // Retain the earlier cash-only comparison as a clearly separate baseline.
+  const cashResult = runEngineDetailed(
+    days.map(({ date, deposits, withdrawals, nisab }) => ({
+      date,
+      deposits,
+      withdrawals,
+      nisab,
+    })),
+    settings,
+  );
   if (!result.series.length) throw new Error('Empty persona period');
   const due = result.events
     .filter((event) => event.type === 'DUE')
@@ -115,10 +170,14 @@ export function comparePersona(persona, prices, settings = defaultSettings) {
         hijri: hijri(event.date),
         base: event.base,
         zakat: event.zakat,
-        traditionalCash: traditional,
-        differenceCash: traditional - event.zakat,
+        cashBase: event.cashBase,
+        otherAssetsBase: event.otherAssetsBase,
+        assets: event.assets,
+        traditionalAllAssets: traditional,
+        differenceAllAssets: traditional - event.zakat,
       };
     });
+  const cashDue = cashResult.events.filter((event) => event.type === 'DUE');
   const years = [...new Set(result.series.map((row) => hijri(row.date)[0]))];
   const ramadan = years.map((year) => {
     const row = result.series.find((row) => {
@@ -128,46 +187,77 @@ export function comparePersona(persona, prices, settings = defaultSettings) {
     if (!row)
       return { year, status: 'غير متاح: أول رمضان غير موجود في الفترة' };
     const baseline = ramadanCalc(result.series, year);
-    const snapshot = snapshotAt(persona, prices, row);
-    const namaaCashDue = due
+    const namaaDue = due
       .filter((event) => event.date <= iso(row.date))
+      .reduce((total, event) => total + event.zakat, 0);
+    const cashBaseline = ramadanCalc(cashResult.series, year);
+    const namaaCashDue = cashDue
+      .filter((event) => event.date <= row.date)
       .reduce((total, event) => total + event.zakat, 0);
     return {
       year,
       date: iso(row.date),
-      cashBase: baseline.base,
-      traditionalCash: baseline.zakat,
+      totalSnapshot: baseline.base,
+      traditionalAllAssets: baseline.zakat,
+      namaaDueToDate: namaaDue,
+      differenceAllAssets: baseline.zakat - namaaDue,
+      cashBase: cashBaseline.base,
+      traditionalCash: cashBaseline.zakat,
       namaaCashDueToDate: namaaCashDue,
-      differenceCash: baseline.zakat - namaaCashDue,
-      totalSnapshot: snapshot.total,
-      traditionalAllAssets: traditionalCalc(snapshot.total, row.nisab),
+      differenceCash: cashBaseline.zakat - namaaCashDue,
     };
   });
   const last = result.series.at(-1);
-  const snapshot = snapshotAt(persona, prices, last);
+  const next = (result) =>
+    result.nextDue && {
+      date: iso(result.nextDue.dueDate),
+      hijri: result.nextDue.targetHijri,
+      expectedZakat: result.nextDue.zakat,
+    };
+  const exemptBalance = persona.transactions
+    .filter(
+      (transaction) =>
+        persona.accounts.find(
+          (account) => account.accountId === transaction.accountId,
+        )?.zakatExempt,
+    )
+    .reduce(
+      (balance, transaction) =>
+        balance +
+        (transaction.direction === 'credit'
+          ? transaction.amount
+          : -transaction.amount),
+      0,
+    );
+  const limitations = [
+    'الأرصدة والأصول الافتتاحية تبدأ متابعة الحول من أول يوم متاح؛ لا يُفترض بلوغ النصاب قبل بداية السجل.',
+  ];
+  for (const holding of persona.holdings) {
+    if (!holding.zakatExempt && !holding.acquired && !holding.date)
+      limitations.push(
+        `تاريخ تملك ${holding.name ?? holding.type} غير مسجل؛ استُخدم أول يوم في البيانات كبداية المتابعة، وليس كتاريخ شراء معلوم.`,
+      );
+  }
   return {
     persona: persona.persona,
     name: persona.name,
     period: persona.period,
     scope:
-      'نتائج نماء للحول النقدي فقط؛ المقارنة الشاملة للأصول لقيمة الوعاء فقط',
-    limitations: persona.holdings.some((holding) => !holding.zakatExempt)
-      ? [
-          'المحرك الحالي لا يتتبع حول الذهب والأسهم؛ لا يتوفر مبلغ نماء شامل للأصول. الرصيد الافتتاحي يبدأ حوله من أول يوم متاح لغياب تاريخ سابق.',
-        ]
-      : ['الرصيد الافتتاحي يبدأ حوله من أول يوم متاح لغياب تاريخ سابق.'],
+      'نماء يشمل النقد والذهب والفضة والأسهم والصناديق والعقار التجاري والإدخال اليدوي الموجود في البيانات.',
+    limitations,
     due,
-    totalCashZakatDue: due.reduce((sum, event) => sum + event.zakat, 0),
-    nextCashDue: result.nextDue && {
-      date: iso(result.nextDue.dueDate),
-      hijri: result.nextDue.targetHijri,
-      expectedZakat: result.nextDue.zakat,
-    },
+    totalZakatDue: due.reduce((sum, event) => sum + event.zakat, 0),
+    totalCashZakatDue: cashDue.reduce((sum, event) => sum + event.zakat, 0),
+    nextDue: next(result),
+    nextCashDue: next(cashResult),
+    exemptBalance,
     endSnapshot: {
       date: iso(last.date),
-      ...snapshot,
-      traditionalCash: traditionalCalc(last.total, last.nisab),
-      traditionalAllAssets: traditionalCalc(snapshot.total, last.nisab),
+      cashBalance: last.cashBalance,
+      otherAssets: last.otherAssets,
+      total: last.total,
+      traditionalCash: traditionalCalc(last.cashBalance, last.nisab),
+      traditionalAllAssets: traditionalCalc(last.total, last.nisab),
     },
     ramadan,
     events: result.events,
@@ -190,9 +280,11 @@ export function markdownReport(reports) {
     '',
     'البيانات محاكاة محفوظة حتى 2026-10-03، وتتضمن أيامًا لاحقة لتاريخ العمل. الأسعار المحفوظة قد تكون ممتدة من آخر سعر متاح بحسب سكربت جلب الأسعار. لم نُعد توليد البيانات أو نجلب أسعارًا جديدة.',
     '',
-    'التحويلات الداخلية بين الحسابات غير المعفاة مستبعدة، وحسابات zakatExempt مستبعدة. تواريخ الوجوب التالية توقعات إذا بقيت الدفعات كما هي؛ الزكاة المستحقة لا تُسحب تلقائيًا من الرصيد.',
+    'يُتتبع حول كل دفعة، وتُقيّم الأصول بسعر يوم الوجوب. الوعاء اليومي يضم النقد والأصول المؤهلة. تغيّر الأسعار لا ينشئ دفعة جديدة. المصروفات البنكية تخصم من النقد، وشراء الذهب المسجل يسحب تكلفة الشراء مرة واحدة ثم يُضاف الذهب كدفعة مستقلة بتاريخ تملكه.',
     '',
-    'المقارنة في يوم الوجوب: الحاسبة التقليدية للنقد في اليوم نفسه ناقص زكاة نماء النقدية لذلك الحدث. مقارنة رمضان: حاسبة النقد في أول رمضان ناقص مجموع زكاة نماء النقدية المستحقة حتى ذلك اليوم؛ هذه مقارنة بين منهجين زمنيين وليست فرقًا في فاتورة واحدة.',
+    'التحويلات الداخلية بين الحسابات غير المعفاة مستبعدة، وحسابات zakatExempt ظاهرة كرصيد مستبعد. تواريخ الوجوب التالية توقعات بأسعار وأرصدة نهاية الفترة؛ الزكاة المستحقة لا تُسحب تلقائيًا من الرصيد.',
+    '',
+    'المقارنة في يوم الوجوب: الحاسبة التقليدية لجميع الأصول في اليوم نفسه ناقص زكاة نماء لذلك الحدث. مقارنة رمضان: الحاسبة لجميع الأصول في أول رمضان ناقص مجموع زكاة نماء المستحقة حتى ذلك اليوم؛ هذه مقارنة بين منهجين زمنيين وليست فرقًا في فاتورة واحدة. لا يجوز تقديم الفرق على أنه وفر مضمون.',
     '',
   ];
   for (const report of reports) {
@@ -203,39 +295,41 @@ export function markdownReport(reports) {
       '',
       ...report.limitations,
       '',
-      `مجموع الزكاة النقدية المستحقة خلال الفترة: ${money(report.totalCashZakatDue)} ريال.`,
+      `مجموع الزكاة المستحقة خلال الفترة لجميع الأصول: ${money(report.totalZakatDue)} ريال.`,
+      `للمقارنة فقط، نتيجة المحرك عند الاقتصار على النقد البنكي: ${money(report.totalCashZakatDue)} ريال.`,
       '',
-      '| الوجوب الميلادي | الهجري | نماء النقدي | التقليدية للنقد يوم الوجوب | الفرق |',
-      '|---|---|---:|---:|---:|',
+      '| الوجوب الميلادي | الهجري | نماء لجميع الأصول | منها زكاة الأصول الأخرى | التقليدية يوم الوجوب | الفرق |',
+      '|---|---|---:|---:|---:|---:|',
       ...report.due.map(
         (event) =>
-          `| ${event.date} | ${event.hijri.join('/')} | ${money(event.zakat)} | ${money(event.traditionalCash)} | ${money(event.differenceCash)} |`,
+          `| ${event.date} | ${event.hijri.join('/')} | ${money(event.zakat)} | ${money(event.otherAssetsBase / 40)} | ${money(event.traditionalAllAssets)} | ${money(event.differenceAllAssets)} |`,
       ),
       '',
     );
-    if (!report.due.length) lines.push('لم يكتمل حول نقدي خلال الفترة.', '');
-    if (report.nextCashDue)
+    if (!report.due.length) lines.push('لم يكتمل حول خلال الفترة.', '');
+    if (report.nextDue)
       lines.push(
-        `الوجوب النقدي المتوقع: ${report.nextCashDue.date}، ${money(report.nextCashDue.expectedZakat)} ريال.`,
+        `الوجوب المتوقع لجميع الأصول: ${report.nextDue.date}، ${money(report.nextDue.expectedZakat)} ريال.`,
         '',
       );
     lines.push(
-      '| أول رمضان | الحاسبة النقدية | نماء النقدي حتى اليوم | الفرق | الحاسبة لجميع الأصول |',
-      '|---|---:|---:|---:|---:|',
+      '| أول رمضان | الحاسبة لجميع الأصول | نماء المستحق حتى اليوم | الفرق |',
+      '|---|---:|---:|---:|',
       ...report.ramadan.map((row) =>
         row.date
-          ? `| ${row.date} (${row.year}) | ${money(row.traditionalCash)} | ${money(row.namaaCashDueToDate)} | ${money(row.differenceCash)} | ${money(row.traditionalAllAssets)} |`
-          : `| ${row.year}: ${row.status} | — | — | — | — |`,
+          ? `| ${row.date} (${row.year}) | ${money(row.traditionalAllAssets)} | ${money(row.namaaDueToDate)} | ${money(row.differenceAllAssets)} |`
+          : `| ${row.year}: ${row.status} | — | — | — |`,
       ),
       '',
-      `نهاية الفترة: النقد ${money(report.endSnapshot.cashBalance)} ريال؛ الأصول الأخرى ${money(report.endSnapshot.otherAssets)} ريال؛ الحاسبة لجميع الأصول ${money(report.endSnapshot.traditionalAllAssets)} ريال.`,
+      `نهاية الفترة: النقد البنكي ${money(report.endSnapshot.cashBalance)} ريال؛ الأصول الأخرى بما فيها النقد اليدوي ${money(report.endSnapshot.otherAssets)} ريال؛ الحاسبة لجميع الأصول ${money(report.endSnapshot.traditionalAllAssets)} ريال.`,
+      `رصيد الحسابات المعفاة المستبعد من الحساب: ${money(report.exemptBalance)} ريال.`,
       '',
     );
   }
   lines.push(
     '## مسائل منفصلة',
     '',
-    'واجهة Manual.jsx تتضمن معدلات ري 10% و5% وشروط الرعي. لم تُستخدم في المحرك أو في هذا التقرير. يلزم مراجعتها منفصلًا وفق المرجع المعتمد.',
+    'المحاصيل والمواشي تقوّم بدوال الأهلية المنفصلة، ولا تدخل في وعاء 2.5%. لا توجد منها بيانات في الشخصيات الثلاث. واجهة Manual.jsx تتضمن معدلات ري 10% و5% وشروط الرعي؛ لم تُستخدم أو تُعدل ضمن مهام المحرك. ربط الواجهة بالمحرك يظل من مهام الأربعاء.',
   );
   return lines.join('\n');
 }
