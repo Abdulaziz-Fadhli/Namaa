@@ -1,6 +1,9 @@
 // خدمة الأسعار: نختبرها بدون إنترنت (fetch وهمي) — الرد الطبيعي، والاحتياط لما يفشل المصدر أو يغيب المفتاح.
 import { describe, expect, it } from 'vitest';
-import handler, { FALLBACK, fetchMetals, fetchStocks, getPrices, normalizeQuote, ouncePriceToGram, parseSymbols } from './prices.js';
+import handler, {
+  FALLBACK, fetchMetals, fetchStocks, fetchUsQuotes, getPrices, marketStatus, normalizeFinnhub, normalizeQuote, ouncePriceToGram,
+  parseSymbols, parseUsSymbols,
+} from './prices.js';
 
 const ok = body => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
 const fail = status => Promise.resolve({ ok: false, status, json: () => Promise.resolve({}) });
@@ -94,5 +97,79 @@ describe('handler', () => {
 
   it('getPrices never throws', async () => {
     await expect(getPrices({ symbols: '1120' }, { key: 'k', fetchImpl: () => { throw new Error('boom'); } })).resolves.toBeTruthy();
+  });
+});
+
+describe('US stocks and ETFs (Finnhub)', () => {
+  it('parses US tickers: uppercase, unique, max 20', () => {
+    expect(parseUsSymbols('aapl, SPY,brk.b,AAPL,1120,$$$')).toEqual(['AAPL', 'SPY', 'BRK.B']);
+    expect(parseUsSymbols(Array.from({ length: 30 }, (_, i) => `A${i}`).join(','))).toHaveLength(20);
+    expect(parseUsSymbols(undefined)).toEqual([]);
+  });
+
+  it('normalizes a quote and rejects unknown symbols (all zeros)', () => {
+    expect(normalizeFinnhub('AAPL', { c: 227.5, d: 1.2, dp: 0.53, pc: 226.3, t: 1790000000 }))
+      .toMatchObject({ symbol: 'AAPL', price: 227.5, change: 1.2, changePercent: 0.53, previousClose: 226.3 });
+    expect(normalizeFinnhub('NOPE', { c: 0, d: null, dp: null, pc: 0, t: 0 })).toBeNull();
+  });
+
+  it('sends the key in a header, not the URL, and keeps partial results', async () => {
+    const f = fakeFetch({
+      'symbol=AAPL': () => ok({ c: 227.5, d: 1, dp: 0.4, pc: 226.5, t: 1790000000 }),
+      'symbol=SPY': () => fail(429),
+    });
+    const r = await fetchUsQuotes(['AAPL', 'SPY'], { key: 'fk', fetchImpl: f });
+    expect(r.source).toBe('finnhub');
+    expect(r.quotes.AAPL.price).toBe(227.5);
+    expect(r.missing).toEqual(['SPY']);
+    expect(f.calls[0].headers['X-Finnhub-Token']).toBe('fk');
+    expect(f.calls.every(c => !c.url.includes('fk'))).toBe(true);
+  });
+
+  it('falls back without a key or when every symbol fails', async () => {
+    expect((await fetchUsQuotes(['AAPL'], { key: '' })).source).toBe('fallback');
+    expect((await fetchUsQuotes(['AAPL'], { key: 'fk', fetchImpl: fakeFetch({}) })).source).toBe('fallback');
+    expect((await fetchUsQuotes([], { key: 'fk' })).source).toBe('none');
+  });
+});
+
+describe('marketStatus', () => {
+  const at = iso => marketStatus(new Date(iso));
+
+  it('demo day (Saturday 3 Oct 2026, noon Riyadh): every market is closed', () => {
+    expect(at('2026-10-03T09:00:00Z')).toMatchObject({ metals: { open: false }, us: { open: false }, tasi: { open: false } });
+  });
+
+  it('Wednesday 6 pm Riyadh: US and metals open, Tadawul closed', () => {
+    expect(at('2026-09-30T15:00:00Z')).toMatchObject({ metals: { open: true }, us: { open: true }, tasi: { open: false } });
+  });
+
+  it('Sunday 11 am Riyadh: Tadawul open, US closed, metals not yet open', () => {
+    expect(at('2026-10-04T08:00:00Z')).toMatchObject({ metals: { open: false }, us: { open: false }, tasi: { open: true } });
+  });
+
+  it('metals pause daily between 5 and 6 pm New York time', () => {
+    expect(at('2026-09-30T21:30:00Z').metals.open).toBe(false); // 5:30 pm EDT
+    expect(at('2026-09-30T22:30:00Z').metals.open).toBe(true);  // 6:30 pm EDT
+  });
+});
+
+describe('handler (fast mode: metals + US only)', () => {
+  it('caches for 10 seconds and returns market status and US quotes', async () => {
+    const headers = {};
+    let body = '';
+    const res = { setHeader: (k, v) => { headers[k] = v; }, end: b => { body = b; } };
+    const original = globalThis.fetch;
+    globalThis.fetch = fakeFetch({
+      'symbol=SPY': () => ok({ c: 570.1, d: -2, dp: -0.35, pc: 572.1, t: 1790000000 }),
+      '/XAU': () => ok({ price: 3000 }), '/XAG': () => ok({ price: 40 }),
+    });
+    process.env.FINNHUB_API_KEY = 'fk';
+    try { await handler({ url: '/api/prices?us=SPY' }, res); } finally { globalThis.fetch = original; delete process.env.FINNHUB_API_KEY; }
+    const r = JSON.parse(body);
+    expect(headers['Cache-Control']).toContain('s-maxage=10');
+    expect(r.us.quotes.SPY.price).toBe(570.1);
+    expect(r.market).toHaveProperty('us.open');
+    expect(r.stocks.source).toBe('none');
   });
 });
