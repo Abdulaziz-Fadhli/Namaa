@@ -1,14 +1,8 @@
 // نقطة البداية: تحدد الشاشة المعروضة، والتنقل بينها بمتغير حالة واحد (بدون مكتبة توجيه).
 // التطبيق يتذكر الشاشات اللي مريت فيها، حتى يرجعك زر الرجوع للمكان اللي جيت منه.
-// الشاشات الحالية مبنية من ملف فيجما (src/figma) وتنقلها مطابق لروابط النموذج في فيجما،
-// والشاشات القديمة باقية في القائمة تحت «النسخة السابقة» للمقارنة.
+// الشاشات مبنية من ملف فيجما (src/figma) وتنقلها مطابق لروابط النموذج في فيجما.
 import { Suspense, lazy, useState } from 'react';
 import PhoneFrame from './components/PhoneFrame.jsx';
-import Dashboard from './screens/Dashboard.jsx';
-import Timeline from './screens/Timeline.jsx';
-import Link from './screens/Link.jsx';
-import Why from './screens/Why.jsx';
-import Manual from './screens/Manual.jsx';
 import { StoreProvider } from './figma/store.jsx';
 import * as Onb from './figma/screens/Onboarding.jsx';
 import * as Ast from './figma/screens/Assets.jsx';
@@ -41,26 +35,14 @@ const FIGMA = {
   success: { name: 'نجاح الإخراج والإيصال', Component: Zk.Success },
 };
 
-// النسخة السابقة (قبل فيجما)
-const LEGACY = {
-  'old:dashboard': { name: 'لوحة الوعاء', Component: Dashboard },
-  'old:timeline': { name: 'الخط الزمني', Component: Timeline },
-  'old:why': { name: 'لماذا هذا المبلغ؟', Component: Why },
-  'old:link': { name: 'الربط', Component: Link },
-  'old:manual': { name: 'أموال لا تراها البنوك', Component: Manual },
-};
-// أزرار الشاشات القديمة تنادي أسماءها القديمة
-const LEGACY_ALIAS = { dashboard: 'old:dashboard', why: 'old:why', manual: 'old:manual', offbank: 'offbank', payout: 'payout', settings: 'settings' };
-
 export default function App() {
   const [history, setHistory] = useState(['start']);
   const screen = history.at(-1);
-  const legacy = screen.startsWith('old:');
-  const go = next => setHistory(h => [...h, legacy ? (LEGACY_ALIAS[next] ?? `old:${next}`) : next]);
+  const go = next => setHistory(h => [...h, next]);
   const back = () => setHistory(h => (h.length > 1 ? h.slice(0, -1) : h));
   const reset = () => setHistory(['home']);
 
-  const current = FIGMA[screen] ?? LEGACY[screen] ?? FIGMA.start;
+  const current = FIGMA[screen] ?? FIGMA.start;
   const Screen = current.Component;
 
   return (
@@ -72,15 +54,10 @@ export default function App() {
         aria-label="الانتقال إلى شاشة"
         style={{ position: 'fixed', top: 12, right: 12, zIndex: 10, height: 36, borderRadius: 8 }}
       >
-        <optgroup label="شاشات فيجما">
-          {Object.entries(FIGMA).map(([key, s]) => <option key={key} value={key}>{s.name}</option>)}
-        </optgroup>
-        <optgroup label="النسخة السابقة">
-          {Object.entries(LEGACY).map(([key, s]) => <option key={key} value={key}>{s.name}</option>)}
-        </optgroup>
+        {Object.entries(FIGMA).map(([key, s]) => <option key={key} value={key}>{s.name}</option>)}
       </select>
 
-      <PhoneFrame chrome={legacy} figma={!legacy}>
+      <PhoneFrame>
         <Suspense fallback={null}>
           <Screen key={screen} go={go} back={back} reset={reset} />
         </Suspense>

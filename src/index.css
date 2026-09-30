@@ -1,17 +1,7 @@
-/* ألوان وتنسيقات الميزة، مستخرجة من تطبيق الإنماء (نفس لوحة التصميم النهائي) */
+/* تنسيقات عامة وإطار الجوال. ألوان الشاشات وتنسيقها في src/figma/figma.css */
 :root {
-  --bg: #002134;       /* الخلفية */
-  --card: #033857;     /* البطاقات */
-  --field: #032C42;    /* الحقول */
-  --line: #0B4A70;     /* الفواصل والحدود */
-  --accent: #F8A093;   /* التمييز والأزرار */
+  --bg: #002134;
   --text: #FFFFFF;
-  --soft: #C9D6DE;     /* نص ثانوي */
-  --muted: #A9BCC8;    /* نص خافت */
-  --green: #4CC38A;    /* بداية الحول */
-  --red: #FF7A7A;      /* انقطاع */
-  --gold: #E8C46A;     /* وجوب */
-  --radius: 22px;
 }
 
 * { box-sizing: border-box; }
@@ -26,7 +16,7 @@ body {
 
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
-input, select { font-family: inherit; accent-color: var(--accent); }
+input, select { font-family: inherit; }
 
 /* ---------- إطار الجوال ---------- */
 .stage {
@@ -69,65 +59,3 @@ input, select { font-family: inherit; accent-color: var(--accent); }
 }
 .screen::-webkit-scrollbar { display: none; } /* كروم وإيدج وسفاري */
 .screen input, .screen select, .screen textarea { user-select: text; }
-
-/* ---------- الرأس والتبويبات ---------- */
-.header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; }
-.subheader { display: flex; align-items: center; gap: 8px; padding: 16px 12px 10px 20px; }
-.h1 { margin: 0; font-size: 26px; font-weight: 700; }
-.h2 { margin: 0; font-size: 22px; font-weight: 700; }
-.icon-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: none; border: none; color: var(--text); }
-
-.pills { display: flex; gap: 8px; padding: 0 20px 12px; }
-.pill {
-  display: flex; align-items: center; height: 36px; padding: 0 16px;
-  border-radius: 12px; border: 1.5px solid var(--text); background: transparent;
-  color: var(--text); font-size: 14px; font-weight: 500;
-}
-.pill.active { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 700; }
-
-/* ---------- البطاقات والنصوص ---------- */
-.card { background: var(--card); border-radius: var(--radius); padding: 16px 18px; }
-.card.accent { border: 2px solid var(--accent); }
-.card.flush { padding: 0; overflow: hidden; }
-.soft { color: var(--soft); }
-.muted { color: var(--muted); }
-.small { font-size: 12px; }
-.label { font-size: 13px; }
-.bold { font-weight: 700; }
-.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.col { display: flex; flex-direction: column; gap: 2px; }
-.list-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 18px; border-top: 1px solid var(--line); font-size: 14px; }
-.list-row:first-child { border-top: none; }
-.big-number { font-size: 34px; font-weight: 700; line-height: 1.25; }
-.unit { font-size: 16px; font-weight: 500; }
-.badge { align-self: flex-start; font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent); }
-
-/* ---------- الأزرار ---------- */
-.btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  height: 54px; border-radius: 16px; font-size: 17px; font-weight: 700;
-  border: none; width: 100%;
-}
-.btn.primary { background: var(--accent); color: var(--bg); }
-.btn.outline { background: transparent; border: 1.5px solid var(--accent); color: var(--accent); }
-.btn.small { height: 42px; width: auto; padding: 0 16px; font-size: 14px; border-radius: 12px; }
-
-/* ---------- الحقول ---------- */
-.field-label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--soft); min-width: 0; }
-.input {
-  height: 46px; width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px;
-  font-size: 15px; background: var(--field); color: var(--text);
-}
-.input::placeholder { color: #8FA6B5; }
-.input.error { border: 2px solid var(--red); }
-.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-
-/* ---------- شريط التقدم ---------- */
-.progress { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
-.progress > div { height: 100%; background: var(--accent); border-radius: 4px; }
-
-/* ---------- أسفل الشاشة ---------- */
-.footer-note { padding: 6px 16px; font-size: 11px; color: var(--muted); text-align: center; }
-.tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); height: 70px; border-top: 1px solid #0B3A57; flex-shrink: 0; }
-.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; color: var(--muted); background: none; border: none; }
-.tab.active { color: var(--accent); font-weight: 700; }
