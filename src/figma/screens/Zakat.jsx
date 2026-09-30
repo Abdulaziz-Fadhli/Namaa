@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Button, Frame, Ico, InfoRow, Line, Note, Screen, AmountCard } from '../ui.jsx';
 import { CHANNELS, bankName, useStore } from '../model.js';
-import { HIJRI_MONTHS, gregShort, gregText, hijriParts, hijriText, money } from '../format.js';
+import { HIJRI_MONTHS, daysText, gregShort, gregText, hijriParts, hijriText, money } from '../format.js';
 
 function Step({ icon, title, detail }) {
   return (
@@ -24,6 +24,16 @@ export function Explain({ go, back }) {
   const { view, vault, payment, due } = useStore();
   const [sources, setSources] = useState(false);
   const exempt = view.accounts.filter(a => a.exempt);
+  if (!due.today && !payment) {
+    return (
+      <Screen theme="dark" title="لا زكاة واجبة اليوم" desc="لم يكتمل الحول اليوم على أي مبلغ في وعائك." onBack={back}
+        cta={<Button variant="primary" icon={ArrowLeft} onClick={() => go('timeline')}>الخط الزمني</Button>}>
+        <Note icon={Scale}>{view.nextDue
+          ? `الوجوب القادم في ${hijriText(view.nextDue.date)}: ${money(view.nextDue.zakat, { decimals: 2 })}، إن بقي الوعاء فوق النصاب (${money(Math.round(view.nisab))}).`
+          : `الوعاء ${money(Math.round(vault))} والنصاب ${money(Math.round(view.nisab))}.`}</Note>
+      </Screen>
+    );
+  }
   return (
     <Screen theme="dark" title={`كيف وصلنا إلى ${money(due.zakat)}؟`} desc="احتساب واضح يستند إلى الأصول التي أكملت الحول." onBack={back}
       cta={payment
@@ -39,13 +49,13 @@ export function Explain({ go, back }) {
       </div>
       {sources && (
         <div className="nm-box" role="region" aria-label="المصادر">
-          <p style={{ fontSize: 11, lineHeight: '18px' }}>{view.due.explanation}</p>
+          {view.due && <p style={{ fontSize: 11, lineHeight: '18px' }}>{view.due.explanation}</p>}
           {due.matured.length > 0 && (
             <p style={{ fontSize: 11, lineHeight: '18px' }}>
               وأصول أضفتها أكملت حولًا هجريًا من تاريخ تملكها: {due.matured.map(a => `${a.title} ${money(a.value)}`).join('، ')}، زكاتها {money(due.maturedBase / 40, { decimals: 2 })}.
             </p>
           )}
-          <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>{view.start.explanation}</p>
+          {view.start && <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>{view.start.explanation}</p>}
           <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>المنهجية: فتوى اللجنة الدائمة رقم 282، حول مستقل لكل مبلغ من يوم ملكه. النصاب الأقل من 85 غرام ذهب و595 غرام فضة بسعر اليوم.</p>
         </div>
       )}
@@ -57,26 +67,33 @@ export function Explain({ go, back }) {
 const hijriMonthYear = iso => { const h = hijriParts(iso); return `${HIJRI_MONTHS[h.m - 1]} ${h.y}`; };
 
 export function Timeline({ go, back }) {
-  const { view, payment, due } = useStore();
+  const { view, payment, due, vault } = useStore();
   const next = view.nextDue;
+  const todayText = view.due
+    ? (due.matured.length ? `${view.due.explanation} ويضاف ${money(due.maturedBase / 40, { decimals: 2 })} عن أصول أضفتها أكملت حولها، فالمجموع ${money(due.zakat)}.` : view.due.explanation)
+    : due.today
+      ? `أصول أضفتها أكملت حولها اليوم، فتجب ${money(due.zakat)}.`
+      : `لا زكاة واجبة اليوم. الوعاء ${money(Math.round(vault))} فوق النصاب ${money(Math.round(view.nisab))}، والحول مستمر.`;
   const points = [
-    { key: 'start', title: 'بداية الحول', date: gregText(view.start.date), text: view.start.explanation },
-    { key: 'due', title: payment ? 'أخرجت اليوم' : 'وجوب اليوم', date: gregShort(view.due.date), text: due.matured.length ? `${view.due.explanation} ويضاف ${money(due.maturedBase / 40, { decimals: 2 })} عن أصول أضفتها أكملت حولها، فالمجموع ${money(due.zakat)}.` : view.due.explanation },
-    {
-      key: 'next', title: 'الوجوب التالي', date: `بعد ${next.inDays} يومًا`,
+    view.start && { key: 'start', title: 'بداية الحول', date: gregText(view.start.date), text: view.start.explanation },
+    { key: 'due', title: payment ? 'أخرجت اليوم' : due.today ? 'وجوب اليوم' : 'اليوم', date: gregShort(view.today), text: todayText },
+    next && {
+      key: 'next', title: 'الوجوب التالي', date: `بعد ${daysText(next.inDays)}`,
       text: `في ${hijriText(next.date)} يكتمل الحول للمبالغ التي دخلت في ${hijriText(next.hawlStart)}، فتجب ${money(next.zakat, { decimals: 2 })} إن بقي الوعاء فوق النصاب.`,
     },
-  ];
-  const [sel, setSel] = useState('next');
+  ].filter(Boolean);
+  const [sel, setSel] = useState(next ? 'next' : 'due');
   const current = points.find(p => p.key === sel);
   return (
     <Screen title="خطك الزمني" desc="الأحداث التي أثرت في اكتمال الحول والاستحقاق." onBack={back}
-      cta={<Button variant="primary" icon={ArrowLeft} onClick={() => go(payment ? 'success' : 'payout')}>{payment ? 'عرض الإيصال' : 'إخراج الزكاة'}</Button>}>
+      cta={payment || due.today
+        ? <Button variant="primary" icon={ArrowLeft} onClick={() => go(payment ? 'success' : 'payout')}>{payment ? 'عرض الإيصال' : 'إخراج الزكاة'}</Button>
+        : <Button variant="primary" icon={ArrowLeft} onClick={() => go('home')}>الرئيسية</Button>}>
       <div className="nm-tl">
-        <div className="nm-tl-period"><span>{hijriMonthYear(view.start.date)}</span><span>{hijriMonthYear(next.date)}</span></div>
+        <div className="nm-tl-period"><span>{hijriMonthYear((view.start ?? view).date ?? view.today)}</span><span>{hijriMonthYear(next ? next.date : view.today)}</span></div>
         <div className="nm-tl-track">
           {points.map((p, i) => (
-            <button key={p.key} className={`nm-tl-dot${i === 2 ? ' big' : ''}`} aria-pressed={sel === p.key}
+            <button key={p.key} className={`nm-tl-dot${i === points.length - 1 ? ' big' : ''}`} aria-pressed={sel === p.key}
               aria-label={p.title} onClick={() => setSel(p.key)} />
           ))}
         </div>
@@ -103,6 +120,14 @@ export function Payout({ go, back }) {
   const { view, channel, pay, due } = useStore();
   const c = CHANNELS[channel];
   const acc = primaryAccount(view);
+  if (!due.today) {
+    return (
+      <Screen theme="dark" title="لا يوجد مبلغ للإخراج اليوم" desc="لم يكتمل الحول اليوم على أي مبلغ." onBack={back}
+        cta={<Button variant="primary" icon={ArrowLeft} onClick={() => go('timeline')}>الخط الزمني</Button>}>
+        <Note icon={Scale}>{view.nextDue ? `الوجوب القادم في ${hijriText(view.nextDue.date)}.` : 'سننبهك يوم الوجوب.'}</Note>
+      </Screen>
+    );
+  }
   return (
     <Screen theme="dark" title="راجع إخراج الزكاة" desc="تأكد من المبلغ والقناة قبل الإرسال." onBack={back}
       cta={<Button variant="primary" icon={LockKeyhole} onClick={() => { pay(); go('success'); }}>تأكيد الإخراج</Button>}>

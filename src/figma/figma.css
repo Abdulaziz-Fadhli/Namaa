@@ -242,3 +242,25 @@
 
 /* إطار الجوال لشاشات فيجما: زوايا 34 وحد 1 وظل الملف */
 .phone.figma { border-radius: 34px; background: transparent; box-shadow: 0 18px 44px rgba(0, 16, 28, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.16); }
+
+/* ---------- الوضع المباشر ---------- */
+.nm-flash { border-radius: 6px; padding: 0 2px; animation: nm-flash 1.4s ease-out; }
+.nm-flash.up { animation-name: nm-flash-up; }
+.nm-flash.down { animation-name: nm-flash-down; }
+@keyframes nm-flash { from { background: rgba(248, 160, 147, 0.22); text-shadow: 0 0 10px rgba(248, 160, 147, 0.9); } to { background: transparent; text-shadow: none; } }
+@keyframes nm-flash-up { from { background: rgba(76, 195, 138, 0.22); text-shadow: 0 0 10px rgba(76, 195, 138, 0.9); } to { background: transparent; text-shadow: none; } }
+@keyframes nm-flash-down { from { background: rgba(255, 122, 122, 0.22); text-shadow: 0 0 10px rgba(255, 122, 122, 0.9); } to { background: transparent; text-shadow: none; } }
+.nm-livepill {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; align-self: flex-start;
+  font: inherit; font-size: 11px; font-weight: 600; color: var(--pill); cursor: pointer;
+  background: rgba(255, 255, 255, 0.08); border: 1px solid color-mix(in srgb, var(--pill) 45%, transparent);
+  border-radius: 999px; padding: 2px 10px;
+}
+.nm-livepill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pill); }
+.nm-livepill-dot.pulse { animation: nm-pulse 1.6s ease-in-out 3; }
+@keyframes nm-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+.nm-spin { animation: nm-spin 0.9s linear infinite; }
+@keyframes nm-spin { to { transform: rotate(-360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .nm-flash, .nm-livepill-dot.pulse, .nm-spin { animation: none; }
+}

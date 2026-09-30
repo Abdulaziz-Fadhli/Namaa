@@ -7,6 +7,7 @@ import { DateField, NumberField } from '../fields.jsx';
 import { parseNum, useStore, zakatableOf } from '../model.js';
 import { money, num } from '../format.js';
 import { assess, check, toEngineEntry } from '../../securities/securities.js';
+import { saudiSymbol, timeOf, useLiveFeed, useLivePrices } from '../live.js';
 
 function Choices({ items, onPick }) {
   return (
@@ -25,13 +26,23 @@ export default function Security({ back }) {
   const [category, setCategory] = useState(null);
   const [units, setUnits] = useState('12');
   const [price, setPrice] = useState('97.40');
+  const [priceTouched, setPriceTouched] = useState(false);
   const [acquired, setAcquired] = useState('2026-01-10');
   const r = useMemo(() => (q.trim() ? check(q, { category: category ?? undefined }) : null), [q, category]);
-  const u = parseNum(units), p = parseNum(price);
   const found = r?.found;
+  // السهم السعودي: نجيب سعره من تداول عبر خدمة الأسعار، والمستخدم يقدر يعدّله
+  const sym = saudiSymbol(r);
+  const live = useLivePrices(sym ? [sym] : []);
+  const us = found && r.market === 'US';
+  // السهم أو الصندوق الأمريكي: سعره باللحظة من Finnhub (طلب واحد بعد ما يوقف المستخدم عن الكتابة)
+  const usSym = us && r.symbol ? r.symbol : null;
+  const usFeed = useLiveFeed({ enabled: Boolean(usSym), us: usSym ? [usSym] : [], delayMs: 600 });
+  const usQuote = usSym ? usFeed.quotes[usSym] : null;
+  const quote = sym ? live.quotes[sym] : usQuote;
+  const shownPrice = !priceTouched && quote ? String(quote.price) : price;
+  const u = parseNum(units), p = parseNum(shownPrice);
   const isCompany = found && r.type === 'COMPANY';
   const shownType = found ? (isCompany ? 'stock' : 'fund') : type;
-  const us = found && r.market === 'US';
   const a = found && u > 0 && p > 0
     ? assess({ symbol: r.symbol || undefined, fundName: r.symbol ? undefined : r.name, category: r.symbol ? undefined : r.category, units: u, price: p, intent: 'INVEST' })
     : null;
@@ -47,6 +58,8 @@ export default function Security({ back }) {
   const add = () => {
     addAsset({
       kind: shownType, engine, value: contribution, market: a.value, acquired,
+      // للوضع المباشر: الأمريكي يعاد تقييمه بنسبة تغيّر سعره
+      live: usSym ? { symbol: usSym, price: p } : null,
       title: `${isCompany ? 'سهم' : 'صندوق'} ${r.name}`,
       short: `${num(u)} ${unitLabel} • ${r.name}`,
       detail: `${num(u)} ${unitLabel} • ${r.marketAr ?? 'غير مدرج'}${a.zakatable ? '' : ' • الشركة تزكي عنه'}`,
@@ -65,18 +78,26 @@ export default function Security({ back }) {
           <span className="nm-field-label">البحث</span>
           <input className="nm-field-input" value={q} maxLength={80} aria-label="اسم السهم أو الصندوق أو رمزه"
             placeholder={shownType === 'stock' ? 'مثال: 1120 أو AAPL' : 'مثال: الراجحي ريت'}
-            onChange={ev => { setQ(ev.target.value); setCategory(null); }} />
+            onChange={ev => { setQ(ev.target.value); setCategory(null); setPriceTouched(false); }} />
         </label>
         <span className="nm-help" role="status">{help}</span>
         {r && !found && r.alternatives?.length > 0 && (
-          <Choices items={r.alternatives.slice(0, 4).map(x => ({ key: x.symbol, label: `${x.name} • ${x.symbol}`, symbol: x.symbol }))} onPick={x => setQ(x.symbol)} />
+          <Choices items={r.alternatives.slice(0, 4).map(x => ({ key: x.symbol, label: `${x.name} • ${x.symbol}`, symbol: x.symbol }))} onPick={x => { setQ(x.symbol); setPriceTouched(false); }} />
         )}
         {r && !found && r.choices && (
           <Choices items={r.choices.map(c => ({ key: c.category, label: c.label, category: c.category }))} onPick={c => setCategory(c.category)} />
         )}
       </div>
       <NumberField icon={Hash} label="الكمية" value={units} onChange={setUnits} unit={unitLabel} />
-      <NumberField icon={BadgeDollarSign} label="سعر الوحدة" value={price} onChange={setPrice} unit={us ? '$' : 'ر.س'} />
+      <NumberField icon={BadgeDollarSign} label="سعر الوحدة" value={shownPrice} unit={us ? '$' : 'ر.س'}
+        onChange={v => { setPrice(v); setPriceTouched(true); }}
+        help={usSym ? (usQuote && !priceTouched
+            ? `سعر السوق الأمريكي ${usFeed.market?.us.open ? 'المباشر' : '(السوق مغلق، آخر سعر)'}${timeOf(usQuote.at) ? ` • ${timeOf(usQuote.at)}` : ''}`
+            : priceTouched ? 'سعر أدخلته أنت' : usFeed.ready ? 'تعذّر جلب السعر المباشر، أدخله يدويًا' : 'نجلب السعر من السوق الأمريكي…')
+          : !sym ? (found ? 'أدخل سعر الوحدة (لا يوجد مصدر أسعار مباشر لهذه الورقة)' : undefined)
+          : quote && !priceTouched ? `سعر ${r.marketAr} المباشر${live.delayedMinutes ? ` (متأخر ${live.delayedMinutes} دقيقة)` : ''}${timeOf(quote.at ?? live.fetchedAt) ? ` • ${timeOf(quote.at ?? live.fetchedAt)}` : ''}`
+          : live.loading ? 'نجلب السعر من السوق…'
+          : priceTouched ? 'سعر أدخلته أنت' : 'تعذّر جلب السعر المباشر، أدخله يدويًا'} />
       <DateField icon={Calendar} label="تاريخ التملك" value={acquired} onChange={setAcquired} calendar="gregorian" max={view.today} />
       <AmountCard theme="dark" label="القيمة السوقية الحالية" amount={money(a ? a.value : 0)}
         detail={a ? `${num(u)} × ${us ? `${num(p, { decimals: 2 })} $ (× 3.75)` : money(p, { decimals: 2 })} • ${a.zakatable ? `يدخل الوعاء ${money(contribution)}` : 'الشركة تزكي عنه، لا يدخل وعاءك'}` : 'أدخل الكمية والسعر'} />

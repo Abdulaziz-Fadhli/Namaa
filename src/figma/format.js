@@ -52,3 +52,11 @@ export function hijriMonthLength(y, m) {
 }
 
 export const daysBetween = (a, b) => Math.round((toDate(b) - toDate(a)) / 86400000);
+
+// «يوم واحد» «يومين» «3 أيام» «11 يومًا»
+export function daysText(n) {
+  if (n === 1) return 'يوم واحد';
+  if (n === 2) return 'يومين';
+  if (n >= 3 && n <= 10) return `${n} أيام`;
+  return `${n} يومًا`;
+}

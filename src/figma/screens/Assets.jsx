@@ -9,6 +9,7 @@ import { AmountCard, Button, Ico, InfoRow, Note, Screen, Segmented } from '../ui
 import { DateField, NumberField, SelectField, TextField } from '../fields.jsx';
 import { bankName, parseNum, useStore, zakatableOf } from '../model.js';
 import { gregText, hijriToIso, money, num } from '../format.js';
+import { timeOf, useLivePrices } from '../live.js';
 
 const KINDS = {
   metals: ['gold', 'silver'],
@@ -33,7 +34,11 @@ function AssetCard({ icon, title, detail, added, onClick }) {
 }
 
 export function OffBank({ go, back }) {
-  const { assets, view } = useStore();
+  const { assets } = useStore();
+  const { metals, loading } = useLivePrices();
+  const liveNote = loading ? 'نحدّث أسعار السوق…'
+    : metals.source !== 'fallback' ? `أسعار الذهب والفضة والأسهم السعودية مباشرة من السوق${timeOf(metals.at) ? ` • ${timeOf(metals.at)}` : ''}.`
+      : `أسعار الذهب والفضة محفوظة بتاريخ ${gregText(metals.at)}.`;
   const of = key => assets.filter(a => KINDS[key].includes(a.kind));
   const summary = (key, empty) => {
     const list = of(key);
@@ -49,7 +54,7 @@ export function OffBank({ go, back }) {
         <AssetCard icon={House} title="عقار" detail={summary('property', 'معد للبيع')} added={of('property').length > 0} onClick={() => go('property')} />
         <AssetCard icon={Banknote} title="نقد" detail={summary('cash', 'خارج البنوك')} added={of('cash').length > 0} onClick={() => go('cash')} />
       </div>
-      <Note icon={RefreshCw}>أسعار الذهب والفضة محدّثة بتاريخ {gregText(view.prices.date)}.</Note>
+      <Note icon={RefreshCw}>{liveNote}</Note>
     </Screen>
   );
 }
@@ -67,7 +72,9 @@ export function Metals({ back }) {
   const g = parseNum(grams);
   const ok = g > 0;
   const gold = metal === 'gold';
-  const price = gold ? view.prices.goldPerGram : view.prices.silverPerGram;
+  const { metals, loading } = useLivePrices();
+  const isLive = metals.source !== 'fallback';
+  const price = gold ? metals.goldPerGram : metals.silverPerGram;
   const engine = gold
     ? { gold: [{ grams: ok ? g : 0, karat, pricePerGram: price }] }
     : { silver: [{ grams: ok ? g : 0, purity, pricePerGram: price }] };
@@ -76,9 +83,11 @@ export function Metals({ back }) {
   const add = () => {
     addAsset({
       kind: metal, engine, value, acquired,
+      // للوضع المباشر: يعاد تقييمه مع كل تحديث لسعر المعدن
+      live: gold ? { metal: 'gold', grams: g, karat } : { metal: 'silver', grams: g, purity },
       title: gold ? `ذهب ${karat} قيراط` : `فضة ${purity}`,
       short: `${num(g)} غرام ${gold ? 'ذهب' : 'فضة'}`,
-      detail: `${num(g)} غرام • سعر اليوم`,
+      detail: `${num(g)} غرام • ${isLive ? 'سعر السوق الآن' : `سعر ${gregText(metals.at)}`}`,
     });
     back();
   };
@@ -97,7 +106,11 @@ export function Metals({ back }) {
       <DateField icon={Calendar} label="تاريخ التملك" value={acquired} onChange={setAcquired} max={view.today} />
       <AmountCard label="القيمة وفق آخر سعر" amount={money(value)}
         detail={`${num(ok ? g : 0)} غ × ${money(unitPrice, { decimals: 2 })}`} />
-      <Note icon={Clock3}>سعر غرام {gold ? 'الذهب عيار 24' : 'الفضة الخالصة'} بتاريخ {gregText(view.prices.date)}: {money(price, { decimals: 2 })}.</Note>
+      <Note icon={Clock3}>
+        {loading ? 'نجلب سعر السوق الآن…'
+          : isLive ? `سعر السوق المباشر لغرام ${gold ? 'الذهب عيار 24' : 'الفضة الخالصة'}: ${money(price, { decimals: 2 })}${timeOf(metals.at) ? ` • آخر تحديث ${timeOf(metals.at)}` : ''}.`
+          : `آخر سعر محفوظ لغرام ${gold ? 'الذهب عيار 24' : 'الفضة الخالصة'} (${gregText(metals.at)}): ${money(price, { decimals: 2 })}.`}
+      </Note>
     </Screen>
   );
 }
