@@ -111,13 +111,17 @@ export function calculateAssetValue(d) {  let total = 0;
   }
 
   // Silver
-  for (const silver of (d.silver ?? [])) {
-    assertFiniteNonNegative(silver.grams, 'silver grams');
-    assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
+  // Silver
+for (const silver of (d.silver ?? [])) {
+  assertFiniteNonNegative(silver.grams, 'silver grams');
+  assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
 
-    total += silver.grams * silver.pricePerGram;
-  }
+  // Purity is expressed as 999, 925, 800, etc.
+  const purity = silver.purity == null ? 1 : silver.purity / 1000;
+  assertFiniteNonNegative(purity, 'silver purity');
 
+  total += silver.grams * purity * silver.pricePerGram;
+}
   // Stocks
   for (const stock of (d.stocks ?? [])) {
     assertFiniteNonNegative(stock.marketValue, 'stock market value');
@@ -135,14 +139,26 @@ export function calculateAssetValue(d) {  let total = 0;
     }
   }
 
-  // Investment products
-  for (const product of (d.investmentProducts ?? [])) {
-    if (product.zakatableValue != null) {
-      assertFiniteNonNegative(product.zakatableValue, 'product zakatable value');
-      total += product.zakatableValue;
-    }
+// Investment products
+for (const product of (d.investmentProducts ?? [])) {
+  // Products held for trading are treated like trade goods:
+  // use the full current market value.
+  if (product.type === 'TRADING') {
+    assertFiniteNonNegative(product.marketValue, 'product market value');
+    total += product.marketValue;
+    continue;
   }
 
+  // Long-term investment products use the zakatable value
+  // disclosed or calculated from the fund/company information.
+  if (product.type === 'LONG_TERM' && product.zakatableValue != null) {
+    assertFiniteNonNegative(product.zakatableValue, 'product zakatable value');
+    total += product.zakatableValue;
+  }
+
+  // If a long-term product has no known zakatable value,
+  // Namaa does not invent a default value or automatically treat it as exempt.
+}
   // Manually entered zakatable assets
   for (const asset of (d.manualAssets ?? [])) {
     assertFiniteNonNegative(asset.value, 'manual asset value');
@@ -156,10 +172,184 @@ export function calculateAssetValue(d) {  let total = 0;
 }
 
 export const defaultSettings = {
-  nisabBasis: 'MIN', goldGrams: 85, silverGrams: 595,
-  mode: 'PRECISE', spendOrder: 'LIFO', jewelry: true,
-  stocksLongTerm: 'EXCLUDE', deductDebts: false
+  // Nisab for cash and trade goods:
+  // use the lower value between gold and silver nisab.
+  nisabBasis: 'MIN',
+
+  // Fixed reference weights from the approved guide.
+  goldGrams: 85,
+  silverGrams: 595,
+
+  // Calculation mode for cash flows.
+
+  // Spending order for lots.
+  spendOrder: 'LIFO',
+
+  // Personal-use jewelry is excluded.
+  jewelryTreatment: 'EXCLUDE_PERSONAL_USE',
+
+  // Stocks / investment products.
+  stockTreatment: 'BY_INTENT',
+  fundTreatment: 'BY_INTENT',
+
+  // Property treatment depends on user intent:
+  // USE, RENTAL, or TRADING.
+  propertyTreatment: 'BY_INTENT',
+
+  // Newly acquired money:
+  // independent hawl by default.
+  acquiredMoneyMode: 'INDEPENDENT_HAWL',
+
+  // According to the approved guide,
+  // debts owed by the user are not deducted from the zakat base.
+  deductDebts: false
 };
+
+export function validateShariaSettings(settings) {
+  if (!settings || typeof settings !== 'object') {
+    throw new TypeError('settings must be an object');
+  }
+
+  const allowedNisabBasis = ['MIN'];
+  const allowedSpendOrders = ['FIFO', 'LIFO'];
+  const allowedJewelryTreatment = ['EXCLUDE_PERSONAL_USE'];
+  const allowedStockTreatment = ['BY_INTENT'];
+  const allowedFundTreatment = ['BY_INTENT'];
+  const allowedPropertyTreatment = ['BY_INTENT'];
+  const allowedAcquiredMoneyMode = ['INDEPENDENT_HAWL', 'ANNUAL_ADVANCE'];
+
+  if (!allowedNisabBasis.includes(settings.nisabBasis)) {
+    throw new TypeError('unsupported nisab basis');
+  }
+
+  
+  if (!allowedSpendOrders.includes(settings.spendOrder)) {
+    throw new TypeError('unsupported spend order');
+  }
+
+  if (!allowedJewelryTreatment.includes(settings.jewelryTreatment)) {
+    throw new TypeError('unsupported jewelry treatment');
+  }
+
+  if (!allowedStockTreatment.includes(settings.stockTreatment)) {
+    throw new TypeError('unsupported stock treatment');
+  }
+
+  if (!allowedFundTreatment.includes(settings.fundTreatment)) {
+    throw new TypeError('unsupported fund treatment');
+  }
+
+  if (!allowedPropertyTreatment.includes(settings.propertyTreatment)) {
+    throw new TypeError('unsupported property treatment');
+  }
+
+  if (!allowedAcquiredMoneyMode.includes(settings.acquiredMoneyMode)) {
+    throw new TypeError('unsupported acquired money mode');
+  }
+
+  if (settings.deductDebts !== false) {
+    throw new TypeError('deductDebts must be false under the approved guide');
+  }
+
+  return true;
+}
+
+
+export const CROP_NISAB_KG = 612;
+
+export function evaluateCropZakat(crop) {
+  if (!crop || typeof crop !== 'object') {
+    throw new TypeError('crop must be an object');
+  }
+
+  assertFiniteNonNegative(crop.kg, 'crop kilograms');
+
+  const eligible = crop.kg >= CROP_NISAB_KG;
+
+  return {
+    kind: crop.kind ?? null,
+    kg: crop.kg,
+    nisabKg: CROP_NISAB_KG,
+    eligible,
+    requiresHawl: false,
+    dueAtHarvest: eligible
+  };
+}
+
+export const LIVESTOCK_NISAB = {
+  camels: 5,
+  cattle: 30,
+  sheep: 40
+};
+
+export function evaluateLivestockZakat(livestock) {
+  if (!livestock || typeof livestock !== 'object') {
+    throw new TypeError('livestock must be an object');
+  }
+
+  const { type, count } = livestock;
+
+  if (!(type in LIVESTOCK_NISAB)) {
+    throw new TypeError('unsupported livestock type');
+  }
+
+  assertFiniteNonNegative(count, 'livestock count');
+
+  const nisab = LIVESTOCK_NISAB[type];
+  const eligible = count >= nisab;
+
+  return {
+    type,
+    count,
+    nisab,
+    eligible,
+    requiresHawl: true
+  };
+}
+
+export function evaluatePropertyZakat(property) {
+  if (!property || typeof property !== 'object') {
+    throw new TypeError('property must be an object');
+  }
+
+  const { intent, marketValue = 0, rentalIncome = 0 } = property;
+
+  if (!['USE', 'RENTAL', 'TRADING'].includes(intent)) {
+    throw new TypeError('unsupported property intent');
+  }
+
+  assertFiniteNonNegative(marketValue, 'property market value');
+  assertFiniteNonNegative(rentalIncome, 'property rental income');
+
+  if (intent === 'USE') {
+    return {
+      intent,
+      zakatablePropertyValue: 0,
+      rentalIncome,
+      treatment: 'EXEMPT_PROPERTY_ASSET'
+    };
+  }
+
+  if (intent === 'RENTAL') {
+    return {
+      intent,
+      zakatablePropertyValue: 0,
+      rentalIncome,
+      treatment: 'RENTAL_INCOME_AS_CASH'
+    };
+  }
+
+  return {
+    intent,
+    zakatablePropertyValue: marketValue,
+    rentalIncome,
+    treatment: 'TRADE_GOODS'
+  };
+}
+
+
+
+
 
 function validateDay(d) {
   if (!d || !(d.date instanceof Date) || Number.isNaN(d.date.getTime())) throw new TypeError('each day must contain a valid date');
@@ -170,6 +360,7 @@ function validateDay(d) {
 
 // Future-facing detailed result for UI integration. Monday's runEngine remains backward compatible.
 export function runEngineDetailed(days, settings = defaultSettings) {
+  validateShariaSettings(settings);
   const lots = [], events = [], series = [];
   let wasAbove = false;
 
@@ -191,10 +382,24 @@ for (const x of (d.deposits ?? [])) lots.push({ amount: x, depositDate: d.date, 
     if (above) {
       const due = lots.filter(l => l.start && isHawlComplete(l.start, d.date));
       if (due.length) {
-        const base = settings.mode === 'EASY' ? total : sum(due);
-        events.push({ type: 'DUE', date: d.date, base, zakat: base / 40 });
-        (settings.mode === 'EASY' ? lots : due).forEach(l => (l.start = d.date));
-      }
+  const annualAdvance =
+    settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
+
+  const base = annualAdvance
+    ? total
+    : sum(due);
+
+  events.push({
+    type: 'DUE',
+    date: d.date,
+    base,
+    zakat: base / 40
+  });
+
+  (annualAdvance ? lots : due).forEach(
+    l => (l.start = d.date)
+  );
+}
     }
     series.push({ date: d.date, total, nisab: d.nisab, above });
   }
@@ -218,7 +423,9 @@ for (const x of (d.deposits ?? [])) lots.push({ amount: x, depositDate: d.date, 
   );
 
   const expectedBase =
-    settings.mode === 'EASY' ? sum(lots) : sum(dueLots);
+  settings.acquiredMoneyMode === 'ANNUAL_ADVANCE'
+    ? sum(lots)
+    : sum(dueLots);
 
   nextDue.zakat = expectedBase / 40;
 }

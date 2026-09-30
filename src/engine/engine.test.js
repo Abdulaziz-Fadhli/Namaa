@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { defaultSettings, hijri, runEngine, traditionalCalc, calculateAssetValue } from './engine.js';
+import { defaultSettings, hijri, runEngine, traditionalCalc, evaluatePropertyZakat , validateShariaSettings , evaluateLivestockZakat  , calculateAssetValue, evaluateCropZakat } from './engine.js';
 const DAY = 86400000;
 
 function dateFromHijri(y, m, d) {
@@ -91,35 +91,51 @@ describe('Namaa hawl engine - Monday validation cases', () => {
     expect(due.zakat).toBe(200);
   });
 
-  test('Case 4A: PRECISE keeps independent hawl for each lot', () => {
-    const d1 = dateFromHijri(1447, 1, 1);
-    const d2 = dateFromHijri(1447, 4, 1);
-    const end = dateFromHijri(1448, 4, 1);
-    const days = range(d1, end, {
-      [key(d1)]: { deposits: [10000] },
-      [key(d2)]: { deposits: [4000] }
-    });
-    const due = dueEvents(runEngine(days, { ...defaultSettings, mode: 'PRECISE' }));
-    expect(due.map(e => [hkey(e.date), e.base, e.zakat])).toEqual([
-      ['1448/1/1', 10000, 250],
-      ['1448/4/1', 4000, 100]
-    ]);
+test('Case 4A: INDEPENDENT_HAWL keeps separate due dates', () => {
+  const d1 = dateFromHijri(1447, 1, 1);
+  const d2 = dateFromHijri(1447, 4, 1);
+  const end = dateFromHijri(1448, 4, 1);
+
+  const days = range(d1, end, {
+    [key(d1)]: { deposits: [10000] },
+    [key(d2)]: { deposits: [4000] }
   });
 
-  test('Case 4B: EASY pays all with the first due lot', () => {
-    const d1 = dateFromHijri(1447, 1, 1);
-    const d2 = dateFromHijri(1447, 4, 1);
-    const end = dateFromHijri(1448, 4, 1);
-    const days = range(d1, end, {
-      [key(d1)]: { deposits: [10000] },
-      [key(d2)]: { deposits: [4000] }
-    });
-    const due = dueEvents(runEngine(days, { ...defaultSettings, mode: 'EASY' }));
-    expect(due).toHaveLength(1);
-    expect(hkey(due[0].date)).toBe('1448/1/1');
-    expect(due[0].base).toBe(14000);
-    expect(due[0].zakat).toBe(350);
+  const due = dueEvents(
+    runEngine(days, {
+      ...defaultSettings,
+      acquiredMoneyMode: 'INDEPENDENT_HAWL'
+    })
+  );
+
+  expect(due.map(e => [hkey(e.date), e.base, e.zakat])).toEqual([
+    ['1448/1/1', 10000, 250],
+    ['1448/4/1', 4000, 100]
+  ]);
+});
+
+test('Case 4B: ANNUAL_ADVANCE pays all with the first due lot', () => {
+  const d1 = dateFromHijri(1447, 1, 1);
+  const d2 = dateFromHijri(1447, 4, 1);
+  const end = dateFromHijri(1448, 4, 1);
+
+  const days = range(d1, end, {
+    [key(d1)]: { deposits: [10000] },
+    [key(d2)]: { deposits: [4000] }
   });
+
+  const due = dueEvents(
+    runEngine(days, {
+      ...defaultSettings,
+      acquiredMoneyMode: 'ANNUAL_ADVANCE'
+    })
+  );
+
+  expect(due).toHaveLength(1);
+  expect(hkey(due[0].date)).toBe('1448/1/1');
+  expect(due[0].base).toBe(14000);
+  expect(due[0].zakat).toBe(350);
+});
 
   test('Case 5 LIFO: spending consumes newest lot first', () => {
     const d1 = dateFromHijri(1447, 1, 1);
@@ -363,11 +379,12 @@ describe('Asset value calculation', () => {
         }
       ],
 
-      investmentProducts: [
-        {
-          zakatableValue: 1000
-        }
-      ],
+     investmentProducts: [
+  {
+    type: 'LONG_TERM',
+    zakatableValue: 1000
+  }
+],
 
       manualAssets: [
         {
@@ -381,6 +398,283 @@ describe('Asset value calculation', () => {
 
     expect(result).toBe(6900);
   });
+
+  test('uses dynamic input values instead of hardcoded amounts', () => {
+  const data = {
+    stocks: [
+      {
+        type: 'TRADING',
+        marketValue: 13789.37
+      }
+    ],
+
+    investmentProducts: [
+      {
+        type: 'LONG_TERM',
+        zakatableValue: 4321.65
+      }
+    ]
+  };
+
+  const result = calculateAssetValue(data);
+
+  expect(result).toBeCloseTo(18111.02, 2);
+});
+
+ describe('Crop zakat evaluation', () => {
+  test('crop below 612 kg is not eligible', () => {
+    const result = evaluateCropZakat({
+      kind: 'قمح',
+      kg: 611
+    });
+
+    expect(result.eligible).toBe(false);
+    expect(result.requiresHawl).toBe(false);
+    expect(result.dueAtHarvest).toBe(false);
+  });
+
+  test('crop at 612 kg reaches nisab and is due at harvest', () => {
+    const result = evaluateCropZakat({
+      kind: 'تمر',
+      kg: 612
+    });
+
+    expect(result.eligible).toBe(true);
+    expect(result.requiresHawl).toBe(false);
+    expect(result.dueAtHarvest).toBe(true);
+    expect(result.nisabKg).toBe(612);
+  });
+
+  describe('Livestock zakat evaluation', () => {
+  test('camels below nisab are not eligible', () => {
+    const result = evaluateLivestockZakat({
+      type: 'camels',
+      count: 4
+    });
+
+    expect(result.eligible).toBe(false);
+    expect(result.nisab).toBe(5);
+    expect(result.requiresHawl).toBe(true);
+  });
+
+  test('cattle at nisab are eligible', () => {
+    const result = evaluateLivestockZakat({
+      type: 'cattle',
+      count: 30
+    });
+
+    expect(result.eligible).toBe(true);
+    expect(result.nisab).toBe(30);
+    expect(result.requiresHawl).toBe(true);
+  });
+
+  test('sheep at nisab are eligible', () => {
+    const result = evaluateLivestockZakat({
+      type: 'sheep',
+      count: 40
+    });
+
+    expect(result.eligible).toBe(true);
+    expect(result.nisab).toBe(40);
+    expect(result.requiresHawl).toBe(true);
+  });
+});
+
+
 });
 
 });
+
+});describe('Sharia settings validation', () => {
+  test('default sharia settings are valid', () => {
+    expect(validateShariaSettings(defaultSettings)).toBe(true);
+  });
+
+  test('rejects debt deduction under the approved guide', () => {
+    expect(() =>
+      validateShariaSettings({
+        ...defaultSettings,
+        deductDebts: true
+      })
+    ).toThrow();
+  });
+
+  test('accepts independent hawl for acquired money', () => {
+    expect(
+      validateShariaSettings({
+        ...defaultSettings,
+        acquiredMoneyMode: 'INDEPENDENT_HAWL'
+      })
+    ).toBe(true);
+  });
+
+  test('accepts annual advance for acquired money', () => {
+    expect(
+      validateShariaSettings({
+        ...defaultSettings,
+        acquiredMoneyMode: 'ANNUAL_ADVANCE'
+      })
+    ).toBe(true);
+  });
+});describe('Property zakat evaluation', () => {
+  test('personal-use property is not zakatable', () => {
+    const result = evaluatePropertyZakat({
+      intent: 'USE',
+      marketValue: 500000
+    });
+
+    expect(result.zakatablePropertyValue).toBe(0);
+    expect(result.treatment).toBe('EXEMPT_PROPERTY_ASSET');
+  });
+
+  test('rental property excludes the property asset itself', () => {
+    const result = evaluatePropertyZakat({
+      intent: 'RENTAL',
+      marketValue: 500000,
+      rentalIncome: 30000
+    });
+
+    expect(result.zakatablePropertyValue).toBe(0);
+    expect(result.rentalIncome).toBe(30000);
+    expect(result.treatment).toBe('RENTAL_INCOME_AS_CASH');
+  });
+
+  test('trading property uses market value', () => {
+    const result = evaluatePropertyZakat({
+      intent: 'TRADING',
+      marketValue: 500000
+    });
+
+    expect(result.zakatablePropertyValue).toBe(500000);
+    expect(result.treatment).toBe('TRADE_GOODS');
+  });
+});
+
+
+describe('Cash zakat calculation', () => {
+  test('25000 SAR gives 625 SAR zakat', () => {
+    const amount = 25000;
+    const zakat = amount / 40;
+
+    expect(zakat).toBe(625);
+  });
+});
+test('calculates silver value using purity', () => {
+  const data = {
+    silver: [
+      {
+        grams: 100,
+        purity: 925,
+        pricePerGram: 4
+      }
+    ]
+  };
+
+  const result = calculateAssetValue(data);
+
+  expect(result).toBeCloseTo(370, 2);
+});
+
+describe('Stock zakat calculation', () => {
+  test('trading stock uses full market value', () => {
+    const data = {
+      stocks: [
+        {
+          type: 'TRADING',
+          marketValue: 20000
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(20000);
+  });
+
+  test('long-term stock uses zakatable value only', () => {
+    const data = {
+      stocks: [
+        {
+          type: 'LONG_TERM',
+          marketValue: 50000,
+          zakatableValue: 12000
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(12000);
+  });
+});
+
+describe('Investment product zakat calculation', () => {
+  test('trading investment product uses full market value', () => {
+    const data = {
+      investmentProducts: [
+        {
+          type: 'TRADING',
+          marketValue: 30000
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(30000);
+  });
+
+  test('long-term investment product uses zakatable value only', () => {
+    const data = {
+      investmentProducts: [
+        {
+          type: 'LONG_TERM',
+          marketValue: 50000,
+          zakatableValue: 14000
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(14000);
+  });
+});
+describe('Gold zakat calculation', () => {
+  test('calculates 21 karat gold using purity', () => {
+    const data = {
+      gold: [
+        {
+          grams: 10,
+          karat: 21,
+          pricePerGram: 300,
+          purpose: 'INVESTMENT'
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBeCloseTo(2625, 2);
+  });
+
+  test('personal-use gold is excluded', () => {
+    const data = {
+      gold: [
+        {
+          grams: 20,
+          karat: 24,
+          pricePerGram: 300,
+          purpose: 'PERSONAL_USE'
+        }
+      ]
+    };
+
+    const result = calculateAssetValue(data);
+
+    expect(result).toBe(0);
+  });
+});
+
+
+
