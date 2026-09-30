@@ -377,9 +377,21 @@ function validateDay(day) {
   if (!day || !(day.date instanceof Date) || Number.isNaN(day.date.getTime()))
     throw new TypeError('each day must contain a valid date');
   assertFiniteNonNegative(day.nisab, 'nisab');
-  for (const deposit of day.deposits ?? []) assertFiniteNonNegative(deposit, 'deposit');
-  for (const withdrawal of day.withdrawals ?? []) assertFiniteNonNegative(withdrawal, 'withdrawal');
+  for (const deposit of day.deposits ?? [])
+    assertFiniteNonNegative(deposit, 'deposit');
+  for (const withdrawal of day.withdrawals ?? [])
+    assertFiniteNonNegative(withdrawal, 'withdrawal');
 }
+
+const explanationMoney = new Intl.NumberFormat('ar-SA', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const explanationDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+});
+const moneyText = (amount) => `${explanationMoney.format(amount)} ريال`;
 
 // Future-facing detailed result for UI integration. Monday's runEngine remains backward compatible.
 export function runEngineDetailed(days, settings = defaultSettings) {
@@ -397,17 +409,26 @@ export function runEngineDetailed(days, settings = defaultSettings) {
         depositDate: day.date,
         start: wasAbove ? day.date : null,
       });
-    for (const withdrawal of day.withdrawals ?? []) consume(lots, withdrawal, settings.spendOrder);
+    for (const withdrawal of day.withdrawals ?? [])
+      consume(lots, withdrawal, settings.spendOrder);
 
     const total = sum(lots),
       above = total >= day.nisab;
     if (!above && wasAbove) {
       lots.forEach((lot) => (lot.start = null));
-      events.push({ type: 'BREAK', date: day.date });
+      events.push({
+        type: 'BREAK',
+        date: day.date,
+        explanation: `في ${explanationDate.format(day.date)}، انخفض الرصيد إلى ${moneyText(total)}، دون النصاب البالغ ${moneyText(day.nisab)}، فانقطع الحول. يبدأ حول جديد عند بلوغ النصاب مجددًا.`,
+      });
     }
     if (above && !wasAbove) {
       lots.forEach((lot) => (lot.start ??= day.date));
-      events.push({ type: 'START', date: day.date });
+      events.push({
+        type: 'START',
+        date: day.date,
+        explanation: `في ${explanationDate.format(day.date)}، بلغ الرصيد ${moneyText(total)}، وبلغ النصاب البالغ ${moneyText(day.nisab)}، فبدأ تتبع الحول الهجري.`,
+      });
     }
     wasAbove = above;
 
@@ -425,6 +446,9 @@ export function runEngineDetailed(days, settings = defaultSettings) {
           date: day.date,
           base,
           zakat: base / 40,
+          explanation: annualAdvance
+            ? `في ${explanationDate.format(day.date)}، اكتمل الحول الهجري للمبلغ المستحق، وأُدرج المال الأحدث تعجيلًا للزكاة. الوعاء ${moneyText(base)}، والزكاة ${moneyText(base / 40)} بنسبة ٢٫٥٪.`
+            : `في ${explanationDate.format(day.date)}، اكتمل الحول الهجري للمبلغ المستحق البالغ ${moneyText(base)}، فوجبت زكاة قدرها ${moneyText(base / 40)} بنسبة ٢٫٥٪.`,
         });
 
         (annualAdvance ? lots : due).forEach((lot) => (lot.start = day.date));
