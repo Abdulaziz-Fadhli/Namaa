@@ -7,6 +7,8 @@ import {
   ramadanCalc,
   runEngineDetailed,
   traditionalCalc,
+  validateAssetFlags,
+  validateCashAmount,
 } from '../src/engine/engine.js';
 
 const iso = (date) => date.toISOString().slice(0, 10);
@@ -23,6 +25,63 @@ const readData = (name) =>
     readFileSync(new URL(`../src/data/${name}.json`, import.meta.url), 'utf8'),
   );
 
+const arrayOrEmpty = (value, label) => {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new TypeError(`${label} must be an array`);
+  return value;
+};
+const recordKey = (record) =>
+  JSON.stringify(
+    Object.fromEntries(
+      Object.keys(record)
+        .sort()
+        .map((key) => [key, record[key]]),
+    ),
+  );
+function normalizePersona(persona) {
+  if (!persona || typeof persona !== 'object' || Array.isArray(persona))
+    throw new TypeError('persona must be an object');
+  for (const key of ['name', 'persona'])
+    if (typeof persona[key] !== 'string' || !persona[key])
+      throw new TypeError(`${key} must be a non-empty string`);
+  if (!persona.period || typeof persona.period !== 'object')
+    throw new TypeError('persona requires a period');
+  if (dateOf(persona.period.start) > dateOf(persona.period.end))
+    throw new RangeError('period end must not precede start');
+  const normalized = { ...persona };
+  for (const key of ['accounts', 'transactions', 'holdings', 'manual'])
+    normalized[key] = arrayOrEmpty(persona[key], key);
+  const accountIds = new Set();
+  for (const account of normalized.accounts) {
+    validateAssetFlags(account);
+    if (
+      typeof account.accountId !== 'string' ||
+      !account.accountId ||
+      accountIds.has(account.accountId)
+    )
+      throw new TypeError('invalid or duplicate account id');
+    if (account.currency !== undefined && account.currency !== 'SAR')
+      throw new TypeError('only SAR account amounts are supported');
+    accountIds.add(account.accountId);
+  }
+  const ids = new Set(),
+    records = new Set();
+  for (const asset of [...normalized.holdings, ...normalized.manual]) {
+    validateAssetFlags(asset);
+    if (asset.id !== undefined) {
+      if (typeof asset.id !== 'string' || !asset.id || ids.has(asset.id))
+        throw new TypeError('duplicate or invalid asset id across sources');
+      ids.add(asset.id);
+    } else {
+      const signature = recordKey(asset);
+      if (records.has(signature))
+        throw new TypeError('duplicate asset record without distinct lot ids');
+      records.add(signature);
+    }
+  }
+  return normalized;
+}
+
 // Adapt the saved account/holding schema to a daily cash ledger and complete
 // asset inventory. Internal bank transfers never create new acquisition lots.
 function holdingAt(holding, id, key, prices, periodStart, requireDate) {
@@ -36,8 +95,12 @@ function holdingAt(holding, id, key, prices, periodStart, requireDate) {
     cash: 'cash',
   }[holding.type];
   if (!kind) throw new TypeError(`Unsupported holding schema: ${holding.type}`);
-  if (holding.zakatExempt) return null;
-  const acquired = holding.acquired ?? holding.date;
+  const acquired =
+    holding.acquired !== undefined ? holding.acquired : holding.date;
+  if (acquired !== undefined) dateOf(acquired);
+  if (holding.disposed !== undefined) dateOf(holding.disposed);
+  if (holding.zakatExempt || (kind === 'cash' && holding.zakatable === false))
+    return null;
   if (!acquired && requireDate)
     throw new TypeError('Manual assets require an acquisition date');
   // Opening holdings without earlier history are explicitly reported as such.
@@ -71,12 +134,51 @@ function holdingAt(holding, id, key, prices, periodStart, requireDate) {
 }
 
 export function personaDays(persona, prices, settings = defaultSettings) {
+  persona = normalizePersona(persona);
   const accounts = new Map(
     persona.accounts.map((account) => [account.accountId, account]),
   );
   const byDate = new Map();
+  const transactionIds = new Set(),
+    transactionRecords = new Set(),
+    transfers = new Map();
   for (const transaction of persona.transactions) {
+    if (
+      !transaction ||
+      typeof transaction !== 'object' ||
+      Array.isArray(transaction)
+    )
+      throw new TypeError('transaction must be an object');
     dateOf(transaction.date);
+    validateCashAmount(transaction.amount);
+    if (!['credit', 'debit'].includes(transaction.direction))
+      throw new Error('Unknown transaction direction');
+    if (
+      transaction.internal !== undefined &&
+      typeof transaction.internal !== 'boolean'
+    )
+      throw new TypeError('internal must be boolean');
+    if (
+      transaction.date < persona.period.start ||
+      transaction.date > persona.period.end
+    )
+      throw new Error('Transaction outside period');
+    if (transaction.id !== undefined) {
+      if (
+        typeof transaction.id !== 'string' ||
+        !transaction.id ||
+        transactionIds.has(transaction.id)
+      )
+        throw new TypeError('duplicate or invalid transaction id');
+      transactionIds.add(transaction.id);
+    } else {
+      const signature = recordKey(transaction);
+      if (transactionRecords.has(signature))
+        throw new TypeError(
+          'duplicate transaction record without distinct ids',
+        );
+      transactionRecords.add(signature);
+    }
     const account = accounts.get(transaction.accountId);
     if (!account) throw new Error(`Unknown account: ${transaction.accountId}`);
     if (transaction.internal) {
@@ -89,6 +191,25 @@ export function personaDays(persona, prices, settings = defaultSettings) {
           'Transfers across exempt/non-exempt accounts require an explicit adapter',
         );
       }
+      const from =
+        transaction.direction === 'debit'
+          ? transaction.accountId
+          : transaction.counterparty;
+      const to =
+        transaction.direction === 'credit'
+          ? transaction.accountId
+          : transaction.counterparty;
+      const transferKey = JSON.stringify([
+        transaction.date,
+        from,
+        to,
+        transaction.amount,
+      ]);
+      transfers.set(
+        transferKey,
+        (transfers.get(transferKey) ?? 0) +
+          (transaction.direction === 'credit' ? 1 : -1),
+      );
       continue;
     }
     if (account.zakatExempt) continue;
@@ -108,6 +229,10 @@ export function personaDays(persona, prices, settings = defaultSettings) {
     );
     byDate.set(transaction.date, day);
   }
+  if ([...transfers.values()].some((balance) => balance !== 0))
+    throw new TypeError(
+      'internal transfer must contain matching credit and debit records',
+    );
   const inputs = [
     ...persona.holdings.map((holding, index) => ({
       holding,
@@ -145,6 +270,7 @@ export function personaDays(persona, prices, settings = defaultSettings) {
 }
 
 export function comparePersona(persona, prices, settings = defaultSettings) {
+  persona = normalizePersona(persona);
   const days = personaDays(persona, prices, settings);
   const result = runEngineDetailed(days, settings);
   // Retain the earlier cash-only comparison as a clearly separate baseline.
@@ -229,6 +355,7 @@ export function comparePersona(persona, prices, settings = defaultSettings) {
           : -transaction.amount),
       0,
     );
+  validateCashAmount(exemptBalance);
   const limitations = [
     'الأرصدة والأصول الافتتاحية تبدأ متابعة الحول من أول يوم متاح؛ لا يُفترض بلوغ النصاب قبل بداية السجل.',
   ];
@@ -272,7 +399,12 @@ export function runPersonas() {
 }
 
 export function markdownReport(reports) {
-  const money = (number) => number.toFixed(2);
+  const money = (number) =>
+    new Intl.NumberFormat('en', {
+      useGrouping: false,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(number);
   const lines = [
     '# نتائج مهام الثلاثاء — العضو الثاني',
     '',

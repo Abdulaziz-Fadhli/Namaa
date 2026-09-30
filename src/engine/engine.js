@@ -55,14 +55,73 @@ function resolveHawlDueDate(start) {
     }
   }
 
+  if (!candidate)
+    throw new RangeError(
+      'hawl due date is outside the supported calendar range',
+    );
   return candidate;
 }
-const sum = (lots) => lots.reduce((s, l) => s + l.amount, 0);
+const sum = (lots) => {
+  const total = lots.reduce((value, lot) => value + lot.amount, 0);
+  assertMonetaryValue(total, 'lot total');
+  return total;
+};
 const cloneLots = (lots) => lots.map((l) => ({ ...l }));
 
 function assertFiniteNonNegative(value, label) {
   if (!Number.isFinite(value) || value < 0)
     throw new RangeError(`${label} must be a finite non-negative number`);
+}
+
+// Keep cent rounding reliable with JavaScript numbers. This is a technical
+// supported range, not a nisab or a jurisprudential threshold.
+export const MAX_MONETARY_VALUE = 1e12;
+
+function assertMonetaryValue(value, label) {
+  assertFiniteNonNegative(value, label);
+  if (value > MAX_MONETARY_VALUE)
+    throw new RangeError(`${label} exceeds supported monetary range`);
+}
+
+export function validateCashAmount(value) {
+  assertMonetaryValue(value, 'cash amount');
+  const rounded = Math.round(value * 100) / 100;
+  if (Math.abs(value - rounded) > Number.EPSILON * Math.max(1, value)) {
+    throw new RangeError('cash amount must have at most two decimal places');
+  }
+  return rounded;
+}
+
+function assertRecord(value, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new TypeError(`${label} must be an object`);
+}
+
+function optionalArray(value, label) {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new TypeError(`${label} must be an array`);
+  return value;
+}
+
+export function validateAssetFlags(asset) {
+  assertRecord(asset, 'asset');
+  for (const key of ['zakatExempt', 'zakatable']) {
+    if (asset[key] !== undefined && typeof asset[key] !== 'boolean')
+      throw new TypeError(`${key} must be boolean`);
+  }
+}
+
+function assertDailyDate(date, label) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime()))
+    throw new TypeError(`${label} must be a valid Date`);
+  if (
+    date.getUTCHours() ||
+    date.getUTCMinutes() ||
+    date.getUTCSeconds() ||
+    date.getUTCMilliseconds()
+  ) {
+    throw new TypeError(`${label} must be a UTC midnight calendar date`);
+  }
 }
 
 export class IncompleteAssetDataError extends Error {
@@ -84,7 +143,7 @@ function assertInvestmentType(asset, label) {
 }
 
 function consume(lots, amount, order) {
-  assertFiniteNonNegative(amount, 'withdrawal');
+  amount = validateCashAmount(amount);
 
   const roundMoney = (value) =>
     Math.round((value + Number.EPSILON) * 100) / 100;
@@ -117,6 +176,27 @@ function consume(lots, amount, order) {
 }
 
 export function calculateAssetValue(data) {
+  assertRecord(data, 'asset data');
+  const ids = new Set();
+  const references = new Set();
+  for (const category of [
+    'gold',
+    'silver',
+    'stocks',
+    'investmentProducts',
+    'properties',
+    'manualAssets',
+  ]) {
+    for (const asset of optionalArray(data[category], category)) {
+      validateAssetFlags(asset);
+      if (asset.id !== undefined && (typeof asset.id !== 'string' || !asset.id))
+        throw new TypeError('asset id must be a non-empty string');
+      if (references.has(asset) || (asset.id != null && ids.has(asset.id)))
+        throw new TypeError('duplicate asset record');
+      references.add(asset);
+      if (asset.id != null) ids.add(asset.id);
+    }
+  }
   let total = 0;
 
   // Gold
@@ -128,7 +208,10 @@ export function calculateAssetValue(data) {
     // Used/personal jewelry is excluded.
     // Other gold is included in the zakat base.
     if (gold.purpose !== 'PERSONAL_USE') {
-      const purity = gold.karat == null ? 1 : gold.karat / 24;
+      const karat = gold.karat === undefined ? 24 : gold.karat;
+      assertFiniteNonNegative(karat, 'gold karat');
+      if (karat === 0) throw new RangeError('gold karat must be positive');
+      const purity = karat / 24;
       assertFiniteNonNegative(purity, 'gold purity');
       if (purity > 1) throw new RangeError('gold karat must not exceed 24');
 
@@ -143,7 +226,10 @@ export function calculateAssetValue(data) {
     assertFiniteNonNegative(silver.pricePerGram, 'silver price per gram');
 
     // Purity is expressed as 999, 925, 800, etc.
-    const purity = silver.purity == null ? 1 : silver.purity / 1000;
+    const fineness = silver.purity === undefined ? 1000 : silver.purity;
+    assertFiniteNonNegative(fineness, 'silver fineness');
+    if (fineness === 0) throw new RangeError('silver purity must be positive');
+    const purity = fineness / 1000;
     assertFiniteNonNegative(purity, 'silver purity');
     if (purity > 1) throw new RangeError('silver purity must not exceed 1000');
 
@@ -209,16 +295,19 @@ export function calculateAssetValue(data) {
     }
   }
 
+  assertMonetaryValue(total, 'asset total');
   return total;
 }
 
 export function calculateZakatableSnapshot(data) {
+  assertRecord(data, 'snapshot data');
   const cashBalance = data.cashBalance ?? 0;
 
-  assertFiniteNonNegative(cashBalance, 'cash balance');
+  assertMonetaryValue(cashBalance, 'cash balance');
 
   const otherAssets = calculateAssetValue(data);
 
+  assertMonetaryValue(cashBalance + otherAssets, 'snapshot total');
   return {
     cashBalance,
     otherAssets,
@@ -259,8 +348,10 @@ export const defaultSettings = {
 };
 
 export function validateShariaSettings(settings) {
-  if (!settings || typeof settings !== 'object') {
-    throw new TypeError('settings must be an object');
+  assertRecord(settings, 'settings');
+  for (const key of Object.keys(settings)) {
+    if (!Object.hasOwn(defaultSettings, key))
+      throw new TypeError(`unsupported setting: ${key}`);
   }
 
   const allowedNisabBasis = ['MIN'];
@@ -348,11 +439,13 @@ export function evaluateLivestockZakat(livestock) {
 
   const { type, count } = livestock;
 
-  if (!(type in LIVESTOCK_NISAB)) {
+  if (!Object.hasOwn(LIVESTOCK_NISAB, type)) {
     throw new TypeError('unsupported livestock type');
   }
 
   assertFiniteNonNegative(count, 'livestock count');
+  if (!Number.isSafeInteger(count))
+    throw new RangeError('livestock count must be a safe integer');
 
   const nisab = LIVESTOCK_NISAB[type];
   const eligible = count >= nisab;
@@ -376,9 +469,11 @@ export function evaluatePropertyZakat(property) {
   if (!['USE', 'RENTAL', 'TRADING'].includes(intent)) {
     throw new TypeError('unsupported property intent');
   }
+  if (intent === 'TRADING' && property.marketValue == null)
+    throw new IncompleteAssetDataError('trading property market value');
 
-  assertFiniteNonNegative(marketValue, 'property market value');
-  assertFiniteNonNegative(rentalIncome, 'property rental income');
+  assertMonetaryValue(marketValue, 'property market value');
+  assertMonetaryValue(rentalIncome, 'property rental income');
 
   if (intent === 'USE') {
     return {
@@ -409,11 +504,13 @@ export function evaluatePropertyZakat(property) {
 function validateDay(day) {
   if (!day || !(day.date instanceof Date) || Number.isNaN(day.date.getTime()))
     throw new TypeError('each day must contain a valid date');
-  assertFiniteNonNegative(day.nisab, 'nisab');
-  for (const deposit of day.deposits ?? [])
-    assertFiniteNonNegative(deposit, 'deposit');
-  for (const withdrawal of day.withdrawals ?? [])
-    assertFiniteNonNegative(withdrawal, 'withdrawal');
+  assertDailyDate(day.date, 'day date');
+  assertMonetaryValue(day.nisab, 'nisab');
+  if (day.nisab === 0) throw new RangeError('nisab must be positive');
+  for (const deposit of optionalArray(day.deposits, 'deposits'))
+    validateCashAmount(deposit);
+  for (const withdrawal of optionalArray(day.withdrawals, 'withdrawals'))
+    validateCashAmount(withdrawal);
 }
 
 const explanationMoney = new Intl.NumberFormat('ar-SA', {
@@ -442,6 +539,7 @@ function reconcileAssets(inventory, assetLots, date, wasAbove) {
     throw new TypeError('assets must be a complete daily array');
   const seen = new Set();
   for (const asset of inventory) {
+    validateAssetFlags(asset);
     if (!asset || typeof asset.id !== 'string' || !asset.id) {
       throw new TypeError('each asset requires a stable non-empty id');
     }
@@ -456,6 +554,7 @@ function reconcileAssets(inventory, assetLots, date, wasAbove) {
     ) {
       throw new TypeError('each asset requires a valid acquisition date');
     }
+    assertDailyDate(asset.acquired, 'acquisition date');
     const previous = assetLots.get(asset.id);
     if (
       previous &&
@@ -486,8 +585,29 @@ function reconcileAssets(inventory, assetLots, date, wasAbove) {
     const quantity = ['gold', 'silver'].includes(asset.kind)
       ? asset.grams
       : asset.quantity;
-    if (quantity != null) assertFiniteNonNegative(quantity, 'asset quantity');
+    const fineness =
+      asset.kind === 'gold'
+        ? asset.karat === undefined
+          ? 24
+          : asset.karat
+        : asset.kind === 'silver'
+          ? asset.purity === undefined
+            ? 1000
+            : asset.purity
+          : undefined;
+    const treatment = asset.type ?? asset.intent;
+    if (quantity !== undefined)
+      assertFiniteNonNegative(quantity, 'asset quantity');
     if (previous) {
+      if (
+        previous.fineness !== fineness ||
+        previous.treatment !== treatment ||
+        (previous.quantity === undefined) !== (quantity === undefined)
+      ) {
+        throw new TypeError(
+          'asset lot characteristics cannot change; use a new lot id',
+        );
+      }
       if (
         (quantity != null &&
           previous.quantity != null &&
@@ -506,6 +626,8 @@ function reconcileAssets(inventory, assetLots, date, wasAbove) {
         kind: asset.kind,
         amount: value,
         quantity,
+        fineness,
+        treatment,
         depositDate: asset.acquired,
         observedDate: date,
         start: wasAbove ? date : null,
@@ -517,6 +639,7 @@ function reconcileAssets(inventory, assetLots, date, wasAbove) {
 
 export function runEngineDetailed(days, settings = defaultSettings) {
   validateShariaSettings(settings);
+  if (!Array.isArray(days)) throw new TypeError('days must be an array');
   const lots = [],
     events = [],
     series = [];
@@ -530,12 +653,14 @@ export function runEngineDetailed(days, settings = defaultSettings) {
     if (previousDate && day.date <= previousDate)
       throw new TypeError('days must be in strictly increasing date order');
     previousDate = day.date;
-    for (const deposit of day.deposits ?? [])
+    for (const deposit of day.deposits ?? []) {
+      if (deposit === 0) continue;
       lots.push({
-        amount: deposit,
+        amount: validateCashAmount(deposit),
         depositDate: day.date,
         start: wasAbove ? day.date : null,
       });
+    }
     for (const withdrawal of day.withdrawals ?? [])
       consume(lots, withdrawal, settings.spendOrder);
 
@@ -547,6 +672,7 @@ export function runEngineDetailed(days, settings = defaultSettings) {
       otherAssets = sum(currentAssets);
     const total = cashBalance + otherAssets,
       above = total >= day.nisab;
+    assertMonetaryValue(total, 'daily total');
     if (!above && wasAbove) {
       trackedLots.forEach((lot) => (lot.start = null));
       events.push({
@@ -592,7 +718,8 @@ export function runEngineDetailed(days, settings = defaultSettings) {
           );
           event.cashBase = base - event.otherAssetsBase;
         }
-        events.push(event);
+        // No payable obligation exists when all matured lots are worth zero.
+        if (base > 0) events.push(event);
         included.forEach((lot) => (lot.start = day.date));
       }
     }
@@ -603,7 +730,7 @@ export function runEngineDetailed(days, settings = defaultSettings) {
 
   const trackedLots = [...lots, ...assetLots.values()];
   const futureLots = trackedLots
-    .filter((lot) => lot.start)
+    .filter((lot) => lot.start && lot.amount > 0)
     .map((lot) => ({
       ...lot,
       dueDate: resolveHawlDueDate(lot.start),
@@ -635,20 +762,33 @@ export function runEngine(days, settings = defaultSettings) {
 }
 
 export const nisabFor = (p, s = defaultSettings) => {
+  assertRecord(p, 'prices');
+  assertRecord(s, 'settings');
+  if (!['MIN', 'GOLD', 'SILVER'].includes(s.nisabBasis))
+    throw new TypeError('unsupported nisab basis');
+  // GOLD/SILVER remain supported for reference-price comparisons only.
+  // The full project engine is restricted to the approved MIN basis.
+  validateShariaSettings({ ...s, nisabBasis: 'MIN' });
   assertFiniteNonNegative(p?.gold, 'gold price');
   assertFiniteNonNegative(p?.silver, 'silver price');
+  if (p.gold === 0 || p.silver === 0)
+    throw new RangeError('nisab prices must be positive');
   const g = s.goldGrams * p.gold,
     v = s.silverGrams * p.silver;
-  return s.nisabBasis === 'GOLD'
-    ? g
-    : s.nisabBasis === 'SILVER'
-      ? v
-      : Math.min(g, v);
+  const nisab =
+    s.nisabBasis === 'GOLD'
+      ? g
+      : s.nisabBasis === 'SILVER'
+        ? v
+        : Math.min(g, v);
+  assertMonetaryValue(nisab, 'nisab');
+  return nisab;
 };
 
 export function traditionalCalc(total, nisab) {
-  assertFiniteNonNegative(total, 'total');
-  assertFiniteNonNegative(nisab, 'nisab');
+  assertMonetaryValue(total, 'total');
+  assertMonetaryValue(nisab, 'nisab');
+  if (nisab === 0) throw new RangeError('nisab must be positive');
   return total >= nisab ? total / 40 : 0;
 }
 
