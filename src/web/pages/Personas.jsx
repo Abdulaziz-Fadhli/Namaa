@@ -357,7 +357,7 @@ export function KhalidAccounts() {
                   <span className="v">{sar(a.balance)}</span>
                   {info.kind === 'review'
                     ? <button onClick={() => setReview(true)}><Pill tone="warn">يحتاج مراجعة</Pill></button>
-                    : <Pill tone={info.pill[0]}>{info.pill[1]}</Pill>}
+                    : info.kind !== 'cash' && <span className="t11 sub">{info.pill[1]}</span>}
                 </span>
               </div>
             );
