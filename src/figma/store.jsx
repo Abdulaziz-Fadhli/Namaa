@@ -3,9 +3,9 @@
 // - «مباشر» (live): المحرك يشتغل هنا في المتصفح على تاريخ اليوم الحقيقي وسعر السوق الآن،
 //   ويُعاد الحساب مع كل تحديث للأسعار، وتُعاد قيمة كل أصل مضاف (ذهب، فضة، سهم أمريكي).
 // الوعاء = أرصدة البنوك من المحرك + calculateAssetValue على الأصول المضافة.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { calculateAssetValue, defaultSettings, isHawlComplete, resolveHawlDueDate } from '../engine/engine.js';
-import { applyTrade, portfolioAssets, seedPortfolio } from '../engine/portfolio.js';
+import { nextScripted, portfolioAssets, providerOf, receiveNext, seedPortfolio } from '../engine/portfolio.js';
 import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
 import { StoreContext } from './model.js';
@@ -93,6 +93,22 @@ export function StoreProvider({ children, personaMode = false }) {
   );
 
   const portfolios = useMemo(() => portfoliosBy[pkey] ?? [], [portfoliosBy, pkey]);
+  const [feedPaused, setFeedPaused] = useState(false);
+  const [events, setEvents] = useState([]);              // عمليات وصلت من التطبيقات (لإشعار يظهر في أي صفحة)
+  const today0 = personaMode ? pd.asOf : today;
+  // العمليات تصل من التطبيق تلقائيًا: أول عملية بعد 5 ثوانٍ من الربط، ثم كل 9 ثوانٍ، حتى تنتهي
+  useEffect(() => {
+    if (feedPaused) return undefined;
+    const p = portfolios.find(x => nextScripted(x));
+    if (!p) return undefined;
+    const t = setTimeout(() => {
+      const res = receiveNext(p, today0, clock12(new Date()));
+      if (!res) return;
+      setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).map(x => (x.id === p.id ? res.portfolio : x)) }));
+      setEvents(ev => [{ id: `${pkey}:${p.id}:${res.trade.id}`, pkey, portfolio: p.id, provider: providerOf(p.provider).name, trade: res.trade, at: Date.now() }, ...ev].slice(0, 20));
+    }, p.trades.length === 0 ? 5000 : 9000);
+    return () => clearTimeout(t);
+  }, [portfolios, feedPaused, pkey, today0]);
   const value = useMemo(() => {
     // المواشي والمحاصيل: يعاد الحكم بتاريخ اليوم (الحول في الأنعام)، وزكاتها عينية خارج وعاء النقود
     const priced = (live ? assets.map(a => reprice(a, feed)) : assets).map(a => (!a.agri ? a : {
@@ -170,14 +186,9 @@ export function StoreProvider({ children, personaMode = false }) {
       linkPortfolio: providerId => setPortfoliosBy(by => ((by[pkey] ?? []).some(x => x.id === providerId) ? by
         : { ...by, [pkey]: [...(by[pkey] ?? []), seedPortfolio(providerId, view.today)] })),
       unlinkPortfolio: id => setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).filter(x => x.id !== id) })),
-      // عملية شراء أو بيع وصلت من التطبيق: تُطبّق على المحفظة فيتحدث الوعاء والوجوب مباشرة
-      trade: (id, t) => {
-        const cur = (portfoliosBy[pkey] ?? []).find(x => x.id === id);
-        const now = new Date();
-        const res = applyTrade(cur, { ...t, date: view.today, time: clock12(now) });
-        setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).map(x => (x.id === id ? res.portfolio : x)) }));
-        return res.trade;
-      },
+      feedPaused,
+      setFeedPaused,
+      events: events.filter(e => e.pkey === pkey),
       vault,
       pendingBanks,
       lastZakat,
@@ -211,7 +222,7 @@ export function StoreProvider({ children, personaMode = false }) {
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, portfolios, portfoliosBy, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
+  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, portfolios, feedPaused, events, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

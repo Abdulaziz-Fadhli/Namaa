@@ -57,6 +57,22 @@ const SEEDS = {
   },
 };
 
+// عمليات تصل من التطبيق تلقائيًا بعد الربط (محاكاة لإشعارات الوسيط)، بالترتيب، وكلها ضمن النقد والكميات المتاحة
+export const SCRIPTS = {
+  'alinma-invest': [['BUY', '9404', 200, 10.25], ['SELL', '1150', 150, 26.8], ['BUY', '2222', 100, 25.0], ['SELL', '9404', 300, 10.3]],
+  derayah: [['BUY', 'AAPL', 3, 235], ['SELL', '7010', 50, 42], ['BUY', 'VOO', 1, 565], ['SELL', 'AAPL', 5, 238]],
+  sahm: [['SELL', 'NVDA', 5, 182], ['BUY', 'MSFT', 2, 472], ['SELL', 'MSFT', 1, 475]],
+  'rajhi-capital': [['BUY', '9413', 100, 12.6], ['SELL', '1120', 30, 99], ['BUY', '1120', 10, 98.5]],
+  'snb-capital': [['SELL', '1180', 50, 39.5], ['BUY', 'SPY', 1, 645]],
+  'aljazira-capital': [['SELL', '2010', 50, 71], ['BUY', '2010', 20, 70.5]],
+};
+
+// العملية التالية التي سيرسلها التطبيق، أو null إذا انتهت
+export function nextScripted(p) {
+  const step = SCRIPTS[p.provider]?.[p.scriptAt ?? 0];
+  return step ? { side: step[0], key: step[1], units: step[2], price: step[3] } : null;
+}
+
 export const providerOf = id => PROVIDERS.find(p => p.id === id);
 
 // حكم الورقة وقيمتها لعدد من الوحدات بسعر معيّن
@@ -79,6 +95,7 @@ export function seedPortfolio(providerId, linkedAt) {
     lots: seed.lots.map(([key, units, hawlFrom]) => ({ key, units, hawlFrom })),
     cash: seed.cash.map(([amount, hawlFrom]) => ({ amount, hawlFrom })),
     trades: [],
+    scriptAt: 0,
   };
 }
 
@@ -163,6 +180,14 @@ export function applyTrade(p, { side, key, units, price, date, time }) {
     impact: { valueBefore: before.value, valueAfter: after.value, baseBefore: before.base, baseAfter: after.base },
   };
   return { portfolio: { ...next, trades: [trade, ...p.trades] }, trade };
+}
+
+// تطبيق العملية التالية الواردة من التطبيق
+export function receiveNext(p, date, time) {
+  const t = nextScripted(p);
+  if (!t) return null;
+  const res = applyTrade(p, { ...t, date, time });
+  return { portfolio: { ...res.portfolio, scriptAt: (p.scriptAt ?? 0) + 1 }, trade: res.trade };
 }
 
 // أصول المحفظة كما يقرأها المتجر: كل دفعة بحولها، والنقد بحوله، والقيمة الزكوية من المحرك

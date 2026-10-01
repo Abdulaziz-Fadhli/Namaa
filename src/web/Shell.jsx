@@ -1,10 +1,10 @@
 // هيكل صفحات التطبيق: قائمة جانبية هادئة على الكمبيوتر، وشريط سفلي على الجوال، ورأس بسيط لكل صفحة.
 import { ArrowLeft, Bell, ChevronDown, History, House, LogOut, RefreshCw, Settings, WalletCards } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Brand, Icon } from './kit.jsx';
 import { go } from './nav.js';
 import { useStore } from '../figma/model.js';
-import { PERSONAS, clock } from './data.js';
+import { PERSONAS, clock, plain, sar } from './data.js';
 import { gregText } from '../figma/format.js';
 
 // أربعة أقسام فقط. الإخراج من زر الرئيسية، والإشعارات من الجرس، والخط الزمني داخل السجل.
@@ -47,6 +47,36 @@ function PersonaSwitch() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// إشعار يظهر في أي صفحة لما توصل عملية من تطبيق استثمار مرتبط
+function LiveToast() {
+  const { events, vault } = useStore();
+  const e = events[0];
+  const [shown, setShown] = useState(null);
+  // يظهر 8 ثوانٍ من وصول العملية فقط (التنقل بين الصفحات لا يعيد إظهار عملية قديمة)
+  useEffect(() => {
+    if (!e) return undefined;
+    const left = 8000 - (Date.now() - e.at);
+    if (left <= 0) return undefined;
+    const show = setTimeout(() => setShown(e.id), 0);
+    const hide = setTimeout(() => setShown(x => (x === e.id ? null : x)), left);
+    return () => { clearTimeout(show); clearTimeout(hide); };
+  }, [e]);
+  if (!e || shown !== e.id) return null;
+  const t = e.trade;
+  const d = t.impact.baseAfter - t.impact.baseBefore;
+  return (
+    <div className="w-live-toast" role="status">
+      <div className="between"><span className="t12 sub"><span className="w-pulse" />وصلت من {e.provider} · {t.time}</span><button className="t12 muted" onClick={() => setShown(null)} aria-label="إغلاق">✕</button></div>
+      <b style={{ display: 'block', margin: '2px 0' }}>{t.side === 'BUY' ? 'شراء' : 'بيع'} {plain(t.units, Number.isInteger(t.units) ? 0 : 2)} {t.name}</b>
+      <span className="t13 sub" style={{ display: 'block' }}>
+        الوعاء صار <b style={{ color: 'var(--ink)' }}>{sar(vault)}</b> ({Math.abs(d) < 0.005 ? 'بلا تغيير' : `${d > 0 ? '+' : '−'}${plain(Math.abs(d))}`})
+      </span>
+      <span className="t13 sub" style={{ display: 'block' }}>زكاة المحفظة صارت <b style={{ color: 'var(--ink)' }}>{plain(t.impact.baseAfter / 40)}</b> (كانت {plain(t.impact.baseBefore / 40)})</span>
+      <button className="w-link t12" style={{ marginTop: 6 }} onClick={() => go(`/app/invest/${e.portfolio}`)}>عرض المحفظة</button>
     </div>
   );
 }
@@ -109,6 +139,7 @@ export function Shell({ path, title, desc, crumb, actions, children }) {
         </header>
         {children}
       </main>
+      <LiveToast />
 
       <nav className="w-bottom-nav" aria-label="التنقل">
         {NAV.map(n => (
