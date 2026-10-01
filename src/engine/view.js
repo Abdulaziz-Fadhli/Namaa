@@ -1,6 +1,6 @@
 // يبني ما تحتاجه شاشات نماء من المحرك: الأرصدة، والوعاء، والنصاب، وزكاة اليوم، والوجوب التالي، والأحداث.
 // ملف نقي بدون node:fs، فيشتغل في المتصفح (الوضع المباشر) وفي سكربت npm run view (ahmad-view.json).
-import { defaultSettings, hijri, runEngineDetailed } from './engine.js';
+import { defaultSettings, hijri, resolveHawlDueDate, runEngineDetailed } from './engine.js';
 import { personaDays } from './personas.js';
 import { methodologySummary } from './zatca.js';
 
@@ -32,12 +32,16 @@ export function buildView(persona, prices, settings = defaultSettings, options =
     };
   });
 
+  // الوعاء والنصاب في يوم كل حدث (للسجل: «النصاب يومها»)
+  const rowOf = new Map(result.series.map((r) => [iso(r.date), r]));
   const event = (e) => ({
     type: e.type,
     date: iso(e.date),
     hijri: hijri(e.date),
     base: e.base ?? null,
     zakat: e.zakat == null ? null : round2(e.zakat),
+    total: round2(rowOf.get(iso(e.date))?.total ?? 0),
+    nisab: round2(rowOf.get(iso(e.date))?.nisab ?? 0),
     explanation: e.explanation ?? '',
   });
   const events = result.events.map(event);
@@ -51,6 +55,32 @@ export function buildView(persona, prices, settings = defaultSettings, options =
     const row = result.series[i];
     series.unshift({ date: iso(row.date), hijri: hijri(row.date), total: round2(row.total) });
   }
+
+  // المواعيد القادمة إن بقي الرصيد كما هو: كل مجموعة مبالغ يكتمل حولها في اليوم نفسه
+  const groups = new Map();
+  for (const lot of [...result.lots, ...(result.assetLots ?? [])]) {
+    if (!lot.start || !(lot.amount > 0)) continue;
+    const d = iso(resolveHawlDueDate(new Date(lot.start)));
+    if (d <= today) continue;
+    groups.set(d, (groups.get(d) ?? 0) + lot.amount);
+  }
+  const upcoming = [...groups.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([d, base]) => ({
+    date: d,
+    hijri: hijri(new Date(`${d}T00:00:00Z`)),
+    base: round2(base),
+    zakat: round2(base / 40),
+    inDays: Math.round((new Date(`${d}T00:00:00Z`) - todayDate) / DAY),
+  }));
+
+  // الوعاء في آخر يوم من كل شهر هجري (والشهر الحالي باليوم): آخر 9 أشهر
+  const months = [];
+  for (const row of result.series) {
+    const [y, m] = hijri(row.date);
+    const last = months.at(-1);
+    if (last && last.y === y && last.m === m) Object.assign(last, { total: round2(row.total), nisab: round2(row.nisab), date: iso(row.date) });
+    else months.push({ y, m, total: round2(row.total), nisab: round2(row.nisab), date: iso(row.date) });
+  }
+  const monthly = months.slice(-9).map(({ y, m, total, nisab, date }) => ({ hijri: [y, m], total, nisab, date }));
 
   const p = prices[today];
   const next = result.nextDue;
@@ -91,6 +121,8 @@ export function buildView(persona, prices, settings = defaultSettings, options =
       inDays: Math.round((next.dueDate - todayDate) / DAY),
     },
     series,
+    upcoming,
+    monthly,
   };
 }
 

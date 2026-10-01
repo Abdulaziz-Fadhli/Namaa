@@ -28,7 +28,8 @@ export function isHawlComplete(start, today) {
   const [ny, nm] = hijri(tomorrow);
   return ny === cy && nm !== cm; // today is the last day of the target Hijri month
 }
-function resolveHawlDueDate(start) {
+// يوم تمام الحول الهجري لمبلغ بدأ حوله في start (اليوم الأخير من الشهر إن لم يوجد اليوم نفسه)
+export function resolveHawlDueDate(start) {
   const [sy, sm, sd] = hijri(start);
   const targetYear = sy + 1;
 
