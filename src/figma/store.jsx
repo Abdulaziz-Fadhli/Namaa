@@ -47,8 +47,11 @@ export function StoreProvider({ children }) {
   const [pendingBanks, setPendingBanks] = useState([]);
   const [lastZakat, setLastZakat] = useState(null);     // { calendar: 'hijri'|'gregorian', iso }
   const [remembers, setRemembers] = useState('yes');     // هل يتذكر تاريخ آخر زكاة؟
-  const [channel, setChannel] = useState('fund');
+  const [channel, setChannel] = useState('charity');
   const [payment, setPayment] = useState(null);
+  // خيارات المنهجية من الإعدادات (كلاهما من دليل الهيئة): تغييرها يعيد تشغيل المحرك فعليًا
+  const [settings, setSettingsState] = useState(defaultSettings);
+  const [fromAccount, setFromAccount] = useState('A1');
 
   const live = mode === 'live';
   const assets = assetsBy[mode];
@@ -58,11 +61,12 @@ export function StoreProvider({ children }) {
   const { goldPerGram, silverPerGram } = feed.metals;
 
   // المحرك في المتصفح: يُعاد الحساب لما يتغير سعر الذهب أو الفضة أو اليوم
+  const custom = settings !== defaultSettings;
   const view = useMemo(
     () => (live
-      ? buildView(ahmad, prices, defaultSettings, { today, live: feed.metalsLive ? { goldPerGram, silverPerGram } : null })
-      : storyView),
-    [live, today, feed.metalsLive, goldPerGram, silverPerGram],
+      ? buildView(ahmad, prices, settings, { today, live: feed.metalsLive ? { goldPerGram, silverPerGram } : null })
+      : custom ? buildView(ahmad, prices, settings) : storyView),
+    [live, custom, settings, today, feed.metalsLive, goldPerGram, silverPerGram],
   );
 
   const value = useMemo(() => {
@@ -106,9 +110,21 @@ export function StoreProvider({ children }) {
       remembers,
       channel,
       payment,
+      settings,
+      setSettings: patch => setSettingsState(s => {
+        const next = { ...s, ...patch };
+        return Object.entries(defaultSettings).every(([k, v]) => next[k] === v) ? defaultSettings : next;
+      }),
+      fromAccount,
+      setFromAccount,
       due,
       dueNow: payment ? 0 : due.zakat,
-      addAsset: a => setAssetsBy(by => ({ ...by, [mode]: [...by[mode], { ...a, id: `${a.kind}-${by[mode].length + 1}` }] })),
+      removeAsset: id => setAssetsBy(by => ({ ...by, [mode]: by[mode].filter(a => a.id !== id) })),
+      addAsset: a => {
+        const id = `${a.kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+        setAssetsBy(by => ({ ...by, [mode]: [...by[mode], { ...a, id }] }));
+        return id;
+      },
       addBank: name => setPendingBanks(list => (list.includes(name) ? list : [...list, name])),
       setLastZakat,
       setRemembers,
@@ -117,10 +133,10 @@ export function StoreProvider({ children }) {
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, '0'), mm = String(now.getMinutes()).padStart(2, '0');
         const seq = String(Math.floor(1000 + Math.random() * 9000));
-        setPayment({ amount: due.zakat, channel, time: `${hh}:${mm}`, ref: `NM-${view.today.slice(2).replaceAll('-', '')}-${seq}` });
+        setPayment({ amount: due.zakat, base: due.base, channel, fromAccount, time: `${hh}:${mm}`, date: view.today, ref: `NM-${view.today.slice(2).replaceAll('-', '')}-${seq}` });
       },
     };
-  }, [mode, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment]);
+  }, [mode, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
