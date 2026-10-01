@@ -1,10 +1,14 @@
 // موقع نماء وتطبيق الويب (من شاشات فيجما «موقع نماء»)، مربوط بمحرك الزكاة عبر StoreProvider.
 // التطبيق القديم بإطار الجوال باقٍ على الرابط #/phone.
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import './web.css';
 import { StoreProvider } from '../figma/store.jsx';
-import { useRoute } from './nav.js';
-import { Dashboard, Explain } from './pages/Home.jsx';
+import { useStore } from '../figma/model.js';
+import { go, useRoute } from './nav.js';
+import { Dashboard, Explain, Timeline } from './pages/Home.jsx';
+import {
+  KhalidAccounts, KhalidAssets, KhalidBanks, KhalidPrices, KhalidRegister, KhalidSync, KhalidWelcome, NouraPage, PersonaChooser,
+} from './pages/Personas.jsx';
 import { Account, Assets } from './pages/Assets.jsx';
 import { History, Payout, ReceiptPage } from './pages/Zakat.jsx';
 import { LinkBank, Notifications, SettingsPage } from './pages/Settings.jsx';
@@ -12,8 +16,18 @@ import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Registe
 
 const PhoneApp = lazy(() => import('../App.jsx'));
 
+// الرابط يحدد الشخصية: /noura و/khalid/* و/ahmad. ما عداها يبقى على الشخصية الحالية.
+const personaOf = path => (path.startsWith('/noura') ? 'noura' : path.startsWith('/khalid') ? 'khalid' : path.startsWith('/ahmad') ? 'ahmad' : null);
+
+const KHALID = { '/khalid': KhalidWelcome, '/khalid/register': KhalidRegister, '/khalid/banks': KhalidBanks, '/khalid/accounts': KhalidAccounts,
+  '/khalid/assets': KhalidAssets, '/khalid/prices': KhalidPrices, '/khalid/sync': KhalidSync };
+
 function page(path) {
   if (path === '/' || path === '') return <Landing />;
+  if (path === '/personas') return <PersonaChooser />;
+  if (path === '/noura') return <NouraPage />;
+  if (KHALID[path]) { const P = KHALID[path]; return <P />; }
+  if (path === '/app/timeline') return <Timeline path={path} />;
   if (path === '/login') return <Login />;
   if (path === '/forgot') return <Forgot />;
   if (path === '/register') return <Register />;
@@ -33,12 +47,24 @@ function page(path) {
   return <Landing />;
 }
 
+function Routed({ path }) {
+  const { persona, setPersona } = useStore();
+  const want = personaOf(path);
+  useEffect(() => {
+    if (want && want !== persona) setPersona(want);
+    if (path === '/ahmad') go('/app');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [want, path]);
+  if (want && want !== persona) return null;
+  return <div className="w">{page(path)}</div>;
+}
+
 export default function WebApp() {
   const path = useRoute();
   if (path === '/phone') return <Suspense fallback={null}><PhoneApp /></Suspense>;
   return (
-    <StoreProvider>
-      <div className="w">{page(path)}</div>
+    <StoreProvider personaMode>
+      <Routed path={path} />
     </StoreProvider>
   );
 }

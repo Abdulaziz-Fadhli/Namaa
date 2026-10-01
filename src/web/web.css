@@ -318,3 +318,9 @@ body:has(.w) { background: #F4F5F7; }
 @media (max-width: 420px) {
     .w-grid2.stack-xs { grid-template-columns: 1fr; }
 }
+.w-list-row .d.warn { color: var(--red); }
+.w-spin { animation: w-spin 1s linear infinite; }
+@keyframes w-spin { to { transform: rotate(360deg); } }
+.w-flow-head > :last-child { gap: 10px; }
+@media (max-width: 960px) { .w-flow-head .w-pill { display: none; } }
+.w-section .w-card-head h2 { font-size: 16px; line-height: 24px; margin-bottom: 0; }

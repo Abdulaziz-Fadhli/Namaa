@@ -9,12 +9,30 @@ import { Brand, Btn, Checkbox, Icon, Option, Pill, Select, Seg, Steps, TextInput
 import { go } from '../nav.js';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriMonthLength, hijriText, hijriToIso, HIJRI_MONTHS } from '../../figma/format.js';
-import { BANKS, hijriFromParts, plain, sar } from '../data.js';
+import { ACCOUNTS, BANKS, PERSONAS, hijriFromParts, linkedBanks, plain, sar, days } from '../data.js';
 import { ZATCA } from '../../engine/zatca.js';
+import { PersonaCards } from './Personas.jsx';
 
 function ZakatCard({ compact }) {
-  const { view } = useStore();
+  const { view, historical } = useStore();
   const due = view.due;
+  if (!due) return (
+    <div className={compact ? 'w-auth-card' : 'w-hero-card'}>
+      <div className="between" style={{ marginBottom: 8 }}>
+        <span className="t13 sub">مستحقات الفترة · {view.name}</span>
+        <Pill tone="info">{historical ? `كما في ${gregText(view.today)}` : 'لا وجوب اليوم'}</Pill>
+      </div>
+      <div className="w-amount md"><strong>{plain(view.totalDueInPeriod)}</strong><span>ر.س</span></div>
+      <p className="t12 muted" style={{ marginBottom: compact ? 0 : 12 }}>{view.dues.length} أحداث وجوب محسوبة من الكشف · لا يوجد سداد مسجل</p>
+      {!compact && (
+        <div className="w-divide">
+          <div className="w-line"><span>الوعاء في آخر يوم</span><span>{sar(view.total)}</span></div>
+          <div className="w-line"><span>النصاب يومها</span><span>{sar(view.nisab)}</span></div>
+          {view.nextDue && <div className="w-line"><span>القادم · توقّع</span><span>{sar(view.nextDue.zakat)} · {gregText(view.nextDue.date)}</span></div>}
+        </div>
+      )}
+    </div>
+  );
   return (
     <div className={compact ? 'w-auth-card' : 'w-hero-card'}>
       <div className="between" style={{ marginBottom: 8 }}>
@@ -56,6 +74,7 @@ export function Landing() {
           <Brand />
           <nav className="links">
             <a href="#features" onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }}>المزايا</a>
+            <a href="#personas" onClick={e => { e.preventDefault(); document.getElementById('personas')?.scrollIntoView({ behavior: 'smooth' }); }}>الشخصيات</a>
             <a href="#how" onClick={e => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }}>كيف يعمل</a>
             <a href="#method" onClick={e => { e.preventDefault(); document.getElementById('method')?.scrollIntoView({ behavior: 'smooth' }); }}>المنهجية</a>
             <a href="#faq" onClick={e => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }); }}>الأسئلة الشائعة</a>
@@ -75,7 +94,7 @@ export function Landing() {
             <p className="lead">نماء يقرأ حساباتك البنكية بصلاحية قراءة فقط، ويتابع حول كل مبلغ من يوم دخوله حسابك، ثم يخبرك متى تجب الزكاة وكم مقدارها بالهللة.</p>
             <div className="row" style={{ gap: 12 }}>
               <Btn variant="primary" className="lg" onClick={() => go('/register')}>ابدأ مجانًا</Btn>
-              <Btn className="lg" onClick={() => go('/app')}>شاهد كيف يعمل</Btn>
+              <Btn className="lg" onClick={() => document.getElementById('personas')?.scrollIntoView({ behavior: 'smooth' })}>شاهد كيف يعمل</Btn>
             </div>
             <div className="w-trust">
               <span><Icon as={Check} size={14} className="green" />صلاحية قراءة فقط</span>
@@ -88,7 +107,7 @@ export function Landing() {
             {next && (
               <div className="w-hero-card row" style={{ padding: 16, maxWidth: 360 }}>
                 <span className="w-ico"><Icon as={CalendarClock} /></span>
-                <span><span className="b7 t13" style={{ display: 'block' }}>الوجوب القادم بعد {next.inDays} يومًا</span><span className="t11 sub">{hijriFromParts(next.hijri)} · {sar(next.zakat)}</span></span>
+                <span><span className="b7 t13" style={{ display: 'block' }}>الوجوب القادم بعد {days(next.inDays)}</span><span className="t11 sub">{hijriFromParts(next.hijri)} · {sar(next.zakat)}</span></span>
               </div>
             )}
           </div>
@@ -96,6 +115,15 @@ export function Landing() {
       </section>
 
       <div className="w-banks"><div className="w-wrap"><span>يعمل مع البنوك المرخّصة للخدمات المصرفية المفتوحة:</span>{BANKS.map(b => <span key={b}>{b}</span>)}</div></div>
+
+      <section className="w-section gray" id="personas">
+        <div className="w-wrap">
+          <p className="w-eyebrow">شاهد كيف يعمل</p>
+          <h2 style={{ marginBottom: 8 }}>ثلاث شخصيات، ثلاث قصص</h2>
+          <p className="sub" style={{ marginBottom: 28 }}>نورة لا تعرف متى يبدأ حولها، وخالد يربط بنوكه لأول مرة، وأحمد سجل كامل عبر الزمن. كل شخصية منفصلة بحساباتها ونتيجتها.</p>
+          <PersonaCards />
+        </div>
+      </section>
 
       <section className="w-section" id="how">
         <div className="w-wrap">
@@ -119,7 +147,7 @@ export function Landing() {
           <h2>مصمم لطريقة دخلك الحقيقية</h2>
           <div className="w-grid3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
             {[[Scale, 'النصاب بسعر اليوم', `نحدّث النصاب يوميًا بأدنى النصابين: 85 غرام ذهب أو 595 غرام فضة.`, `نصاب اليوم ${sar(view.nisab)}`],
-              [CalendarDays, 'حول مستقل لكل مبلغ', 'الراتب الذي دخل حسابك في شوال لا يُزكّى مع مبلغ دخل في رمضان. لكل مبلغ تاريخه وحوله.', `${sar(view.due?.base ?? 0)} أكملت حولها اليوم`],
+              [CalendarDays, 'حول مستقل لكل مبلغ', 'الراتب الذي دخل حسابك في شوال لا يُزكّى مع مبلغ دخل في رمضان. لكل مبلغ تاريخه وحوله.', view.due ? `${sar(view.due.base)} أكملت حولها اليوم` : `${view.dues.length} أحداث وجوب في سجل ${view.name}`],
               [Layers3, 'الأسهم والذهب والمواشي', 'نعرف إن كانت الشركة تزكي عنك، ونحسب الذهب والفضة بسعر السوق، والأنعام والزروع بجداول الهيئة.', 'سهم الراجحي للمستثمر: الشركة تزكي عنه'],
               [FileText, 'إخراج وإيصال موثّق', 'أخرج زكاتك لجهة مرخّصة من حسابك، واحتفظ بإيصال فيه الرقم المرجعي والتاريخ.', 'المرجع NM-261003-4236']].map(([ic, t, d, tag]) => (
               <div key={t} className="w-feature">
@@ -229,7 +257,8 @@ function Password({ value, onChange, label = 'كلمة المرور' }) {
 }
 
 export function Login() {
-  const [email, setEmail] = useState('ahmad.alsubaie@gmail.com');
+  const { persona } = useStore();
+  const [email, setEmail] = useState(PERSONAS[persona].email);
   const [pw, setPw] = useState('namaa-demo');
   const [remember, setRemember] = useState(true);
   const ok = /.+@.+\..+/.test(email) && pw.length >= 6;
@@ -247,7 +276,8 @@ export function Login() {
 }
 
 export function Forgot() {
-  const [email, setEmail] = useState('ahmad.alsubaie@gmail.com');
+  const { persona } = useStore();
+  const [email, setEmail] = useState(PERSONAS[persona].email);
   const [sent, setSent] = useState(false);
   return (
     <AuthLayout title="نسيت كلمة المرور" lead="نرسل لك رابطًا لتعيين كلمة مرور جديدة.">
@@ -260,7 +290,9 @@ export function Forgot() {
 }
 
 export function Register() {
-  const [f, setF] = useState({ name: 'أحمد عبدالله السبيعي', email: 'ahmad.alsubaie@gmail.com', phone: '+966 55 012 3447', pw: 'namaa-2026' });
+  const { persona } = useStore();
+  const me = PERSONAS[persona];
+  const [f, setF] = useState({ name: me.full, email: me.email, phone: me.phone, pw: 'namaa-2026' });
   const [agree, setAgree] = useState(true);
   const set = k => v => setF(s => ({ ...s, [k]: v }));
   const strength = [f.pw.length >= 8, /\d/.test(f.pw), /[a-zA-Z؀-ۿ]/.test(f.pw), f.pw.length >= 12].filter(Boolean).length;
@@ -296,11 +328,11 @@ function Flow({ step, children }) {
 }
 
 export function OnboardBanks() {
-  const { pendingBanks, addBank } = useStore();
+  const { view, pendingBanks, addBank } = useStore();
   const [q, setQ] = useState('');
   const [consent, setConsent] = useState(null);
-  const linked = ['مصرف الإنماء', 'البنك الأهلي السعودي', ...pendingBanks];
-  const masks = { 'مصرف الإنماء': 'حساب جاري · 1842 ••••', 'البنك الأهلي السعودي': 'حساب ادخار · 7730 ••••' };
+  const linked = linkedBanks(view, pendingBanks);
+  const masks = Object.fromEntries(BANKS.map(b => [b, view.accounts.filter(a => b.startsWith(ACCOUNTS[a.id].bank)).map(a => `${ACCOUNTS[a.id].kind} · ${ACCOUNTS[a.id].mask} ••••`).join('، ') || null]));
   return (
     <Flow step={0}>
       <div><h1>اربط حساباتك البنكية</h1><p className="sub">نقرأ أرصدتك وحركاتك لنحسب الوعاء والحول بدقة. لا نستطيع تحريك أموالك.</p></div>
@@ -379,7 +411,7 @@ export function OnboardLast() {
 }
 
 export function OnboardSync() {
-  const { view } = useStore();
+  const { view, personaData } = useStore();
   const [p, setP] = useState(8);
   useEffect(() => {
     if (p >= 100) { const t = setTimeout(() => go('/app'), 700); return () => clearTimeout(t); }
@@ -387,14 +419,13 @@ export function OnboardSync() {
     return () => clearTimeout(t);
   }, [p]);
   const steps = [
-    ['مصرف الإنماء · جاري', '1,284 حركة', 30],
-    ['البنك الأهلي · ادخار', '612 حركة', 55],
+    ...view.accounts.map((a, i, all) => [`${ACCOUNTS[a.id].bank} · ${ACCOUNTS[a.id].kind}`, `${personaData.transactions.filter(t => t.accountId === a.id).length.toLocaleString('en-US')} حركة`, Math.round(((i + 1) / all.length) * 60)]),
     ['حساب الوعاء والنصاب لكل يوم', `من ${hijriText(view.start?.date ?? view.today)} إلى اليوم`, 85],
     ['تحديد حول كل مبلغ والمواعيد القادمة', 'بمحرك نماء', 100],
   ];
   return (
     <Flow step={2}>
-      <div><h1>نجهّز حساباتك</h1><p className="sub">نقرأ حركات حسابين منذ {hijriText(view.start?.date ?? view.today)}، ونحسب حول كل مبلغ.</p></div>
+      <div><h1>نجهّز حساباتك</h1><p className="sub">نقرأ حركات {view.accounts.length === 1 ? 'حسابك' : view.accounts.length === 2 ? 'حسابين' : `${view.accounts.length} حسابات`} منذ {hijriText(view.start?.date ?? view.today)}، ونحسب حول كل مبلغ.</p></div>
       <div className="w-card">
         <div className="between" style={{ marginBottom: 8 }}><b>{p < 100 ? 'قيد المعالجة · بضع ثوانٍ متبقية' : 'اكتملت المزامنة'}</b><b>{p}٪</b></div>
         <div className="w-progress" style={{ marginBottom: 12 }}><i style={{ width: `${p}%`, background: 'var(--primary)' }} /></div>

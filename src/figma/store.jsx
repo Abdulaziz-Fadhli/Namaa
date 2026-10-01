@@ -11,6 +11,7 @@ import { StoreContext } from './model.js';
 import { riyadhToday, useLiveFeed } from './live.js';
 import storyView from '../data/ahmad-view.json';
 import ahmad from '../data/ahmad.json';
+import { PERSONA_DATA, khalidWith } from './persona-data.js';
 import prices from '../data/prices.json';
 
 const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -40,33 +41,52 @@ function reprice(asset, feed) {
   return asset;
 }
 
-export function StoreProvider({ children }) {
-  const [mode, setMode] = useState('story');           // 'story' | 'live'
-  // كل وجه له أصوله: ما يضيفه المستخدم في المباشر ما يدخل قصة أحمد، والعكس
-  const [assetsBy, setAssetsBy] = useState({ story: [], live: [] });
-  const [pendingBanks, setPendingBanks] = useState([]);
+// personaMode: موقع الويب (ثلاث شخصيات). بدونه يبقى التطبيق القديم (#/phone) على قصة أحمد الأصلية كما هو.
+export function StoreProvider({ children, personaMode = false }) {
+  // الشخصية الحالية تبقى بعد تحديث الصفحة (تفضيل عرض لكل متصفح فقط)
+  const [persona, setPersonaState] = useState(() => {
+    try { const p = sessionStorage.getItem('namaa.persona'); return PERSONA_DATA[p] ? p : 'ahmad'; } catch { return 'ahmad'; }
+  });
+  const setPersona = p => { setPersonaState(p); try { sessionStorage.setItem('namaa.persona', p); } catch { /* التخزين غير متاح */ } };
+  const [modeState, setMode] = useState('story');       // 'story' | 'live'
+  // الشخصيات للعرض فقط على أسعار محفوظة؛ خالد وحده يقدر يحدّث الأسعار الآن (مسار تقييم حالي منفصل)
+  const [khalidLive, setKhalidLive] = useState(false);
+  const [k4, setK4] = useState(null);                   // حقائق حساب خالد K4 بعد مراجعته
+  const [confirmedBy, setConfirmedBy] = useState({});   // أصول الشخصية التي راجعها المستخدم وأكّدها
+  const mode = personaMode ? (persona === 'khalid' && khalidLive ? 'live' : 'story') : modeState;
+  const scope = personaMode ? `${persona}:${mode}` : mode;
+  // كل شخصية (وكل وجه) لها أصولها وإخراجها وبنوكها: ما يضيفه خالد ما يظهر عند أحمد
+  const [assetsBy, setAssetsBy] = useState({});
+  const [banksBy, setBanksBy] = useState({});
+  const [paymentBy, setPaymentBy] = useState({});
   const [lastZakat, setLastZakat] = useState(null);     // { calendar: 'hijri'|'gregorian', iso }
   const [remembers, setRemembers] = useState('yes');     // هل يتذكر تاريخ آخر زكاة؟
   const [channel, setChannel] = useState('charity');
-  const [payment, setPayment] = useState(null);
+  const pkey = personaMode ? persona : 'phone';
+  const payment = paymentBy[pkey] ?? null;
+  const setPayment = p => setPaymentBy(by => ({ ...by, [pkey]: p }));
+  const pendingBanks = banksBy[pkey] ?? [];
   // خيارات المنهجية من الإعدادات (كلاهما من دليل الهيئة): تغييرها يعيد تشغيل المحرك فعليًا
   const [settings, setSettingsState] = useState(defaultSettings);
   const [fromAccount, setFromAccount] = useState('A1');
 
   const live = mode === 'live';
-  const assets = assetsBy[mode];
+  const assets = useMemo(() => assetsBy[scope] ?? [], [assetsBy, scope]);
   const usSymbols = assets.map(a => a.live?.symbol).filter(Boolean);
   const feed = useLiveFeed({ enabled: live, us: usSymbols });
-  const today = live ? riyadhToday() : storyView.today;
+  const pd = useMemo(() => (persona === 'khalid' ? { ...PERSONA_DATA.khalid, data: khalidWith(k4) } : PERSONA_DATA[persona]), [persona, k4]);
+  const today = personaMode ? pd.asOf : live ? riyadhToday() : storyView.today;
   const { goldPerGram, silverPerGram } = feed.metals;
 
   // المحرك في المتصفح: يُعاد الحساب لما يتغير سعر الذهب أو الفضة أو اليوم
   const custom = settings !== defaultSettings;
   const view = useMemo(
-    () => (live
-      ? buildView(ahmad, prices, settings, { today, live: feed.metalsLive ? { goldPerGram, silverPerGram } : null })
-      : custom ? buildView(ahmad, prices, settings) : storyView),
-    [live, custom, settings, today, feed.metalsLive, goldPerGram, silverPerGram],
+    () => (personaMode
+      ? buildView(pd.data, prices, settings, { today, live: live && feed.metalsLive ? { goldPerGram, silverPerGram } : null })
+      : live
+        ? buildView(ahmad, prices, settings, { today, live: feed.metalsLive ? { goldPerGram, silverPerGram } : null })
+        : custom ? buildView(ahmad, prices, settings) : storyView),
+    [personaMode, pd, live, custom, settings, today, feed.metalsLive, goldPerGram, silverPerGram],
   );
 
   const value = useMemo(() => {
@@ -79,7 +99,8 @@ export function StoreProvider({ children }) {
     const merged = {};
     for (const a of priced) for (const [k, list] of Object.entries(a.engine)) merged[k] = [...(merged[k] ?? []), ...list];
     const otherAssets = priced.length ? calculateAssetValue(merged) : 0;
-    const vault = view.bankTotal + otherAssets;
+    // الوعاء = البنوك + أصول الشخصية من مصدرها (view.total) + ما أضافه المستخدم يدويًا
+    const vault = view.total + otherAssets;
     // أصل مضاف يدويًا أكمل حولًا هجريًا من تاريخ تملكه (isHawlComplete من المحرك): تجب زكاته اليوم مع زكاة الحسابات
     const todayDate = new Date(`${view.today}T00:00:00Z`);
     const matured = priced.filter(a => a.value > 0 && a.acquired && isHawlComplete(new Date(`${a.acquired}T00:00:00Z`), todayDate));
@@ -97,9 +118,28 @@ export function StoreProvider({ children }) {
       inKind,
     };
     return {
+      personaMode,
+      persona,
+      setPersona: p => { if (PERSONA_DATA[p]) setPersona(p); },
+      personaData: pd.data,
+      historical: personaMode && pd.historical,
+      khalidLive,
+      setKhalidLive,
+      k4,
+      setK4,
+      confirmed: confirmedBy[pkey] ?? {},
+      confirmHolding: id => setConfirmedBy(by => ({ ...by, [pkey]: { ...(by[pkey] ?? {}), [id]: true } })),
+      resetPersona: p => {
+        setAssetsBy(by => Object.fromEntries(Object.entries(by).filter(([k]) => !k.startsWith(`${p}:`))));
+        setBanksBy(by => ({ ...by, [p]: [] }));
+        setPaymentBy(by => ({ ...by, [p]: null }));
+        setConfirmedBy(by => ({ ...by, [p]: {} }));
+        if (p === 'khalid') { setK4(null); setKhalidLive(false); }
+      },
       mode,
       live,
       setMode: m => { setMode(m); setPayment(null); },
+      setPendingBanks: list => setBanksBy(by => ({ ...by, [pkey]: list })),
       feed,
       view,
       assets: priced,
@@ -119,13 +159,13 @@ export function StoreProvider({ children }) {
       setFromAccount,
       due,
       dueNow: payment ? 0 : due.zakat,
-      removeAsset: id => setAssetsBy(by => ({ ...by, [mode]: by[mode].filter(a => a.id !== id) })),
+      removeAsset: id => setAssetsBy(by => ({ ...by, [scope]: (by[scope] ?? []).filter(a => a.id !== id) })),
       addAsset: a => {
         const id = `${a.kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
-        setAssetsBy(by => ({ ...by, [mode]: [...by[mode], { ...a, id }] }));
+        setAssetsBy(by => ({ ...by, [scope]: [...(by[scope] ?? []), { ...a, id }] }));
         return id;
       },
-      addBank: name => setPendingBanks(list => (list.includes(name) ? list : [...list, name])),
+      addBank: name => setBanksBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).includes(name) ? by[pkey] : [...(by[pkey] ?? []), name] })),
       setLastZakat,
       setRemembers,
       setChannel,
@@ -136,7 +176,8 @@ export function StoreProvider({ children }) {
         setPayment({ amount: due.zakat, base: due.base, channel, fromAccount, time: `${hh}:${mm}`, date: view.today, ref: `NM-${view.today.slice(2).replaceAll('-', '')}-${seq}` });
       },
     };
-  }, [mode, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

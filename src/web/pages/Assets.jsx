@@ -2,10 +2,10 @@
 // قيمة كل أصل في الوعاء من المحرك (calculateAssetValue)، والأسهم من src/securities، والمواشي والمحاصيل من zatca.js.
 import { useMemo, useState } from 'react';
 import {
-  Banknote, Building2, Check, ChartCandlestick, ChevronLeft, Gem, House, Landmark, PawPrint, Plus, RefreshCw, Search,
-  ShieldCheck, WalletCards, Wheat,
+  Banknote, Building2, Check, ChartCandlestick, ChevronLeft, Gem, House, Info, Landmark, PawPrint, PieChart, Plus, RefreshCw, Search,
+  ShieldCheck, TriangleAlert, WalletCards, Wheat,
 } from 'lucide-react';
-import { Btn, Card, Icon, Modal, NumberInput, Pill, Seg, Select, TextInput } from '../kit.jsx';
+import { Btn, Card, Icon, Modal, NumberInput, Option, Pill, Seg, Select, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { parseNum, useStore, zakatableOf } from '../../figma/model.js';
@@ -16,8 +16,7 @@ import {
   CROP_KINDS, CROP_UNITS, GRAZING, IRRIGATION, LIVESTOCK_PURPOSES, LIVESTOCK_TYPES, ZATCA, assessCrop, assessLivestock,
 } from '../../engine/zatca.js';
 import { assess, check, toEngineEntry } from '../../securities/securities.js';
-import { ACCOUNTS, daysFrom, plain, sar } from '../data.js';
-import ahmad from '../../data/ahmad.json';
+import { ACCOUNTS, accountInfo, daysFrom, personaHoldings, plain, sar, days } from '../data.js';
 
 const ICON = { gold: Gem, silver: Gem, stock: ChartCandlestick, fund: ChartCandlestick, cash: Banknote, property: House, livestock: PawPrint, crop: Wheat };
 const TABS = [
@@ -39,7 +38,7 @@ const hawlOf = (iso, today) => {
 };
 const hawlText = (iso, today) => {
   const h = hawlOf(iso, today);
-  return h.inDays <= 0 ? `${hijriText(h.date)} · حال حوله` : `${hijriText(h.date)} · بعد ${h.inDays} يومًا`;
+  return h.inDays <= 0 ? `${hijriText(h.date)} · حال حوله` : `${hijriText(h.date)} · بعد ${days(h.inDays)}`;
 };
 
 function DateInput({ label, value, onChange, max }) {
@@ -310,7 +309,7 @@ function LivestockForm({ today, frame }) {
       <DateInput label="من متى وهي عندك؟" value={acquired} onChange={setAcquired} max={today} />
       <Summary rows={[
         [r.status === 'TRADE_GOODS' ? 'تدخل وعاء النقود' : 'الواجب في زكاتها', r.status === 'TRADE_GOODS' ? sar(r.vaultValue) : (r.inKind ?? 'لا شيء')],
-        r.dueDate ? ['يكمل حولها', r.status === 'DUE' ? `${hijriText(r.dueDate)} · حال حولها` : `${hijriText(r.dueDate)} · بعد ${r.inDays} يومًا`] : ['الحكم', r.headline],
+        r.dueDate ? ['يكمل حولها', r.status === 'DUE' ? `${hijriText(r.dueDate)} · حال حولها` : `${hijriText(r.dueDate)} · بعد ${days(r.inDays)}`] : ['الحكم', r.headline],
         ['المرجع', `${r.sources[0]} · ${ZATCA.authority}`],
       ]} />
       <p className="w-note"><span>{r.reason}</span></p>
@@ -362,7 +361,7 @@ function CropForm({ frame }) {
   ));
 }
 
-function AddAsset({ tab, setTab, onClose, onAdded }) {
+export function AddAsset({ tab, setTab, onClose, onAdded }) {
   const { view, addAsset } = useStore();
   const today = view.today;
   const agri = tab === 'livestock' || tab === 'crop';
@@ -386,13 +385,56 @@ function AddAsset({ tab, setTab, onClose, onAdded }) {
   return <CropForm frame={frame} />;
 }
 
+// حساب خالد الاستثماري القديم: لا نعتبره معفى من اسمه. نسأل عن نوعه، ثم يُعاد تشغيل المحرك.
+export function K4Review({ onClose }) {
+  const { setK4, k4 } = useStore();
+  const [type, setType] = useState(k4?.type ?? 'fund');
+  const [share, setShare] = useState(k4?.zakatableValue ? String(k4.zakatableValue) : '');
+  const v = parseNum(share);
+  const ok = type === 'cash' || type === 'later' || v > 0;
+  const save = () => {
+    if (type === 'cash') setK4({ type: 'cash' });
+    else if (type === 'fund') setK4({ type: 'fund', zakatableValue: v });
+    else setK4(null);
+    onClose();
+  };
+  return (
+    <Modal size="sm" title="محفظة نماء الاستثمارية · 7720 ••••" desc="رصيدها 50,000 ر.س. نحتاج نوعها لنحسبها بدقة" onClose={onClose}
+      foot={<><Btn onClick={onClose}>إلغاء</Btn><Btn variant="primary" disabled={!ok} onClick={save}>{type === 'later' ? 'إبقاؤه للمراجعة' : 'حفظ وإعادة الحساب'}</Btn></>}>
+      <div className="col" style={{ gap: 10 }}>
+        <Option selected={type === 'cash'} onClick={() => setType('cash')} icon={Banknote} title="حساب نقدي أو ودائع"
+          desc="يدخل الوعاء كاملًا من أول ظهور له في الكشف" />
+        <Option selected={type === 'fund'} onClick={() => setType('fund')} icon={PieChart} title="صندوق أو منتج استثماري"
+          desc="يدخل بحصته الزكوية من إفصاح الصندوق، لا بقيمته" />
+        <Option selected={type === 'later'} onClick={() => setType('later')} icon={TriangleAlert} title="اتركه للمراجعة"
+          desc="يبقى خارج الحساب، وتبقى النتيجة جزئية" />
+      </div>
+      {type === 'fund' && (
+        <NumberInput label="الحصة الزكوية من إفصاح الصندوق" value={share} onChange={setShare} unit="ر.س"
+          help="تجدها في القوائم المالية أو إفصاح الزكاة للصندوق: وعاء الصندوق × نسبة ملكيتك" warn={share !== '' && !(v > 0)} />
+      )}
+      <p className="w-note"><Icon as={Info} size={14} /><span>لا نفترض الإعفاء من اسم المنتج. الصناديق تُزكّى بحسب موجوداتها الزكوية (دليل الهيئة §3.9).</span></p>
+    </Modal>
+  );
+}
+
+const PART_COLORS = ['var(--primary)', '#9DB3C4', '#5E8AA8', 'var(--gold)', '#C9A65A'];
+
 export function Assets({ path }) {
-  const { view, vault, assets, otherAssets, removeAsset } = useStore();
+  const { view, vault, assets, otherAssets, removeAsset, personaData, confirmed, confirmHolding, historical } = useStore();
   const [tab, setTab] = useState(null);
   const [toast, setToast] = useState(null);
-  const included = view.accounts.filter(a => !a.exempt);
-  const colors = ['var(--primary)', '#9DB3C4', 'var(--gold)'];
-  const parts = [...included.map(a => ({ label: ACCOUNTS[a.id].bank, v: a.balance })), { label: 'أصول خارج البنوك', v: otherAssets }];
+  const [review, setReview] = useState(false);
+  const infos = view.accounts.map(a => [a, accountInfo(a)]);
+  const included = infos.filter(([, i]) => i.included);
+  const holdings = personaHoldings(personaData, view);
+  const heldValue = holdings.reduce((s, h) => s + h.zakatable, 0);
+  const parts = [
+    ...included.map(([a]) => ({ label: ACCOUNTS[a.id].bank, v: a.balance })),
+    ...(holdings.length ? [{ label: 'أصول من مصدرها', v: heldValue }] : []),
+    { label: 'أصول أضفتها', v: otherAssets },
+  ];
+  const ICO = { gold: Gem, stock: ChartCandlestick, fund: PieChart };
   return (
     <Shell path={path} title="الأصول" desc="كل ما يدخل وعاءك الزكوي، من البنوك وخارجها">
       {toast && (
@@ -405,7 +447,7 @@ export function Assets({ path }) {
       <Card>
         <div className="between" style={{ alignItems: 'flex-end', marginBottom: 16, flexWrap: 'wrap' }}>
           <div>
-            <span className="t12 sub">إجمالي الوعاء الزكوي</span>
+            <span className="t12 sub">إجمالي الوعاء الزكوي{historical ? ` · كما في ${gregText(view.today)}` : ''}</span>
             <div className="w-amount md"><strong>{plain(vault)}</strong><span>ر.س</span></div>
           </div>
           <div className="row">
@@ -414,36 +456,38 @@ export function Assets({ path }) {
           </div>
         </div>
         <div className="w-progress" aria-hidden="true">
-          {parts.map((p, i) => p.v > 0 && <i key={p.label} style={{ width: `${(p.v / vault) * 100}%`, background: colors[i] }} />)}
+          {parts.map((p, i) => p.v > 0 && <i key={p.label} style={{ width: `${(p.v / vault) * 100}%`, background: PART_COLORS[i % PART_COLORS.length] }} />)}
         </div>
         <div className="w-legend" style={{ marginTop: 12 }}>
-          {parts.map((p, i) => (
-            <span key={p.label}><i style={{ background: colors[i] }} />{p.label} <b className="num" style={{ color: 'var(--ink)' }}>{sar(p.v)}</b> · {vault ? Math.round((p.v / vault) * 1000) / 10 : 0}٪</span>
+          {parts.filter(p => p.v > 0 || p.label === 'أصول أضفتها').map(p => (
+            <span key={p.label}><i style={{ background: PART_COLORS[parts.indexOf(p) % PART_COLORS.length] }} />{p.label} <b className="num" style={{ color: 'var(--ink)' }}>{sar(p.v)}</b> · {vault ? Math.round((p.v / vault) * 1000) / 10 : 0}٪</span>
           ))}
         </div>
       </Card>
 
       <div className="w-cols c-assets">
-        <Card flush title="الحسابات المرتبطة" desc={`${included.length === 2 ? 'حسابان' : `${included.length} حسابات`} · عبر الخدمات المصرفية المفتوحة`}
+        <Card flush title="الحسابات المرتبطة" desc={`${view.accounts.length === 1 ? 'حساب واحد' : view.accounts.length === 2 ? 'حسابان' : `${view.accounts.length} حسابات`} · عبر الخدمات المصرفية المفتوحة`}
           action={<Btn className="sm" icon={RefreshCw}>مزامنة الآن</Btn>}>
           <div className="w-table-wrap" style={{ marginTop: 16 }}>
             <table className="w-table">
               <thead><tr><th>الحساب</th><th className="w-hide-m">آخر مزامنة</th><th>يدخل الوعاء</th><th style={{ textAlign: 'left' }}>الرصيد</th></tr></thead>
               <tbody>
-                {view.accounts.map(a => (
-                  <tr key={a.id} className={a.exempt ? 'dim' : ''} style={{ cursor: 'pointer' }} onClick={() => go(`/app/account/${a.id}`)}>
+                {infos.map(([a, info]) => (
+                  <tr key={a.id} className={info.kind === 'exempt' ? 'dim' : ''} style={{ cursor: 'pointer' }} onClick={() => go(`/app/account/${a.id}`)}>
                     <td>
                       <span className="row">
-                        <span className="w-ico"><Icon as={a.id === 'A1' ? Landmark : a.exempt ? WalletCards : Building2} /></span>
+                        <span className={`w-ico${info.kind === 'review' ? ' warn' : ''}`}><Icon as={info.kind === 'fund' ? PieChart : info.kind === 'review' ? TriangleAlert : info.kind === 'exempt' ? WalletCards : a.id.endsWith('1') ? Landmark : Building2} /></span>
                         <span>
-                          <span className="b6" style={{ display: 'block', color: 'var(--ink)' }}>{a.exempt ? `محفظة ${a.product}` : ACCOUNTS[a.id].bank}</span>
-                          <span className="t11 sub">{a.exempt ? 'منتج استثماري · مصرف الإنماء' : `حساب ${ACCOUNTS[a.id].kind} · ${ACCOUNTS[a.id].mask} ••••`}</span>
+                          <span className="b6" style={{ display: 'block', color: 'var(--ink)' }}>{info.title}</span>
+                          <span className="t11 sub">{info.sub}</span>
                         </span>
                       </span>
                     </td>
-                    <td className="w-hide-m t12 sub">اليوم {ACCOUNTS[a.id].synced}</td>
-                    <td>{a.exempt ? <Pill>معفى</Pill> : <Pill tone="ok">نعم</Pill>}</td>
-                    <td className="b7" style={{ textAlign: 'left', whiteSpace: 'nowrap' }}>{sar(a.balance)}</td>
+                    <td className="w-hide-m t12 sub">{historical ? gregText(view.today) : `اليوم ${info.synced}`}</td>
+                    <td>{info.kind === 'review'
+                      ? <button onClick={e => { e.stopPropagation(); setReview(true); }}><Pill tone="warn">يحتاج مراجعة</Pill></button>
+                      : <Pill tone={info.pill[0]}>{info.pill[1]}</Pill>}</td>
+                    <td className="b7" style={{ textAlign: 'left', whiteSpace: 'nowrap', color: info.kind === 'review' ? 'var(--muted)' : undefined }}>{sar(a.balance)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -456,8 +500,28 @@ export function Assets({ path }) {
           </p>
         </Card>
 
-        <Card title="أصول خارج البنوك" desc="تُضاف يدويًا ويُحسب حول كل أصل من تاريخ تملكه">
+        <Card title="أصول خارج البنوك" desc="يُحسب حول كل أصل من تاريخ تملكه">
           <div className="col" style={{ gap: 8 }}>
+            {holdings.map(h => {
+              const ok = historical || confirmed[h.id];
+              return (
+                <div key={h.id} className="w-list-row" style={{ border: '1px solid var(--line)', borderRadius: 12, padding: '12px 14px', alignItems: 'flex-start' }}>
+                  <span className="w-ico"><Icon as={ICO[h.kind] ?? Gem} /></span>
+                  <span className="grow">
+                    <span className="t" style={{ display: 'block' }}>{h.title}</span>
+                    <span className="d" style={{ display: 'block' }}>{h.sub}</span>
+                    <span className="t11 muted" style={{ display: 'block' }}>{h.source} · تملّك {gregText(h.acquired)}{h.auto ? ' (تلقائي من أول كشف)' : ''}</span>
+                    <span className="row" style={{ gap: 6, marginTop: 6 }}>
+                      {ok ? <Pill tone="ok">مؤكد</Pill> : <><Pill tone="warn">بانتظار تأكيدك</Pill><Btn className="sm" onClick={() => confirmHolding(h.id)}>تأكيد</Btn></>}
+                    </span>
+                  </span>
+                  <span style={{ textAlign: 'left' }}>
+                    <span className="v" style={{ display: 'block' }}>{sar(h.zakatable)}</span>
+                    {Math.abs(h.market - h.zakatable) > 0.005 && <span className="t11 muted">القيمة {plain(h.market, 0)}</span>}
+                  </span>
+                </div>
+              );
+            })}
             {assets.map(a => (
               <div key={a.id} className="w-list-row" style={{ background: 'var(--warn-soft)', border: '1px solid #F3E2B8', borderRadius: 12, padding: '12px 14px' }}>
                 <span className="w-ico warn"><Icon as={ICON[a.kind] ?? Gem} /></span>
@@ -469,7 +533,7 @@ export function Assets({ path }) {
               </div>
             ))}
             {ADD_ROWS.map(([k, t, d, ic]) => (
-              <button key={k} className="w-list-row" style={{ border: '1px solid var(--line)', borderRadius: 12, padding: '12px 14px', width: '100%' }} onClick={() => setTab(k)}>
+              <button key={k} className="w-list-row" style={{ border: '1px dashed var(--line-2)', borderRadius: 12, padding: '12px 14px', width: '100%' }} onClick={() => setTab(k)}>
                 <span className="w-ico"><Icon as={ic} /></span>
                 <span className="grow" style={{ textAlign: 'start' }}>
                   <span className="t" style={{ display: 'block' }}>{t}</span>
@@ -487,24 +551,34 @@ export function Assets({ path }) {
 
       {tab && <AddAsset tab={tab} setTab={setTab} onClose={() => setTab(null)}
         onAdded={(text, id) => { setTab(null); setToast({ text, id }); }} />}
+      {review && <K4Review onClose={() => setReview(false)} />}
     </Shell>
   );
 }
 
 export function Account({ path }) {
-  const { view } = useStore();
+  const { view, personaData, historical } = useStore();
+  const [review, setReview] = useState(false);
   const id = path.split('/').pop();
   const a = view.accounts.find(x => x.id === id) ?? view.accounts[0];
   const meta = ACCOUNTS[a.id];
-  const txs = ahmad.transactions.filter(t => t.accountId === a.id && t.date <= view.today).slice(-40).reverse();
+  const info = accountInfo(a);
+  const txs = personaData.transactions.filter(t => t.accountId === a.id && t.date <= view.today).slice(-40).reverse();
   return (
-    <Shell path="/app/assets" title={a.exempt ? `محفظة ${a.product}` : `${meta.bank} · ${meta.kind}`}
+    <Shell path="/app/assets" title={info.title}
       crumb={<><button onClick={() => go('/app/assets')}>الأصول</button><Icon as={ChevronLeft} size={12} /><span>{meta.mask} ••••</span></>}>
+      {info.kind === 'review' && (
+        <div className="w-banner" style={{ background: 'var(--warn-bg)', border: '1px solid #F3E2B8' }}>
+          <Icon as={TriangleAlert} />
+          <span>هذا الحساب خارج الحساب حتى نعرف نوعه. لا نعتبره معفى من اسمه.</span>
+          <Btn variant="primary" className="sm" onClick={() => setReview(true)}>إكمال المعلومات</Btn>
+        </div>
+      )}
       <div className="w-kpis">
         <div className="w-kpi"><span className="t12 sub">الرصيد</span><strong>{sar(a.balance)}</strong></div>
-        <div className="w-kpi"><span className="t12 sub">يدخل الوعاء</span><strong>{a.exempt ? 'لا · معفى' : 'نعم'}</strong></div>
+        <div className="w-kpi"><span className="t12 sub">يدخل الوعاء</span><strong>{info.kind === 'cash' ? 'نعم' : info.kind === 'fund' ? 'بحصته الزكوية' : info.kind === 'review' ? 'بعد المراجعة' : 'لا · معفى'}</strong></div>
         <div className="w-kpi"><span className="t12 sub">آخر حركة</span><strong>{a.lastActivity ? hijriText(a.lastActivity) : '—'}</strong></div>
-        <div className="w-kpi"><span className="t12 sub">آخر مزامنة</span><strong>اليوم {meta.synced}</strong></div>
+        <div className="w-kpi"><span className="t12 sub">مصدر البيانات</span><strong>{historical ? `كشف حتى ${gregText(view.today)}` : `مزامنة ${meta.synced}`}</strong></div>
       </div>
       <Card flush title="آخر الحركات" desc="من الخدمات المصرفية المفتوحة · قراءة فقط">
         <div className="w-table-wrap" style={{ marginTop: 16 }}>
@@ -514,7 +588,7 @@ export function Account({ path }) {
               {txs.map((t, i) => (
                 <tr key={i}>
                   <td className="t12"><span className="b6" style={{ display: 'block' }}>{hijriText(t.date)}</span><span className="sub">{gregText(t.date)}</span></td>
-                  <td>{t.desc}</td>
+                  <td>{t.desc}{t.internal && <span className="t11 sub" style={{ display: 'block' }}>تحويل داخلي {t.direction === 'debit' ? 'إلى' : 'من'} {ACCOUNTS[t.counterparty]?.short ?? t.counterparty} · لا يُعد دخلًا جديدًا</span>}</td>
                   <td className="b7" style={{ textAlign: 'left', whiteSpace: 'nowrap', color: t.direction === 'credit' ? 'var(--ok)' : undefined }}>
                     {t.direction === 'credit' ? '+' : '−'}{money(t.amount, { decimals: 2 })}
                   </td>
@@ -524,6 +598,7 @@ export function Account({ path }) {
           </table>
         </div>
       </Card>
+      {review && <K4Review onClose={() => setReview(false)} />}
     </Shell>
   );
 }
