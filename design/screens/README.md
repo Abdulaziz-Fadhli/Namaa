@@ -2,11 +2,13 @@
 
 تصاميم الموقع والتطبيق من ملف فيجما «موقع نماء». الأرقام من بيانات أحمد التجريبية بتاريخ 22 ربيع الآخر 1448هـ (3 أكتوبر 2026).
 
+المنهجية الشرعية في كل الشاشات وفق أدلة هيئة الزكاة والضريبة والجمارك: الدليل الإرشادي للأحكام الفقهية لزكاة الأفراد (مارس 2023م)، والدليل المبسط لجباية زكاة بهيمة الأنعام والحبوب والثمار. التفاصيل ومواضع كل قاعدة في `src/engine/ZATCA-METHODOLOGY.md`.
+
 - ملف فيجما: https://www.figma.com/design/6VLNpDDzl8jWuuxaKt7ngO/Namaa?node-id=93-2
 - الـ Prototype (كمبيوتر): https://www.figma.com/proto/6VLNpDDzl8jWuuxaKt7ngO/Namaa?node-id=95-2&starting-point-node-id=95%3A2
 - الـ Prototype (جوال): https://www.figma.com/proto/6VLNpDDzl8jWuuxaKt7ngO/Namaa?node-id=97-28&starting-point-node-id=97%3A28
 
-هنا 37 شاشة كمبيوتر و20 شاشة جوال. الملف فيه 165 شاشة وحالة، والباقي (ربط بقية البنوك، تفاصيل كل زكاة سابقة، حالات الحفظ والمزامنة) موجود في فيجما.
+هنا 41 شاشة كمبيوتر و24 شاشة جوال. الملف فيه 173 شاشة وحالة، والباقي (ربط بقية البنوك، تفاصيل كل زكاة سابقة، حالات الحفظ والمزامنة) موجود في فيجما.
 
 ## الكمبيوتر
 
@@ -93,6 +95,22 @@
 **الأصول بعد إضافة الذهب**
 
 <img src="desktop/19-assets-after-gold.png" width="720" alt="الأصول بعد إضافة الذهب">
+
+**إضافة أصل: مواشي** (الفريضة بالرؤوس حسب جدول الهيئة، ولا تدخل وعاء النقود)
+
+<img src="desktop/38-add-livestock.png" width="720" alt="إضافة أصل: مواشي">
+
+**إضافة أصل: محاصيل زراعية** (الحبوب والثمار، تجب عند الحصاد بلا حول)
+
+<img src="desktop/39-add-crops.png" width="720" alt="إضافة أصل: محاصيل زراعية">
+
+**الأصول بعد إضافة مواشي**
+
+<img src="desktop/40-assets-after-livestock.png" width="720" alt="الأصول بعد إضافة مواشي">
+
+**الأصول بعد إضافة محصول**
+
+<img src="desktop/41-assets-after-crops.png" width="720" alt="الأصول بعد إضافة محصول">
 
 ### ربط بنك جديد
 
@@ -197,6 +215,10 @@
 <img src="mobile/18-settings.png" width="200" alt="الإعدادات" title="الإعدادات">
 <img src="mobile/19-methodology.png" width="200" alt="منهجية الحساب" title="منهجية الحساب">
 <img src="mobile/20-notifications.png" width="200" alt="الإشعارات" title="الإشعارات">
+<img src="mobile/21-add-livestock.png" width="200" alt="إضافة مواشي" title="إضافة مواشي">
+<img src="mobile/22-add-crops.png" width="200" alt="إضافة محصول" title="إضافة محصول">
+<img src="mobile/23-livestock-added.png" width="200" alt="أضفنا المواشي" title="أضفنا المواشي">
+<img src="mobile/24-crop-added.png" width="200" alt="أضفنا المحصول" title="أضفنا المحصول">
 </p>
 
 | # | الشاشة |

@@ -5,6 +5,7 @@
 // الوعاء = أرصدة البنوك من المحرك + calculateAssetValue على الأصول المضافة.
 import { useMemo, useState } from 'react';
 import { calculateAssetValue, defaultSettings, isHawlComplete } from '../engine/engine.js';
+import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
 import { StoreContext } from './model.js';
 import { riyadhToday, useLiveFeed } from './live.js';
@@ -65,14 +66,19 @@ export function StoreProvider({ children }) {
   );
 
   const value = useMemo(() => {
-    const priced = live ? assets.map(a => reprice(a, feed)) : assets;
+    // المواشي والمحاصيل: يعاد الحكم بتاريخ اليوم (الحول في الأنعام)، وزكاتها عينية خارج وعاء النقود
+    const priced = (live ? assets.map(a => reprice(a, feed)) : assets).map(a => (!a.agri ? a : {
+      ...a,
+      result: a.kind === 'livestock' ? assessLivestock({ ...a.agri, asOf: view.today }) : assessCrop(a.agri),
+    }));
+    const inKind = priced.filter(a => a.result?.status === 'DUE' && a.result.inKind);
     const merged = {};
     for (const a of priced) for (const [k, list] of Object.entries(a.engine)) merged[k] = [...(merged[k] ?? []), ...list];
     const otherAssets = priced.length ? calculateAssetValue(merged) : 0;
     const vault = view.bankTotal + otherAssets;
     // أصل مضاف يدويًا أكمل حولًا هجريًا من تاريخ تملكه (isHawlComplete من المحرك): تجب زكاته اليوم مع زكاة الحسابات
     const todayDate = new Date(`${view.today}T00:00:00Z`);
-    const matured = priced.filter(a => a.value > 0 && isHawlComplete(new Date(`${a.acquired}T00:00:00Z`), todayDate));
+    const matured = priced.filter(a => a.value > 0 && a.acquired && isHawlComplete(new Date(`${a.acquired}T00:00:00Z`), todayDate));
     const maturedBase = matured.reduce((s, a) => s + a.value, 0);
     // قد لا يكون فيه وجوب اليوم (مثلًا في الوضع المباشر قبل يوم العرض): الشاشات تعرض الوجوب القادم بدله
     const bank = view.due ?? { base: 0, zakat: 0 };
@@ -84,6 +90,7 @@ export function StoreProvider({ children }) {
       matured,
       maturedBase,
       today: Boolean(view.due) || maturedBase > 0,
+      inKind,
     };
     return {
       mode,

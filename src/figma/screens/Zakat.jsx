@@ -43,6 +43,10 @@ export function Explain({ go, back }) {
       <Step icon={CircleMinus} title="استبعاد غير الخاضع"
         detail={`${exempt.map(a => `${a.product} ${money(a.balance)}`).join('، ')}، والمبالغ التي لم يكتمل حولها`} />
       <Step icon={Calculator} title="تطبيق النسبة" detail={`2.5٪ على ${money(due.base)} اكتمل حولها اليوم`} />
+      {due.inKind.length > 0 && (
+        <Step icon={HandHeart} title="زكاة المواشي والمحاصيل"
+          detail={`${due.inKind.map(a => `${a.short}: ${a.result.inKind}`).join('، ')}. تُخرج من جنسها عبر بوابة الهيئة، ولا تدخل المبلغ أعلاه.`} />
+      )}
       <div className="nm-btn-pair">
         <Button onClick={() => go('timeline')}>الخط الزمني</Button>
         <Button onClick={() => setSources(s => !s)}>{sources ? 'إخفاء المصادر' : 'المصادر'}</Button>
@@ -56,7 +60,10 @@ export function Explain({ go, back }) {
             </p>
           )}
           {view.start && <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>{view.start.explanation}</p>}
-          <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>المنهجية: فتوى اللجنة الدائمة رقم 282، حول مستقل لكل مبلغ من يوم ملكه. النصاب الأقل من 85 غرام ذهب و595 غرام فضة بسعر اليوم.</p>
+          <p style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>{view.methodology.statement}</p>
+          {view.methodology.applied.map(r => (
+            <p key={r.rule} style={{ fontSize: 11, lineHeight: '18px', color: 'var(--nm-muted)' }}>{r.text} ({r.source})</p>
+          ))}
         </div>
       )}
       <Note icon={Scale}>النصاب الحالي {money(Math.round(view.nisab))}، والوعاء أعلى منه.</Note>
