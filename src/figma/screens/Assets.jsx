@@ -37,7 +37,7 @@ export function OffBank({ go, back }) {
   const { assets } = useStore();
   const { metals, loading } = useLivePrices();
   const liveNote = loading ? 'نحدّث أسعار السوق…'
-    : metals.source !== 'fallback' ? `أسعار الذهب والفضة والأسهم السعودية مباشرة من السوق${timeOf(metals.at) ? ` • ${timeOf(metals.at)}` : ''}.`
+    : metals.source !== 'fallback' ? `أسعار الذهب والفضة والأسهم الأمريكية مباشرة من السوق${timeOf(metals.at) ? ` • ${timeOf(metals.at)}` : ''}.`
       : `أسعار الذهب والفضة محفوظة بتاريخ ${gregText(metals.at)}.`;
   const of = key => assets.filter(a => KINDS[key].includes(a.kind));
   const summary = (key, empty) => {
