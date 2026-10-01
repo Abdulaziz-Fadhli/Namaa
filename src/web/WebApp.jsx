@@ -10,6 +10,7 @@ import {
   KhalidAccounts, KhalidAssets, KhalidBanks, KhalidPrices, KhalidRegister, KhalidSync, KhalidWelcome, NouraPage, PersonaChooser,
 } from './pages/Personas.jsx';
 import { Account, Assets } from './pages/Assets.jsx';
+import { InvestPage } from './pages/Invest.jsx';
 import { History, Payout, ReceiptPage } from './pages/Zakat.jsx';
 import { LinkBank, Notifications, SettingsPage } from './pages/Settings.jsx';
 import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Register } from './pages/Site.jsx';
@@ -37,6 +38,7 @@ function page(path) {
   if (path === '/app/explain') return <Explain path={path} />;
   if (path === '/app/assets') return <Assets path={path} />;
   if (path.startsWith('/app/account/')) return <Account path={path} />;
+  if (path.startsWith('/app/invest/')) return <InvestPage path={path} />;
   if (path === '/app/link') return <LinkBank path={path} />;
   if (path === '/app/history') return <History path={path} />;
   if (path === '/app/payout') return <Payout path={path} />;

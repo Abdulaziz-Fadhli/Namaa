@@ -17,7 +17,7 @@ const NAV = [
 
 const section = path => {
   if (path.startsWith('/app/timeline') || path.startsWith('/app/history')) return '/app/history';
-  if (path.startsWith('/app/assets') || path.startsWith('/app/account') || path.startsWith('/app/link')) return '/app/assets';
+  if (['/app/assets', '/app/account', '/app/link', '/app/invest'].some(x => path.startsWith(x))) return '/app/assets';
   if (path.startsWith('/app/settings')) return '/app/settings';
   return '/app';
 };

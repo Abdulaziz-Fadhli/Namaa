@@ -4,7 +4,8 @@
 //   ويُعاد الحساب مع كل تحديث للأسعار، وتُعاد قيمة كل أصل مضاف (ذهب، فضة، سهم أمريكي).
 // الوعاء = أرصدة البنوك من المحرك + calculateAssetValue على الأصول المضافة.
 import { useMemo, useState } from 'react';
-import { calculateAssetValue, defaultSettings, isHawlComplete } from '../engine/engine.js';
+import { calculateAssetValue, defaultSettings, isHawlComplete, resolveHawlDueDate } from '../engine/engine.js';
+import { applyTrade, portfolioAssets, seedPortfolio } from '../engine/portfolio.js';
 import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
 import { StoreContext } from './model.js';
@@ -15,6 +16,7 @@ import { PERSONA_DATA, khalidWith } from './persona-data.js';
 import prices from '../data/prices.json';
 
 const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+const clock12 = d => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Riyadh' }).replace(' AM', ' ص').replace(' PM', ' م');
 
 // قيمة الأصل بسعر اللحظة: المعادن من سعر الجرام، والسهم الأمريكي بنسبة تغيّر سعره
 function reprice(asset, feed) {
@@ -52,7 +54,8 @@ export function StoreProvider({ children, personaMode = false }) {
   // الشخصيات للعرض فقط على أسعار محفوظة؛ خالد وحده يقدر يحدّث الأسعار الآن (مسار تقييم حالي منفصل)
   const [khalidLive, setKhalidLive] = useState(false);
   const [k4, setK4] = useState(null);                   // حقائق حساب خالد K4 بعد مراجعته
-  const [confirmedBy, setConfirmedBy] = useState({});   // أصول الشخصية التي راجعها المستخدم وأكّدها
+  const [confirmedBy, setConfirmedBy] = useState({});
+  const [portfoliosBy, setPortfoliosBy] = useState({});  // تطبيقات الاستثمار المرتبطة لكل شخصية   // أصول الشخصية التي راجعها المستخدم وأكّدها
   const mode = personaMode ? (persona === 'khalid' && khalidLive ? 'live' : 'story') : modeState;
   const scope = personaMode ? `${persona}:${mode}` : mode;
   // كل شخصية (وكل وجه) لها أصولها وإخراجها وبنوكها: ما يضيفه خالد ما يظهر عند أحمد
@@ -89,6 +92,7 @@ export function StoreProvider({ children, personaMode = false }) {
     [personaMode, pd, live, custom, settings, today, feed.metalsLive, goldPerGram, silverPerGram],
   );
 
+  const portfolios = useMemo(() => portfoliosBy[pkey] ?? [], [portfoliosBy, pkey]);
   const value = useMemo(() => {
     // المواشي والمحاصيل: يعاد الحكم بتاريخ اليوم (الحول في الأنعام)، وزكاتها عينية خارج وعاء النقود
     const priced = (live ? assets.map(a => reprice(a, feed)) : assets).map(a => (!a.agri ? a : {
@@ -96,14 +100,18 @@ export function StoreProvider({ children, personaMode = false }) {
       result: a.kind === 'livestock' ? assessLivestock({ ...a.agri, asOf: view.today }) : assessCrop(a.agri),
     }));
     const inKind = priced.filter(a => a.result?.status === 'DUE' && a.result.inKind);
+    // أصول تطبيقات الاستثمار المرتبطة: كل دفعة بحولها، وتدخل الوعاء والوجوب مثل أي أصل
+    const linked = portfolios.flatMap(portfolioAssets);
+    const all = [...priced, ...linked];
     const merged = {};
-    for (const a of priced) for (const [k, list] of Object.entries(a.engine)) merged[k] = [...(merged[k] ?? []), ...list];
-    const otherAssets = priced.length ? calculateAssetValue(merged) : 0;
+    for (const a of all) for (const [k, list] of Object.entries(a.engine)) merged[k] = [...(merged[k] ?? []), ...list];
+    const otherAssets = all.length ? calculateAssetValue(merged) : 0;
+    const linkedValue = linked.reduce((s2, a) => s2 + a.value, 0);
     // الوعاء = البنوك + أصول الشخصية من مصدرها (view.total) + ما أضافه المستخدم يدويًا
     const vault = view.total + otherAssets;
     // أصل مضاف يدويًا أكمل حولًا هجريًا من تاريخ تملكه (isHawlComplete من المحرك): تجب زكاته اليوم مع زكاة الحسابات
     const todayDate = new Date(`${view.today}T00:00:00Z`);
-    const matured = priced.filter(a => a.value > 0 && a.acquired && isHawlComplete(new Date(`${a.acquired}T00:00:00Z`), todayDate));
+    const matured = all.filter(a => a.value > 0 && a.acquired && isHawlComplete(new Date(`${a.acquired}T00:00:00Z`), todayDate));
     const maturedBase = matured.reduce((s, a) => s + a.value, 0);
     // قد لا يكون فيه وجوب اليوم (مثلًا في الوضع المباشر قبل يوم العرض): الشاشات تعرض الوجوب القادم بدله
     const bank = view.due ?? { base: 0, zakat: 0 };
@@ -117,6 +125,16 @@ export function StoreProvider({ children, personaMode = false }) {
       today: Boolean(view.due) || maturedBase > 0,
       inKind,
     };
+    // المواعيد القادمة: من المحرك (البنوك وأصول الشخصية) + حول كل أصل مضاف أو مرتبط لم يحل بعد
+    const groups = new Map(view.upcoming.map(u => [u.date, { date: u.date, base: u.base, zakat: u.zakat }]));
+    for (const a of all) {
+      if (!(a.value > 0) || !a.acquired || matured.includes(a)) continue;
+      const d = resolveHawlDueDate(new Date(`${a.acquired}T00:00:00Z`)).toISOString().slice(0, 10);
+      const g = groups.get(d) ?? { date: d, base: 0, zakat: 0 };
+      groups.set(d, { ...g, base: g.base + a.value, zakat: round2(g.zakat + a.value / 40) });
+    }
+    const upcoming = [...groups.values()].sort((x, y) => (x.date < y.date ? -1 : 1))
+      .map(u => ({ ...u, inDays: Math.round((new Date(`${u.date}T00:00:00Z`) - todayDate) / 86400000) }));
     return {
       personaMode,
       persona,
@@ -134,6 +152,7 @@ export function StoreProvider({ children, personaMode = false }) {
         setBanksBy(by => ({ ...by, [p]: [] }));
         setPaymentBy(by => ({ ...by, [p]: null }));
         setConfirmedBy(by => ({ ...by, [p]: {} }));
+        setPortfoliosBy(by => ({ ...by, [p]: [] }));
         if (p === 'khalid') { setK4(null); setKhalidLive(false); }
       },
       mode,
@@ -144,6 +163,21 @@ export function StoreProvider({ children, personaMode = false }) {
       view,
       assets: priced,
       otherAssets,
+      portfolios,
+      linkedValue,
+      upcoming,
+      nextDue: upcoming[0] ?? null,
+      linkPortfolio: providerId => setPortfoliosBy(by => ((by[pkey] ?? []).some(x => x.id === providerId) ? by
+        : { ...by, [pkey]: [...(by[pkey] ?? []), seedPortfolio(providerId, view.today)] })),
+      unlinkPortfolio: id => setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).filter(x => x.id !== id) })),
+      // عملية شراء أو بيع وصلت من التطبيق: تُطبّق على المحفظة فيتحدث الوعاء والوجوب مباشرة
+      trade: (id, t) => {
+        const cur = (portfoliosBy[pkey] ?? []).find(x => x.id === id);
+        const now = new Date();
+        const res = applyTrade(cur, { ...t, date: view.today, time: clock12(now) });
+        setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).map(x => (x.id === id ? res.portfolio : x)) }));
+        return res.trade;
+      },
       vault,
       pendingBanks,
       lastZakat,
@@ -177,7 +211,7 @@ export function StoreProvider({ children, personaMode = false }) {
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
+  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, portfolios, portfoliosBy, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
