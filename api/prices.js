@@ -1,6 +1,6 @@
-// خدمة الأسعار الحية (Vercel Function): GET /api/prices?symbols=1120,2222
-// - الأسهم السعودية (تداول ونمو) من SAHMK، متأخرة 15 دقيقة في الباقة المجانية. المفتاح في متغير البيئة SAHMK_API_KEY
-//   ولا يوصل للمتصفح أبدًا.
+// خدمة الأسعار الحية (Vercel Function): GET /api/prices?symbols=4340&us=AAPL
+// - صناديق تداول (ريت ومؤشرات) من SAHMK، متأخرة 15 دقيقة في الباقة المجانية. المفتاح في متغير البيئة SAHMK_API_KEY.
+//   أسهم الشركات السعودية ما نطلب سعرها: الشركة تدفع الزكاة عن مساهميها فلا تدخل الوعاء. المفتاح لا يوصل للمتصفح.
 // - الذهب والفضة من gold-api.com (بدون مفتاح): دولار للأونصة ← ريال للغرام (الريال مربوط على 3.75).
 // - كل مصدر له احتياط: إذا فشل أو ما فيه مفتاح نرجع آخر سعر محفوظ من src/data/prices.json ونقول ذلك صراحة.
 // - الأسهم والصناديق الأمريكية (ETF) من Finnhub باللحظة: GET /api/prices?us=AAPL,SPY
@@ -16,7 +16,7 @@ const SAHMK = 'https://api.sahmk.sa/api/v1';
 const GOLD_API = 'https://api.gold-api.com/price';
 const FINNHUB = 'https://finnhub.io/api/v1';
 const TIMEOUT_MS = 4000;
-const CACHE_SECONDS = 900;      // الأسهم السعودية
+const CACHE_SECONDS = 900;      // صناديق تداول (حد SAHMK اليومي)
 const FAST_CACHE_SECONDS = 10;  // الذهب والفضة والأمريكي
 
 const lastDate = Object.keys(prices).sort().at(-1);

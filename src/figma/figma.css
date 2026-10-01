@@ -264,3 +264,6 @@
 @media (prefers-reduced-motion: reduce) {
   .nm-flash, .nm-livepill-dot.pulse, .nm-spin { animation: none; }
 }
+
+/* الحقل يبيّن تركيزه بإطاره (focus-within)، فما نحتاج إطار المتصفح داخله */
+.nm .nm-field-input:focus-visible { outline: none; }
