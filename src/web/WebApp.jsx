@@ -8,7 +8,7 @@ import { Dashboard, Explain } from './pages/Home.jsx';
 import { Account, Assets } from './pages/Assets.jsx';
 import { History, Payout, ReceiptPage } from './pages/Zakat.jsx';
 import { LinkBank, Notifications, SettingsPage } from './pages/Settings.jsx';
-import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Register, Verify } from './pages/Site.jsx';
+import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Register } from './pages/Site.jsx';
 
 const PhoneApp = lazy(() => import('../App.jsx'));
 
@@ -17,7 +17,6 @@ function page(path) {
   if (path === '/login') return <Login />;
   if (path === '/forgot') return <Forgot />;
   if (path === '/register') return <Register />;
-  if (path === '/verify') return <Verify />;
   if (path === '/onboarding/banks' || path === '/onboarding') return <OnboardBanks />;
   if (path === '/onboarding/last') return <OnboardLast />;
   if (path === '/onboarding/sync') return <OnboardSync />;

@@ -154,25 +154,6 @@ export function Modal({ title, desc, onClose, children, foot, tabs, size }) {
   );
 }
 
-// رمز تحقق من 6 خانات (تجريبي: أي 6 أرقام)
-export function Otp({ value, onChange }) {
-  const digits = value.padEnd(6, ' ').slice(0, 6).split('');
-  return (
-    <div className="w-otp">
-      {digits.map((d, i) => (
-        <input key={i} inputMode="numeric" maxLength={1} value={d.trim()} aria-label={`الرقم ${i + 1}`}
-          onChange={e => {
-            const v = e.target.value.replace(/[٠-٩]/g, c => '٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/\D/g, '').slice(-1);
-            const next = digits.slice(); next[i] = v || ' ';
-            onChange(next.join('').trimEnd());
-            if (v) e.target.nextElementSibling?.focus();
-          }}
-          onKeyDown={e => { if (e.key === 'Backspace' && !d.trim()) e.currentTarget.previousElementSibling?.focus(); }} />
-      ))}
-    </div>
-  );
-}
-
 export function Steps({ items, current }) {
   return (
     <div className="w-steps">

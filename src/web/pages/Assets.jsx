@@ -452,7 +452,7 @@ export function Assets({ path }) {
           <button className="row b6 t13" style={{ padding: '16px 24px' }} onClick={() => go('/app/link')}><Icon as={Plus} size={16} />ربط حساب من بنك آخر</button>
           <p className="w-note" style={{ background: 'var(--soft)', padding: '12px 24px' }}>
             <Icon as={ShieldCheck} size={15} className="green" />
-            <span>نقرأ الأرصدة والحركات فقط، ولا نستطيع التحويل من حساباتك إلا بموافقتك ورمز التحقق في كل مرة.</span>
+            <span>نقرأ الأرصدة والحركات فقط، ولا نستطيع التحويل من حساباتك إلا بتأكيدك في كل مرة.</span>
           </p>
         </Card>
 
