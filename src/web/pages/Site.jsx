@@ -5,7 +5,7 @@ import {
   ArrowRight, CalendarClock, CalendarDays, Check, ChevronDown, CircleCheck, Eye, EyeOff, FileText, Info, Landmark, Layers3,
   LockKeyhole, Plus, RefreshCw, Scale, Search, ShieldCheck, X,
 } from 'lucide-react';
-import { Brand, Btn, Checkbox, Icon, Option, Otp, Pill, Select, Seg, Steps, TextInput } from '../kit.jsx';
+import { Brand, Btn, Checkbox, Icon, Option, Pill, Select, Seg, Steps, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriMonthLength, hijriText, hijriToIso, HIJRI_MONTHS } from '../../figma/format.js';
@@ -37,7 +37,7 @@ function ZakatCard({ compact }) {
 }
 
 const FAQ = [
-  ['هل يستطيع نماء تحويل أموالي؟', 'لا. الربط بصلاحية قراءة فقط، وأي إخراج للزكاة يتم بتأكيد منك ورمز تحقق يرسله بنكك.'],
+  ['هل يستطيع نماء تحويل أموالي؟', 'لا. الربط بصلاحية قراءة فقط، وأي إخراج للزكاة لا يتم إلا بتأكيد منك.'],
   ['كيف تحسبون الحول إذا كان دخلي يتغير كل شهر؟', 'لكل مبلغ يدخل حسابك حوله المستقل من يوم دخوله، كما في دليل هيئة الزكاة (§2.2.5.1). ولك أن تختار يومًا واحدًا في السنة تزكّي فيه كل المال، فيُعجَّل ما لم يحل حوله (§3.3).'],
   ['هل أزكي على أسهم الشركات السعودية؟', 'إن كنت مستثمرًا فلا، لأن هيئة الزكاة تجبي زكاة الشركات المساهمة في المملكة، فيكفيك إخراج الشركة عنك (§3.6). أما المضارب فيزكي القيمة السوقية.'],
   ['هل يحسب نماء زكاة المواشي والمحاصيل؟', 'نعم. الإبل والبقر والغنم بجداول الهيئة، والحبوب والثمار بنصاب خمسة أوسق، وزكاتها من جنسها وتُدفع عبر بوابة الهيئة.'],
@@ -140,7 +140,7 @@ export function Landing() {
             <p className="t12" style={{ color: '#9DB3C4', marginTop: 12 }}>{ZATCA.disclaimer}</p>
           </div>
           <div className="col" style={{ gap: 12 }}>
-            {[[Eye, 'قراءة فقط', 'لا نستطيع تحويل أي مبلغ من حساباتك، الإخراج يتم بتأكيدك وبرمز تحقق من بنكك.'],
+            {[[Eye, 'قراءة فقط', 'لا نستطيع تحويل أي مبلغ من حساباتك، والإخراج لا يتم إلا بتأكيدك.'],
               [LockKeyhole, 'بياناتك مشفّرة', 'التشفير أثناء النقل والتخزين، ولا نشارك بياناتك مع أي طرف.'],
               [ShieldCheck, 'تلغي الربط متى شئت', 'من الإعدادات، وتُحذف بيانات الحساب المرتبط فورًا.']].map(([ic, t, d]) => (
               <div key={t} className="w-dark-card"><span className="w-ico"><Icon as={ic} /></span><span><b style={{ display: 'block' }}>{t}</b><span className="t12" style={{ color: '#B9C7D2' }}>{d}</span></span></div>
@@ -267,10 +267,10 @@ export function Register() {
   const ok = f.name.trim().length > 2 && /.+@.+\..+/.test(f.email) && f.pw.length >= 8 && agree;
   return (
     <AuthLayout title="أنشئ حسابك" lead="بعدها نربط حساباتك البنكية بصلاحية قراءة فقط." side={<span className="t12 sub">الخطوة 1 من 3</span>}>
-      <form className="col" style={{ gap: 14 }} onSubmit={e => { e.preventDefault(); if (ok) go('/verify'); }}>
+      <form className="col" style={{ gap: 14 }} onSubmit={e => { e.preventDefault(); if (ok) go('/onboarding/banks'); }}>
         <TextInput label="الاسم الكامل" value={f.name} onChange={set('name')} />
         <TextInput label="البريد الإلكتروني" value={f.email} onChange={set('email')} dir="ltr" help="نرسل لك رابط تأكيد على هذا البريد" />
-        <TextInput label="رقم الجوال" value={f.phone} onChange={set('phone')} dir="ltr" help="نستخدمه لرمز التحقق عند إخراج الزكاة فقط" />
+        <TextInput label="رقم الجوال" value={f.phone} onChange={set('phone')} dir="ltr" help="لتنبيهات مواعيد الزكاة" />
         <Password value={f.pw} onChange={set('pw')} />
         <div className="w-strength">{[0, 1, 2, 3].map(i => <i key={i} className={i < strength ? 'on' : ''} />)}</div>
         <Checkbox on={agree} onChange={setAgree}>أوافق على <b>الشروط والأحكام</b> و<b>سياسة الخصوصية</b></Checkbox>
@@ -278,26 +278,6 @@ export function Register() {
         <p className="t13 sub" style={{ textAlign: 'center' }}>لديك حساب؟ <button type="button" className="b7" style={{ color: 'var(--ink)' }} onClick={() => go('/login')}>سجّل الدخول</button></p>
       </form>
     </AuthLayout>
-  );
-}
-
-export function Verify() {
-  const [code, setCode] = useState('7305');
-  const [left, setLeft] = useState(42);
-  useEffect(() => { const t = setInterval(() => setLeft(s => Math.max(0, s - 1)), 1000); return () => clearInterval(t); }, []);
-  return (
-    <div className="w" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 16px', gap: 24 }}>
-      <Brand />
-      <div className="w-card col" style={{ width: 'min(460px, 100%)', gap: 16 }}>
-        <button className="row t12 b6" onClick={() => go('/register')}><Icon as={ArrowRight} size={14} />تعديل البريد</button>
-        <h1 style={{ fontSize: 24, fontWeight: 700 }}>تحقق من بريدك</h1>
-        <p className="t13 sub">أرسلنا رمزًا من 6 أرقام إلى <span className="ltr">ahmad.alsubaie@gmail.com</span>. الرمز صالح لمدة 10 دقائق.</p>
-        <Otp value={code} onChange={setCode} />
-        <Btn variant="primary" className="lg" disabled={code.length < 6} onClick={() => go('/onboarding/banks')}>تأكيد البريد</Btn>
-        <div className="w-banner ok t12"><Icon as={CircleCheck} className="green" size={16} />{left ? `لم يصلك الرمز؟ إعادة الإرسال بعد 0:${String(left).padStart(2, '0')}، وتأكد من مجلد الرسائل غير المرغوبة.` : <button className="b7" onClick={() => setLeft(42)}>إعادة إرسال الرمز</button>}</div>
-        <p className="t11 muted" style={{ textAlign: 'center' }}>نسخة العرض: أي 6 أرقام تكفي.</p>
-      </div>
-    </div>
   );
 }
 

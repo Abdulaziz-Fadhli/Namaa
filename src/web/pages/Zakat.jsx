@@ -1,10 +1,10 @@
-// سجل الزكاة، وإخراج الزكاة (الجهة ← المراجعة ← رمز التحقق)، والإيصال. المبالغ من أحداث المحرك (DUE).
+// سجل الزكاة، وإخراج الزكاة (الجهة ← المراجعة ← التأكيد)، والإيصال. المبالغ من أحداث المحرك (DUE).
 import { useState } from 'react';
 import {
   ArrowLeft, BellRing, Building2, CalendarClock, CalendarPlus, Check, CheckCheck, ChevronLeft, CircleCheck, Copy, Download,
-  HandHeart, History as HistoryIcon, Info, Landmark, LockKeyhole, Plus, Receipt, Share2, ShieldCheck, WalletCards,
+  HandHeart, History as HistoryIcon, Info, Landmark, Plus, Receipt, Share2, ShieldCheck, WalletCards,
 } from 'lucide-react';
-import { Btn, Card, Icon, Modal, Option, Otp, Pill, Seg, Steps, TextInput } from '../kit.jsx';
+import { Btn, Card, Icon, Modal, Option, Pill, Seg, Steps, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
@@ -157,7 +157,6 @@ function NewBeneficiary({ onClose, onSave }) {
 
 export function Payout({ path }) {
   const { view, due, channel, setChannel, fromAccount, setFromAccount, pay, payment } = useStore();
-  const [otp, setOtp] = useState(null);
   const [newBen, setNewBen] = useState(false);
   const [ben, setBen] = useState(null);
   const accounts = view.accounts.filter(a => !a.exempt);
@@ -181,10 +180,10 @@ export function Payout({ path }) {
       </Shell>
     );
   }
-  const confirm = () => { pay(); setOtp(null); go('/app/receipt'); };
+  const confirm = () => { pay(); go('/app/receipt'); };
   return (
-    <Shell path={path} title="إخراج الزكاة" desc={`الخطوة ${otp != null ? 3 : 2} من 3 · ${otp != null ? 'أكّد التحويل برمز التحقق' : 'راجع التفاصيل قبل التحويل'}`}>
-      <div className="w-hide-m"><Steps items={['اختيار الجهة', 'المراجعة', 'رمز التحقق']} current={otp != null ? 2 : 1} /></div>
+    <Shell path={path} title="إخراج الزكاة" desc="الخطوة 2 من 2 · راجع التفاصيل ثم أكّد الإخراج">
+      <div className="w-hide-m"><Steps items={['اختيار الجهة', 'المراجعة']} current={1} /></div>
       <div className="w-cols c-wide">
         <div className="col" style={{ gap: 24 }}>
           <Card title="من حساب" desc="الرصيد المتاح يكفي للتحويل">
@@ -222,32 +221,15 @@ export function Payout({ path }) {
             <div className="w-line" style={{ borderTop: '1px solid var(--line)' }}><span>تاريخ التنفيذ</span><span>{gregText(view.today)}</span></div>
           </div>
           {!enough && <p className="w-help warn" style={{ marginBottom: 12 }}>رصيد هذا الحساب أقل من مبلغ الزكاة، اختر حسابًا آخر.</p>}
-          {channel !== 'self' && <p className="w-note" style={{ marginBottom: 12 }}><Icon as={LockKeyhole} size={14} />سنرسل رمز تحقق إلى جوالك المنتهي بـ 47 لإتمام التحويل.</p>}
           <div className="col" style={{ gap: 10 }}>
-            <Btn variant="primary" className="lg" disabled={!enough} onClick={() => (channel === 'self' ? confirm() : setOtp(''))}>
-              {channel === 'self' ? 'تسجيل الإخراج' : 'متابعة لرمز التحقق'}
+            <Btn variant="primary" className="lg" disabled={!enough} onClick={confirm}>
+              {channel === 'self' ? 'تسجيل الإخراج' : 'تأكيد الإخراج'}
             </Btn>
             <Btn onClick={() => go('/app')}>رجوع</Btn>
           </div>
         </Card>
       </div>
 
-      {otp != null && (
-        <Modal size="sm" onClose={() => setOtp(null)}
-          foot={<Btn variant="primary" className="lg" disabled={otp.length < 6} onClick={confirm}>تأكيد التحويل</Btn>}>
-          <div className="col" style={{ alignItems: 'center', gap: 10, textAlign: 'center', paddingTop: 12 }}>
-            <span className="w-ico sel" style={{ width: 52, height: 52, borderRadius: 99 }}><Icon as={LockKeyhole} size={22} /></span>
-            <h2 className="b7" style={{ fontSize: 20 }}>أدخل رمز التحقق</h2>
-            <p className="t13 sub">أرسلنا رمزًا من 6 أرقام برسالة نصية إلى جوالك المنتهي بـ 47</p>
-          </div>
-          <Otp value={otp} onChange={setOtp} />
-          <div className="w-soft">
-            <div className="w-line"><span>تحويل زكاة</span><span>{sar(due.zakat)}</span></div>
-            <div className="w-line t12" style={{ borderTop: '1px solid var(--line)' }}><span>من {ACCOUNTS[from.id].short} {ACCOUNTS[from.id].kind} · {ACCOUNTS[from.id].mask} ••••</span><span>{ch.to}</span></div>
-          </div>
-          <p className="t12 sub" style={{ textAlign: 'center' }}>نسخة العرض: أي 6 أرقام تكفي.</p>
-        </Modal>
-      )}
       {newBen && <NewBeneficiary onClose={() => setNewBen(false)} onSave={b => { setBen(b); setChannel('beneficiary'); setNewBen(false); }} />}
     </Shell>
   );

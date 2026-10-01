@@ -128,7 +128,7 @@ function ToggleRow({ on, onChange, title, desc }) {
 }
 
 function Simple({ id }) {
-  const [t, setT] = useState({ face: true, twofa: true, before3: true, onDue: true, nisab: true, monthly: false, push: true, email: true, sms: false });
+  const [t, setT] = useState({ face: true, before3: true, onDue: true, nisab: true, monthly: false, push: true, email: true, sms: false });
   const tog = k => v => setT(s => ({ ...s, [k]: v }));
   if (id === 'profile') return (
     <Card title="الملف الشخصي" desc="بياناتك الأساسية">
@@ -143,7 +143,6 @@ function Simple({ id }) {
     <Card title="الأمان وتسجيل الدخول" desc="تحكم في طريقة الدخول والأجهزة">
       <div className="w-divide">
         <ToggleRow on={t.face} onChange={tog('face')} title="الدخول ببصمة الوجه" desc="على هذا الجهاز" />
-        <ToggleRow on={t.twofa} onChange={tog('twofa')} title="رمز تحقق عند كل إخراج" desc="مطلوب دائمًا للتحويل" />
         <div className="between" style={{ padding: '14px 0' }}><span><span className="b6" style={{ display: 'block' }}>الأجهزة المسجّلة</span><span className="t12 sub">آيفون 15 · ماك بوك · آخر دخول اليوم</span></span><Btn variant="ghost">إدارة</Btn></div>
       </div>
     </Card>
@@ -163,7 +162,7 @@ function Simple({ id }) {
       <div className="col t13 sub" style={{ gap: 12 }}>
         <p>{ZATCA.statement}</p>
         <p>{ZATCA.disclaimer}</p>
-        <p>نقرأ أرصدتك وحركاتك بموافقتك عبر الخدمات المصرفية المفتوحة، ولا نشارك بياناتك مع أي طرف، ولا نحوّل أي مبلغ إلا برمز تحقق منك.</p>
+        <p>نقرأ أرصدتك وحركاتك بموافقتك عبر الخدمات المصرفية المفتوحة، ولا نشارك بياناتك مع أي طرف، ولا نحوّل أي مبلغ إلا بتأكيد منك.</p>
       </div>
     </Card>
   );
