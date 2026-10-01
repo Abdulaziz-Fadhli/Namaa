@@ -13,6 +13,7 @@ import {
   CROP_KINDS, CROP_UNITS, GRAZING, IRRIGATION, LIVESTOCK_PURPOSES, LIVESTOCK_TYPES, ZATCA, assessCrop, assessLivestock,
 } from '../../engine/zatca.js';
 import { assess, check, toEngineEntry } from '../../securities/securities.js';
+import { InvestCard } from './Invest.jsx';
 import { ACCOUNTS, accountInfo, daysFrom, personaHoldings, plain, sar, days } from '../data.js';
 
 const TABS = [
@@ -446,6 +447,8 @@ export function Assets({ path }) {
           </div>
         </Card>
 
+        <div className="col" style={{ gap: 24 }}>
+        <InvestCard />
         <Card title="خارج البنوك" action={<button className="w-link t13" onClick={() => setTab('gold')}>إضافة</button>}>
           {holdings.length === 0 && assets.length === 0 && (
             <p className="w-quiet">لا أصول بعد. الذهب والأسهم والنقد والعقار المعد للبيع والمواشي والمحاصيل تُضاف من «إضافة أصل».</p>
@@ -479,6 +482,7 @@ export function Assets({ path }) {
             <p className="w-note" style={{ marginTop: 12 }}><span>زكاة المواشي والمحاصيل تُخرج من جنسها، وتُدفع عبر {ZATCA.channels.livestockCrops}.</span></p>
           )}
         </Card>
+        </div>
       </div>
 
       {tab && <AddAsset tab={tab} setTab={setTab} onClose={() => setTab(null)}

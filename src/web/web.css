@@ -364,3 +364,7 @@ details.w-more .w-more-body { font-size: 13px; line-height: 21px; color: var(--s
   .w-ev .when { grid-column: 1 / -1; }
   .w-amount strong { font-size: 46px; line-height: 56px; }
 }
+@media (max-width: 960px) {
+  .w-top { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
+  .w-top-actions { justify-content: flex-end; }
+}

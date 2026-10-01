@@ -5,12 +5,14 @@ import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriText, hijriToIso, money } from '../../figma/format.js';
-import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, hijriFromParts, kFmt, monthName, plain, sar, weekday, days } from '../data.js';
+import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, kFmt, monthName, plain, sar, weekday, days } from '../data.js';
 import { AHMAD_V2 } from '../../engine/ahmad-v2.js';
+import { providerOf, summarize } from '../../engine/portfolio.js';
 import { K4Review } from './Assets.jsx';
 import { useState } from 'react';
 
 function AccountsCard({ view, vault }) {
+  const { portfolios } = useStore();
   return (
     <Card title="حساباتك" action={<button className="w-link t13" onClick={() => go('/app/assets')}>كل الأصول</button>}>
       <div className="w-rows">
@@ -21,6 +23,16 @@ function AccountsCard({ view, vault }) {
               <span className="t">{info.title}</span>
               <span className="v" style={info.kind === 'review' ? { color: 'var(--muted)', fontWeight: 500 } : undefined}>{plain(a.balance)}</span>
               <span className="d">{info.kind === 'cash' ? `•••• ${info.mask}` : info.kind === 'review' ? <span style={{ color: 'var(--warn)' }}>يحتاج مراجعة · غير محسوب</span> : info.sub}</span>
+            </button>
+          );
+        })}
+        {portfolios.map(p => {
+          const sm = summarize(p);
+          return (
+            <button key={p.id} className="w-rowline" style={{ width: '100%', textAlign: 'start' }} onClick={() => go(`/app/invest/${p.id}`)}>
+              <span className="t">{providerOf(p.provider).name}</span>
+              <span className="v">{plain(sm.base)}</span>
+              <span className="d">محفظة استثمار · ما يدخل الوعاء منها</span>
             </button>
           );
         })}
@@ -54,9 +66,8 @@ function VaultChart({ view }) {
 
 // الرئيسية تجاوب على سؤال واحد: كم عليّ، ومتى؟
 export function Dashboard({ path }) {
-  const { view, vault, due, payment, historical, persona, k4 } = useStore();
+  const { view, vault, due, payment, historical, persona, k4, nextDue: next } = useStore();
   const [review, setReview] = useState(false);
-  const next = view.nextDue;
   const today = view.today;
   const k4Pending = persona === 'khalid' && !k4;
   const name = view.name;
@@ -80,7 +91,7 @@ export function Dashboard({ path }) {
             </span>
             <div className="w-amount"><strong>{plain(amount)}</strong><span>ر.س</span></div>
             <p className="w-quiet">
-              {state === 'none' && next ? `${hijriFromParts(next.hijri)} · ${gregText(next.date)} · بعد ${days(next.inDays)}، إذا بقي الرصيد كما هو` : bothDates(today)}
+              {state === 'none' && next ? `${hijriText(next.date)} · ${gregText(next.date)} · بعد ${days(next.inDays)}، إذا بقي الرصيد كما هو` : bothDates(today)}
             </p>
           </div>
           <p className="w-quiet" style={{ margin: '18px 0 22px', lineHeight: '24px' }}>
