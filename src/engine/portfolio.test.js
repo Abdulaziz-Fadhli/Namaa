@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyTrade, portfolioAssets, seedPortfolio, summarize, USD_SAR } from './portfolio.js';
+import { applyTrade, PROVIDERS, portfolioAssets, receiveNext, SCRIPTS, seedPortfolio, summarize, USD_SAR } from './portfolio.js';
 import { calculateAssetValue } from './engine.js';
 
 const near = (a, b) => expect(Math.abs(a - b)).toBeLessThan(0.01);
@@ -78,5 +78,20 @@ describe('العمليات تحدّث الزكاة فورًا', () => {
     const p = seedPortfolio('aljazira-capital', '2026-10-03');
     expect(() => applyTrade(p, { side: 'BUY', key: '2010', units: 100, price: 70, date: '2026-10-03' })).toThrow('لا يكفي');
     expect(() => applyTrade(p, { side: 'SELL', key: '2010', units: 151, price: 70, date: '2026-10-03' })).toThrow('أكبر مما تملك');
+  });
+});
+
+describe('العمليات الواردة تلقائيًا من التطبيق', () => {
+  it('كل تطبيق: عملياته المجدولة تنطبق بالترتيب بدون خطأ، ثم تتوقف', () => {
+    for (const { id } of PROVIDERS) {
+      let p = seedPortfolio(id, '2026-10-03');
+      for (let i = 0; i < SCRIPTS[id].length; i++) {
+        const r = receiveNext(p, '2026-10-03', '9:00 ص');
+        expect(r.trade.side).toBe(SCRIPTS[id][i][0]);
+        p = r.portfolio;
+      }
+      expect(receiveNext(p, '2026-10-03', '9:00 ص')).toBeNull();
+      expect(p.trades).toHaveLength(SCRIPTS[id].length);
+    }
   });
 });

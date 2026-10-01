@@ -368,3 +368,15 @@ details.w-more .w-more-body { font-size: 13px; line-height: 21px; color: var(--s
   .w-top { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
   .w-top-actions { justify-content: flex-end; }
 }
+
+/* ---------- تحديث مباشر من تطبيقات الاستثمار ---------- */
+.w-live { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--sub); padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.w-live .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--line-2); flex-shrink: 0; }
+.w-live .dot.on { background: var(--ok); animation: w-blink 1.6s ease-in-out infinite; }
+.w-pulse { display: inline-block; width: 7px; height: 7px; border-radius: 99px; background: var(--ok); margin-inline-end: 6px; animation: w-blink 1.6s ease-in-out infinite; }
+@keyframes w-blink { 50% { opacity: .3; } }
+.w-live-toast { position: fixed; bottom: 24px; inset-inline-end: 24px; z-index: 50; width: min(340px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; box-shadow: 0 12px 32px rgba(21, 34, 44, .12); animation: w-up .25s ease; }
+@keyframes w-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.w-new { animation: w-hl 2.4s ease; }
+@keyframes w-hl { from { background: var(--ok-bg); } to { background: transparent; } }
+@media (max-width: 960px) { .w-live-toast { bottom: 84px; inset-inline-end: 16px; } }

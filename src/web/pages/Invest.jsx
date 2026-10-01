@@ -1,14 +1,13 @@
 // تطبيقات الاستثمار: ربط المحفظة (محاكاة)، وصفحة المحفظة، وعمليات الشراء والبيع التي تحدّث الزكاة فورًا.
-import { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, LoaderCircle, Search, ShieldCheck, Zap } from 'lucide-react';
-import { Btn, Card, Icon, Modal, NumberInput, Seg, Select, TextInput } from '../kit.jsx';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, LoaderCircle, Search, ShieldCheck } from 'lucide-react';
+import { Btn, Card, Icon, Modal, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
-import { parseNum, useStore } from '../../figma/model.js';
+import { useStore } from '../../figma/model.js';
 import { gregText } from '../../figma/format.js';
 import { resolveHawlDueDate } from '../../engine/engine.js';
-import { PROVIDERS, applyTrade, providerOf, seedPortfolio, summarize, USD_SAR } from '../../engine/portfolio.js';
-import { check } from '../../securities/securities.js';
+import { PROVIDERS, nextScripted, providerOf, seedPortfolio, summarize } from '../../engine/portfolio.js';
 import { plain, sar } from '../data.js';
 
 const hawlEnd = iso => resolveHawlDueDate(new Date(`${iso}T00:00:00Z`)).toISOString().slice(0, 10);
@@ -62,7 +61,7 @@ export function LinkInvest({ onClose }) {
   );
   const zak = preview.holdings.filter(h => h.zakatable).length;
   return (
-    <Modal size="sm" title={`ربطنا ${pick.name}`} desc="من الآن تتحدث زكاتك مع كل عملية في التطبيق" onClose={onClose}
+    <Modal size="sm" title={`ربطنا ${pick.name}`} desc="العمليات تصل من التطبيق تلقائيًا، وتتحدث زكاتك مع كل واحدة" onClose={onClose}
       foot={<><Btn onClick={onClose}>إغلاق</Btn><Btn variant="primary" onClick={() => { onClose(); go(`/app/invest/${pick.id}`); }}>عرض المحفظة</Btn></>}>
       <div className="w-rows t13">
         <div className="w-line"><span>استوردنا</span><span>{papers(preview.holdings.length)} ونقد {sar(preview.cash, 0)}</span></div>
@@ -77,68 +76,11 @@ export function LinkInvest({ onClose }) {
   );
 }
 
-// ---------- عملية من التطبيق (محاكاة): شراء أو بيع ----------
-function TradeModal({ p, onClose, onDone }) {
-  const { trade, view } = useStore();
-  const s = summarize(p);
-  const [side, setSide] = useState('BUY');
-  const [q, setQ] = useState('AAPL');
-  const [sellKey, setSellKey] = useState(s.holdings[0]?.key ?? '');
-  const [qty, setQty] = useState('2');
-  const [px, setPx] = useState('');
-  const [err, setErr] = useState('');
-  const found = useMemo(() => (side === 'BUY' && q.trim() ? check(q) : null), [side, q]);
-  const key = side === 'SELL' ? sellKey : found?.found && found.symbol ? found.symbol : null;
-  const known = key ? p.prices[key] : null;
-  const priceStr = px === '' && known != null ? String(known) : px;
-  const n = parseNum(qty), price = parseNum(priceStr);
-  const us = key && (side === 'SELL' ? s.holdings.find(h => h.key === key)?.market === 'US' : found?.market === 'US');
-  let preview = null, previewErr = '';
-  if (key && n > 0 && price > 0) {
-    try { preview = applyTrade(p, { side, key, units: n, price, date: view.today }).trade; } catch (e) { previewErr = e.message; }
-  }
-  const delta = preview ? preview.impact.baseAfter - preview.impact.baseBefore : 0;
-  const hawlNote = !preview ? '' : side === 'BUY'
-    ? (preview.zakatable ? 'تأخذ حول النقد الذي اشتُريت به، فلا يبدأ حول جديد.' : 'الشركة تزكي عن هذا السهم، فيخرج المبلغ من وعائك.')
-    : (preview.zakatable ? 'النقد من البيع يكمل حول الورقة.' : 'السهم كانت تزكيه الشركة، فالنقد من بيعه مال جديد يبدأ حوله اليوم.');
-  const submit = () => {
-    try { onDone(trade(p.id, { side, key, units: n, price })); } catch (e) { setErr(e.message); }
-  };
-  return (
-    <Modal size="sm" title="عملية من التطبيق" desc={`${providerOf(p.provider).name} · محاكاة لعملية تصل لحظيًا`} onClose={onClose}
-      foot={<><Btn onClick={onClose}>إلغاء</Btn><Btn variant="primary" disabled={!preview} onClick={submit}>إرسال العملية</Btn></>}>
-      <Seg block value={side} onChange={v => { setSide(v); setPx(''); setErr(''); }} options={[{ value: 'BUY', label: 'شراء' }, { value: 'SELL', label: 'بيع' }]} label="نوع العملية" />
-      {side === 'BUY' ? (
-        <TextInput label="السهم أو الصندوق" value={q} onChange={v => { setQ(v); setPx(''); }} icon={Search} placeholder="مثال: AAPL أو 1150 أو الراجحي"
-          help={found ? (found.found && found.symbol ? `${found.name || found.nameEn} · ${found.marketAr} · ${found.paysZakat ? 'يزكي عنك' : 'الزكاة عليك'}` : found.message) : undefined}
-          warn={Boolean(found && !(found.found && found.symbol))} />
-      ) : (
-        <Select label="الورقة" value={sellKey} onChange={v => { setSellKey(v); setPx(''); }}
-          options={s.holdings.map(h => ({ value: h.key, label: `${h.name} · ${units(h.units)}` }))} />
-      )}
-      <div className="w-grid2">
-        <NumberInput label="الكمية" value={qty} onChange={setQty} />
-        <NumberInput label="السعر" value={priceStr} onChange={setPx} unit={us ? '$' : 'ر.س'} help={us ? `يُحوّل بسعر ${USD_SAR}` : undefined} />
-      </div>
-      {preview && (
-        <div className="w-rows t13">
-          <div className="w-line"><span>المبلغ</span><span>{sar(preview.amount)}</span></div>
-          <div className="w-line"><span>أثرها على الوعاء</span><span>{delta > 0.005 ? '+' : delta < -0.005 ? '−' : ''}{plain(Math.abs(delta))} ر.س</span></div>
-        </div>
-      )}
-      {preview && <p className="t13 sub">{hawlNote}</p>}
-      {(previewErr || err) && <p className="w-help warn">{previewErr || err}</p>}
-    </Modal>
-  );
-}
-
 // ---------- صفحة المحفظة ----------
 export function InvestPage({ path }) {
-  const { portfolios, unlinkPortfolio, vault, nextDue } = useStore();
+  const { portfolios, unlinkPortfolio, feedPaused, setFeedPaused } = useStore();
   const id = path.split('/').pop();
   const p = portfolios.find(x => x.id === id);
-  const [tradeOpen, setTradeOpen] = useState(false);
-  const [last, setLast] = useState(null);
   if (!p) return (
     <Shell path="/app/assets" title="محفظة غير مرتبطة">
       <Card><p className="w-quiet">هذه المحفظة غير مرتبطة في هذه الشخصية.</p><Btn style={{ marginTop: 12 }} onClick={() => go('/app/assets')}>الأصول</Btn></Card>
@@ -146,26 +88,21 @@ export function InvestPage({ path }) {
   );
   const prov = providerOf(p.provider);
   const s = summarize(p);
+  const waiting = Boolean(nextScripted(p));
   const zakNext = s.holdings.filter(h => h.zakatable).flatMap(h => h.lots).map(l => l.hawlFrom).concat(s.cashLots.map(c => c.hawlFrom)).sort()[0];
   return (
     <Shell path="/app/assets" title={prov.name}
       crumb={<><button onClick={() => go('/app/assets')}>الأصول</button><Icon as={ChevronLeft} size={12} /><span>تطبيقات الاستثمار</span></>}
-      desc={`مرتبط منذ ${gregText(p.linkedAt)} · تتحدث الزكاة مع كل عملية`}
-      actions={<Btn variant="primary" className="sm" icon={Zap} onClick={() => setTradeOpen(true)}>عملية من التطبيق</Btn>}>
-      {last && (
-        <div className="w-banner ok" style={{ alignItems: 'flex-start' }}>
-          <span className="grow">
-            <b style={{ display: 'block' }}>وصلت عملية {last.trade.side === 'BUY' ? 'شراء' : 'بيع'} {units(last.trade.units)} {last.trade.name} · {last.trade.time}</b>
-            <span className="t13">الوعاء الزكوي {plain(last.vaultBefore)} ← <b>{plain(vault)}</b>
-              {' '}· زكاة هذه المحفظة عند حولها {plain(last.trade.impact.baseBefore / 40)} ← <b>{plain(last.trade.impact.baseAfter / 40)}</b>
-              {nextDue && <><br />أقرب زكاة عليك {plain(nextDue.zakat)} ر.س في {gregText(nextDue.date)}{last.nextBefore && Math.abs(last.nextBefore.zakat - nextDue.zakat) > 0.005 && last.nextBefore.date === nextDue.date ? ` (كانت ${plain(last.nextBefore.zakat)})` : ''}</>}
-            </span>
-          </span>
-          <button className="t12 sub" onClick={() => setLast(null)}>إخفاء</button>
-        </div>
-      )}
+      desc={`مرتبط منذ ${gregText(p.linkedAt)}`}>
+      <div className="w-live">
+        <span className={`dot${waiting && !feedPaused ? ' on' : ''}`} />
+        <span className="grow">
+          {feedPaused ? 'التحديث موقوف مؤقتًا' : waiting ? 'مباشر · أي شراء أو بيع في التطبيق يصل هنا ويحدّث زكاتك تلقائيًا' : 'مباشر · وصلت كل العمليات، وزكاتك محدّثة'}
+        </span>
+        {waiting && <button className="w-link t13" onClick={() => setFeedPaused(!feedPaused)}>{feedPaused ? 'استئناف' : 'إيقاف مؤقت'}</button>}
+      </div>
       <p className="w-quiet" style={{ lineHeight: '26px' }}>
-        قيمة المحفظة <b>{sar(s.value)}</b> · يدخل وعاءك منها <b>{sar(s.base)}</b>
+        قيمة المحفظة <b>{sar(s.value)}</b> · يدخل وعاءك منها <b>{sar(s.base)}</b> · زكاتها عند حولها <b>{sar(s.zakat)}</b>
         {zakNext && <> · أقرب حول فيها {gregText(hawlEnd(zakNext))}</>}
       </p>
       <div className="w-cols c-wide">
@@ -199,18 +136,18 @@ export function InvestPage({ path }) {
           <div className="w-total"><span>يدخل الوعاء</span><span>{sar(s.base)}</span></div>
         </Card>
         <div className="col" style={{ gap: 24 }}>
-          <Card title="آخر العمليات" action={p.trades.length > 0 && <span className="t12 muted">أثرها على الوعاء</span>}>
+          <Card title="العمليات من التطبيق" action={p.trades.length > 0 && <span className="t12 muted">أثرها على الوعاء</span>}>
             {p.trades.length === 0 ? (
-              <p className="w-quiet">لا عمليات بعد. أي شراء أو بيع في التطبيق يصل هنا لحظيًا ويحدّث زكاتك.</p>
+              <p className="w-quiet">بانتظار أول عملية من التطبيق…</p>
             ) : (
               <div className="w-rows">
-                {p.trades.map(t => {
+                {p.trades.map((t, i) => {
                   const d = t.impact.baseAfter - t.impact.baseBefore;
                   return (
-                    <div key={t.id} className="w-rowline">
+                    <div key={t.id} className={`w-rowline${i === 0 ? ' w-new' : ''}`}>
                       <span className="t">{t.side === 'BUY' ? 'شراء' : 'بيع'} {units(t.units)} {t.name}</span>
                       <span className="v" style={{ fontWeight: 500 }}>{d > 0.005 ? '+' : d < -0.005 ? '−' : ''}{plain(Math.abs(d))}</span>
-                      <span className="d">{t.time} · بمبلغ {sar(t.amount, 0)}</span>
+                      <span className="d">{t.time} · بمبلغ {sar(t.amount, 0)} · {tradeNote(t)}</span>
                     </div>
                   );
                 })}
@@ -218,16 +155,19 @@ export function InvestPage({ path }) {
             )}
           </Card>
           <p className="t12 muted" style={{ lineHeight: '20px' }}>
-            محاكاة للعرض: المحفظة والأسعار توضيحية. شراء ورقة زكاتها عليك بنقد المحفظة لا يقطع الحول، وبيعها يترك النقد يكمل حولها.
+            محاكاة للعرض: المحفظة والعمليات والأسعار توضيحية.
             {' '}<button className="w-link" onClick={() => { unlinkPortfolio(p.id); go('/app/assets'); }}>إلغاء الربط</button>
           </p>
         </div>
       </div>
-      {tradeOpen && <TradeModal p={p} onClose={() => setTradeOpen(false)}
-        onDone={t => { setLast({ trade: t, vaultBefore: vault, nextBefore: nextDue }); setTradeOpen(false); }} />}
     </Shell>
   );
 }
+
+// سطر يشرح أثر العملية على الحول
+const tradeNote = t => (t.side === 'BUY'
+  ? (t.zakatable ? 'تكمل حول النقد' : 'تزكيه الشركة، فخرج المبلغ من الوعاء')
+  : (t.zakatable ? 'النقد يكمل حولها' : 'نقد جديد يبدأ حوله اليوم'));
 
 // ---------- بطاقة في صفحة الأصول ----------
 export function InvestCard() {
