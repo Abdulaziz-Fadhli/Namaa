@@ -148,12 +148,12 @@ export function SettingsScreen({ go, back }) {
     <Screen title="الإعدادات" desc="تحكم في طريقة الاحتساب والبيانات والتنبيهات." onBack={back}
       cta={<Button variant="primary" icon={Check} onClick={back}>حفظ</Button>}>
       <InfoRow icon={BookOpen} title="المنهجية الشرعية"
-        detail={view.settings.acquiredMoneyMode === 'INDEPENDENT_HAWL' ? 'فتوى اللجنة الدائمة 282 • حول مستقل لكل مبلغ' : 'حول سنوي واحد'} />
-      <InfoRow icon={Scale} title="أساس النصاب" detail={`الأقل من الذهب والفضة (${basis}) • ${money(Math.round(view.nisab))}`} />
+        detail={`أدلة هيئة الزكاة والضريبة والجمارك • ${view.settings.acquiredMoneyMode === 'INDEPENDENT_HAWL' ? 'حول مستقل لكل مبلغ' : 'يوم واحد في السنة'}`} />
+      <InfoRow icon={Scale} title="أساس النصاب" detail={`أدنى النصابين كما في دليل الهيئة (${basis}) • ${money(Math.round(view.nisab))}`} />
       <InfoRow icon={Bell} title="التنبيهات" detail={lastZakat ? `آخر زكاة ${hijriText(lastZakat.iso)} • قبل الوجوب بـ 30 و7 أيام` : 'قبل الوجوب بـ 30 و7 أيام'} />
       <InfoRow icon={Database} title="مصادر البيانات" detail={`${count} حسابات • أسعار الذهب والفضة`} onClick={() => go('link')} />
       <InfoRow icon={ShieldCheck} title="الخصوصية" detail="صلاحية قراءة فقط" />
-      <Note icon={Info}>تُحفظ التغييرات من دون التأثير في سجلّك السابق.</Note>
+      <Note icon={Info}>{view.methodology.statement} {view.methodology.disclaimer}</Note>
     </Screen>
   );
 }

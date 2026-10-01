@@ -2,6 +2,7 @@
 // ملف نقي بدون node:fs، فيشتغل في المتصفح (الوضع المباشر) وفي سكربت npm run view (ahmad-view.json).
 import { defaultSettings, hijri, runEngineDetailed } from './engine.js';
 import { personaDays } from './personas.js';
+import { methodologySummary } from './zatca.js';
 
 const iso = (d) => d.toISOString().slice(0, 10);
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -55,6 +56,8 @@ export function buildView(persona, prices, settings = defaultSettings, options =
   const next = result.nextDue;
   return {
     source: 'npm run view — محرك نماء على بيانات أحمد',
+    // المنهجية الشرعية: أدلة هيئة الزكاة والضريبة والجمارك
+    methodology: methodologySummary(settings),
     persona: persona.persona,
     name: persona.name,
     today,

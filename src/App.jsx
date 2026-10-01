@@ -27,6 +27,8 @@ const FIGMA = {
   security: { name: 'إضافة سهم أو صندوق', Component: Security },
   cash: { name: 'إضافة نقد', Component: Ast.Cash },
   property: { name: 'إضافة عقار', Component: Ast.Property },
+  livestock: { name: 'إضافة مواشي', Component: Ast.Livestock },
+  crops: { name: 'إضافة محاصيل زراعية', Component: Ast.Crops },
   home: { name: 'الرئيسية', Component: Hm.Home },
   notifications: { name: 'الإشعارات', Component: Hm.Notifications },
   details: { name: 'تفاصيل الأصول', Component: Ast.Details },

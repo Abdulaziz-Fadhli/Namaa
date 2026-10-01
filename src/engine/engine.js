@@ -638,7 +638,13 @@ export function validateShariaSettings(settings) {
   return true;
 }
 
+// نصاب الحبوب والثمار خمسة أوسق: 612 كغ تقريبًا من القمح ونحوه (دليل زكاة الأفراد، هيئة الزكاة ص12)،
+// وبالكيل 5 أوسق × 60 صاعًا × 3 لترات = 900 لتر (دليل بهيمة الأنعام والحبوب والثمار ص10).
 export const CROP_NISAB_KG = 612;
+export const CROP_NISAB_LITERS = 900;
+export const CROP_NISAB_SAA = 300;
+// مقدار الواجب حسب كلفة السقي: العشر بلا كلفة، ونصفه بكلفة، وثلاثة أرباعه إذا سُقي نصف السنة بهذا ونصفها بذاك.
+export const CROP_RATES = Object.freeze({ WITHOUT_COST: 0.1, WITH_COST: 0.05, HALF_COST: 0.075 });
 
 export function evaluateCropZakat(crop, options) {
   if (!crop || typeof crop !== 'object') {
@@ -668,7 +674,7 @@ export function evaluateCropZakat(crop, options) {
     else if (crop.unit === 'AWSUQ') nisab = 5;
     else if (crop.unit === 'KG' && crop.kind === 'WHEAT' && crop.goodWheat === true) nisab = 612;
     else return ruleResult('UNRESOLVED', 'C04', 'NOT_RESOLVED_BY_SOURCE', ['crop-specific weight conversion'], { dueQuantity: null });
-    const rates = { WITH_COST: 0.05, WITHOUT_COST: 0.1, HALF_COST: 0.075 };
+    const rates = CROP_RATES;
     if (!Object.hasOwn(rates, crop.irrigation)) return ruleResult('UNRESOLVED', 'C10', 'NOT_RESOLVED_BY_SOURCE', ['irrigation outside documented categories'], { dueQuantity: null });
     const eligible = crop.quantity >= nisab;
     const dueQuantity = eligible && crop.obligationReached ? crop.quantity * rates[crop.irrigation] : 0;
@@ -748,7 +754,11 @@ function combinations(count, firstSize, secondSize, firstAnimal, secondAnimal) {
   }
   return alternatives;
 }
-function livestockObligations(type, count) {
+// جدول الفريضة في بهيمة الأنعام كما في الدليل المبسط لجباية زكاة بهيمة الأنعام والحبوب والثمار
+// (هيئة الزكاة والضريبة والجمارك، ص6–8). يعيد بدائل الفريضة؛ لكل بديل قائمة الحيوانات الواجبة.
+export function livestockObligations(type, count) {
+  if (!['camels', 'cattle', 'sheep', 'goats'].includes(type)) throw new TypeError('unsupported livestock type');
+  if (!Number.isSafeInteger(count) || count < 0) throw new RangeError('livestock count must be a non-negative safe integer');
   if (type === 'sheep' || type === 'goats') {
     const due = count < 40 ? 0 : count <= 120 ? 1 : count <= 200 ? 2 : count <= 399 ? 3 : Math.floor(count / 100);
     return due ? [[{ animal: type === 'goats' ? 'GOAT' : 'SHEEP', count: due, minAgeMonths: type === 'goats' ? 12 : 6, sex: 'FEMALE', quality: 'AVERAGE_HEALTHY' }]] : [];
