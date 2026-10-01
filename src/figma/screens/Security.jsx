@@ -29,10 +29,12 @@ export default function Security({ back }) {
   const [priceTouched, setPriceTouched] = useState(false);
   const [acquired, setAcquired] = useState('2026-01-10');
   const [zpu, setZpu] = useState('');   // زكاة الوحدة المنشورة من مدير الصندوق (للريت)
-  const r = useMemo(() => (q.trim() ? check(q, { category: category ?? undefined }) : null), [q, category]);
+  // النية تغيّر الحكم: المستثمر في شركة سعودية تزكي عنه شركته، والمضارب (يشتري ليبيع) زكاته عليه بالقيمة السوقية
+  const [intent, setIntent] = useState('INVEST');
+  const r = useMemo(() => (q.trim() ? check(q, { intent, category: category ?? undefined }) : null), [q, intent, category]);
   const found = r?.found;
   // سهم شركة سعودية: الشركة تدفع الزكاة عنه، فلا نحتاج سعره ولا يدخل الوعاء
-  const saudiCompany = found && r.type === 'COMPANY' && (r.market === 'TASI' || r.market === 'NOMU');
+  const saudiCompany = found && r.type === 'COMPANY' && (r.market === 'TASI' || r.market === 'NOMU') && intent === 'INVEST';
   // صندوق مدرج في تداول (ريت، مؤشرات): سعره من السوق عبر خدمة الأسعار، والمستخدم يقدر يعدّله
   const sym = saudiCompany ? null : saudiSymbol(r);
   const live = useLivePrices(sym ? [sym] : []);
@@ -52,7 +54,7 @@ export default function Security({ back }) {
   const a = found && u > 0 && (saudiCompany || p > 0)
     ? assess({
       symbol: r.symbol || undefined, fundName: r.symbol ? undefined : r.name, category: r.symbol ? undefined : r.category,
-      units: u, price: saudiCompany ? 0 : p, intent: 'INVEST', ...(fundBase && z >= 0 && zpu !== '' ? { zakatPerUnit: z } : {}),
+      units: u, price: saudiCompany ? 0 : p, intent, ...(fundBase && z >= 0 && zpu !== '' ? { zakatPerUnit: z } : {}),
     })
     : null;
   const e = a && toEngineEntry(a);
@@ -69,7 +71,7 @@ export default function Security({ back }) {
       kind: shownType, engine, value: contribution, market: a.value, acquired,
       // للوضع المباشر: الأمريكي يعاد تقييمه بنسبة تغيّر سعره
       live: usSym ? { symbol: usSym, price: p } : null,
-      title: `${isCompany ? 'سهم' : 'صندوق'} ${r.name}`,
+      title: `${isCompany ? 'سهم' : 'صندوق'} ${r.name}${intent === 'TRADE' ? ' (مضاربة)' : ''}`,
       short: `${num(u)} ${unitLabel} • ${r.name}`,
       detail: `${num(u)} ${unitLabel} • ${r.marketAr ?? 'غير مدرج'}${a.zakatable ? (a.calcMethod === 'FUND_BASE' ? ' • بزكاة الوحدة' : '') : isCompany ? ' • الشركة تزكي عنه' : ' • شركاته تزكي عنه'}`,
     });
@@ -97,6 +99,8 @@ export default function Security({ back }) {
           <Choices items={r.choices.map(c => ({ key: c.category, label: c.label, category: c.category }))} onPick={c => setCategory(c.category)} />
         )}
       </div>
+      <Segmented label="نيتك من الورقة" value={intent} onChange={v => { setIntent(v); setPriceTouched(false); }}
+        options={[{ value: 'INVEST', label: 'أحتفظ بها (مستثمر)' }, { value: 'TRADE', label: 'أشتري لأبيع (مضارب)' }]} />
       <NumberField icon={Hash} label="الكمية" value={units} onChange={setUnits} unit={unitLabel} />
       {!saudiCompany && <NumberField icon={BadgeDollarSign} label={unlisted ? 'سعر الوحدة (NAV)' : 'سعر الوحدة'} value={shownPrice} unit={us ? '$' : 'ر.س'}
         onChange={v => { setPrice(v); setPriceTouched(true); }}

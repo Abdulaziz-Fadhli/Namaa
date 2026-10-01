@@ -21,8 +21,8 @@ function reprice(asset, feed) {
   if (l.metal) {
     const pricePerGram = l.metal === 'gold' ? feed.metals.goldPerGram : feed.metals.silverPerGram;
     const entry = l.metal === 'gold'
-      ? { grams: l.grams, karat: l.karat, pricePerGram }
-      : { grams: l.grams, purity: l.purity, pricePerGram };
+      ? { grams: l.grams, karat: l.karat, pricePerGram, ...(l.purpose ? { purpose: l.purpose } : {}) }
+      : { grams: l.grams, purity: l.purity, pricePerGram, ...(l.purpose ? { purpose: l.purpose } : {}) };
     const engine = { [l.metal]: [entry] };
     return { ...asset, engine, value: calculateAssetValue(engine), livePrice: pricePerGram };
   }
