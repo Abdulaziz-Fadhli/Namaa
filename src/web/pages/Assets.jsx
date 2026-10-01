@@ -1,10 +1,7 @@
 // الأصول: الحسابات المرتبطة، والأصول خارج البنوك، ونافذة إضافة أصل بسبعة أنواع.
 // قيمة كل أصل في الوعاء من المحرك (calculateAssetValue)، والأسهم من src/securities، والمواشي والمحاصيل من zatca.js.
 import { useMemo, useState } from 'react';
-import {
-  Banknote, Building2, Check, ChartCandlestick, ChevronLeft, Gem, House, Info, Landmark, PawPrint, PieChart, Plus, RefreshCw, Search,
-  ShieldCheck, TriangleAlert, WalletCards, Wheat,
-} from 'lucide-react';
+import { Banknote, Check, ChartCandlestick, ChevronLeft, Info, PieChart, Plus, Search, TriangleAlert } from 'lucide-react';
 import { Btn, Card, Icon, Modal, NumberInput, Option, Pill, Seg, Select, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
@@ -18,17 +15,8 @@ import {
 import { assess, check, toEngineEntry } from '../../securities/securities.js';
 import { ACCOUNTS, accountInfo, daysFrom, personaHoldings, plain, sar, days } from '../data.js';
 
-const ICON = { gold: Gem, silver: Gem, stock: ChartCandlestick, fund: ChartCandlestick, cash: Banknote, property: House, livestock: PawPrint, crop: Wheat };
 const TABS = [
   ['gold', 'ذهب'], ['silver', 'فضة'], ['security', 'أسهم وصناديق'], ['cash', 'نقد'], ['property', 'عقار للبيع'], ['livestock', 'مواشي'], ['crop', 'محاصيل'],
-];
-const ADD_ROWS = [
-  ['gold', 'ذهب وفضة', 'بالجرام والعيار · سعر مباشر', Gem],
-  ['security', 'أسهم وصناديق أمريكية', 'بالرمز · سعر مباشر', ChartCandlestick],
-  ['cash', 'نقد', 'مبالغ خارج البنوك', Banknote],
-  ['property', 'عقار للبيع', 'بقيمته السوقية اليوم', House],
-  ['livestock', 'مواشي', 'إبل، بقر، غنم · بالرؤوس', PawPrint],
-  ['crop', 'محاصيل زراعية', 'حبوب وتمور · عند الحصاد', Wheat],
 ];
 
 // يوم تمام الحول من تاريخ التملك (نفس دالة المحرك)
@@ -418,25 +406,16 @@ export function K4Review({ onClose }) {
   );
 }
 
-const PART_COLORS = ['var(--primary)', '#9DB3C4', '#5E8AA8', 'var(--gold)', '#C9A65A'];
-
 export function Assets({ path }) {
-  const { view, vault, assets, otherAssets, removeAsset, personaData, confirmed, confirmHolding, historical } = useStore();
+  const { view, vault, assets, removeAsset, personaData, confirmed, confirmHolding, historical } = useStore();
   const [tab, setTab] = useState(null);
   const [toast, setToast] = useState(null);
   const [review, setReview] = useState(false);
   const infos = view.accounts.map(a => [a, accountInfo(a)]);
-  const included = infos.filter(([, i]) => i.included);
   const holdings = personaHoldings(personaData, view);
-  const heldValue = holdings.reduce((s, h) => s + h.zakatable, 0);
-  const parts = [
-    ...included.map(([a]) => ({ label: ACCOUNTS[a.id].bank, v: a.balance })),
-    ...(holdings.length ? [{ label: 'أصول من مصدرها', v: heldValue }] : []),
-    { label: 'أصول أضفتها', v: otherAssets },
-  ];
-  const ICO = { gold: Gem, stock: ChartCandlestick, fund: PieChart };
   return (
-    <Shell path={path} title="الأصول" desc="كل ما يدخل وعاءك الزكوي، من البنوك وخارجها">
+    <Shell path={path} title="الأصول" desc={`الوعاء الزكوي ${sar(vault)}${historical ? ` كما في ${gregText(view.today)}` : ''}`}
+      actions={<Btn variant="primary" className="sm" icon={Plus} onClick={() => setTab('gold')}>إضافة أصل</Btn>}>
       {toast && (
         <div className="w-toast" role="status">
           <Icon as={Check} className="green" />
@@ -444,107 +423,60 @@ export function Assets({ path }) {
           <Btn variant="ghost" onClick={() => { removeAsset(toast.id); setToast(null); }}>تراجع</Btn>
         </div>
       )}
-      <Card>
-        <div className="between" style={{ alignItems: 'flex-end', marginBottom: 16, flexWrap: 'wrap' }}>
-          <div>
-            <span className="t12 sub">إجمالي الوعاء الزكوي{historical ? ` · كما في ${gregText(view.today)}` : ''}</span>
-            <div className="w-amount md"><strong>{plain(vault)}</strong><span>ر.س</span></div>
-          </div>
-          <div className="row">
-            <Btn variant="primary" icon={Plus} onClick={() => setTab('gold')}>إضافة أصل</Btn>
-            <Btn onClick={() => go('/app/link')}>ربط حساب بنكي</Btn>
-          </div>
-        </div>
-        <div className="w-progress" aria-hidden="true">
-          {parts.map((p, i) => p.v > 0 && <i key={p.label} style={{ width: `${(p.v / vault) * 100}%`, background: PART_COLORS[i % PART_COLORS.length] }} />)}
-        </div>
-        <div className="w-legend" style={{ marginTop: 12 }}>
-          {parts.filter(p => p.v > 0 || p.label === 'أصول أضفتها').map(p => (
-            <span key={p.label}><i style={{ background: PART_COLORS[parts.indexOf(p) % PART_COLORS.length] }} />{p.label} <b className="num" style={{ color: 'var(--ink)' }}>{sar(p.v)}</b> · {vault ? Math.round((p.v / vault) * 1000) / 10 : 0}٪</span>
-          ))}
-        </div>
-      </Card>
-
       <div className="w-cols c-assets">
-        <Card flush title="الحسابات المرتبطة" desc={`${view.accounts.length === 1 ? 'حساب واحد' : view.accounts.length === 2 ? 'حسابان' : `${view.accounts.length} حسابات`} · عبر الخدمات المصرفية المفتوحة`}
-          action={<Btn className="sm" icon={RefreshCw}>مزامنة الآن</Btn>}>
-          <div className="w-table-wrap" style={{ marginTop: 16 }}>
+        <Card flush title="الحسابات البنكية" action={<button className="w-link t13" onClick={() => go('/app/link')}>ربط بنك آخر</button>}>
+          <div className="w-table-wrap" style={{ marginTop: 8 }}>
             <table className="w-table">
-              <thead><tr><th>الحساب</th><th className="w-hide-m">آخر مزامنة</th><th>يدخل الوعاء</th><th style={{ textAlign: 'left' }}>الرصيد</th></tr></thead>
+              <thead><tr><th>الحساب</th><th>في الوعاء</th><th style={{ textAlign: 'left' }}>الرصيد</th></tr></thead>
               <tbody>
                 {infos.map(([a, info]) => (
                   <tr key={a.id} className={info.kind === 'exempt' ? 'dim' : ''} style={{ cursor: 'pointer' }} onClick={() => go(`/app/account/${a.id}`)}>
                     <td>
-                      <span className="row">
-                        <span className={`w-ico${info.kind === 'review' ? ' warn' : ''}`}><Icon as={info.kind === 'fund' ? PieChart : info.kind === 'review' ? TriangleAlert : info.kind === 'exempt' ? WalletCards : a.id.endsWith('1') ? Landmark : Building2} /></span>
-                        <span>
-                          <span className="b6" style={{ display: 'block', color: 'var(--ink)' }}>{info.title}</span>
-                          <span className="t11 sub">{info.sub}</span>
-                        </span>
-                      </span>
+                      <span className="b6" style={{ display: 'block', color: 'var(--ink)' }}>{info.title}</span>
+                      <span className="t11 muted">{info.kind === 'cash' ? `•••• ${info.mask}` : info.sub}</span>
                     </td>
-                    <td className="w-hide-m t12 sub">{historical ? gregText(view.today) : `اليوم ${info.synced}`}</td>
                     <td>{info.kind === 'review'
                       ? <button onClick={e => { e.stopPropagation(); setReview(true); }}><Pill tone="warn">يحتاج مراجعة</Pill></button>
-                      : <Pill tone={info.pill[0]}>{info.pill[1]}</Pill>}</td>
-                    <td className="b7" style={{ textAlign: 'left', whiteSpace: 'nowrap', color: info.kind === 'review' ? 'var(--muted)' : undefined }}>{sar(a.balance)}</td>
+                      : info.kind === 'cash' ? <span className="sub">نعم</span> : <span className="sub">{info.pill[1]}</span>}</td>
+                    <td className="b6" style={{ textAlign: 'left', whiteSpace: 'nowrap', color: info.kind === 'review' ? 'var(--muted)' : undefined }}>{plain(a.balance)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <button className="row b6 t13" style={{ padding: '16px 24px' }} onClick={() => go('/app/link')}><Icon as={Plus} size={16} />ربط حساب من بنك آخر</button>
-          <p className="w-note" style={{ background: 'var(--soft)', padding: '12px 24px' }}>
-            <Icon as={ShieldCheck} size={15} className="green" />
-            <span>نقرأ الأرصدة والحركات فقط، ولا نستطيع التحويل من حساباتك إلا بتأكيدك في كل مرة.</span>
-          </p>
         </Card>
 
-        <Card title="أصول خارج البنوك" desc="يُحسب حول كل أصل من تاريخ تملكه">
-          <div className="col" style={{ gap: 8 }}>
+        <Card title="خارج البنوك" action={<button className="w-link t13" onClick={() => setTab('gold')}>إضافة</button>}>
+          {holdings.length === 0 && assets.length === 0 && (
+            <p className="w-quiet">لا أصول بعد. الذهب والأسهم والنقد والعقار المعد للبيع والمواشي والمحاصيل تُضاف من «إضافة أصل».</p>
+          )}
+          <div className="w-rows">
             {holdings.map(h => {
               const ok = historical || confirmed[h.id];
               return (
-                <div key={h.id} className="w-list-row" style={{ border: '1px solid var(--line)', borderRadius: 12, padding: '12px 14px', alignItems: 'flex-start' }}>
-                  <span className="w-ico"><Icon as={ICO[h.kind] ?? Gem} /></span>
-                  <span className="grow">
-                    <span className="t" style={{ display: 'block' }}>{h.title}</span>
-                    <span className="d" style={{ display: 'block' }}>{h.sub}</span>
-                    <span className="t11 muted" style={{ display: 'block' }}>{h.source} · تملّك {gregText(h.acquired)}{h.auto ? ' (تلقائي من أول كشف)' : ''}</span>
-                    <span className="row" style={{ gap: 6, marginTop: 6 }}>
-                      {ok ? <Pill tone="ok">مؤكد</Pill> : <><Pill tone="warn">بانتظار تأكيدك</Pill><Btn className="sm" onClick={() => confirmHolding(h.id)}>تأكيد</Btn></>}
-                    </span>
-                  </span>
-                  <span style={{ textAlign: 'left' }}>
-                    <span className="v" style={{ display: 'block' }}>{sar(h.zakatable)}</span>
-                    {Math.abs(h.market - h.zakatable) > 0.005 && <span className="t11 muted">القيمة {plain(h.market, 0)}</span>}
-                  </span>
-                </div>
+                <details key={h.id} className="w-more">
+                  <summary className="w-rowline">
+                    <span className="t">{h.title}</span>
+                    <span className="v">{plain(h.zakatable)}</span>
+                    <span className="d">{ok ? (Math.abs(h.market - h.zakatable) > 0.005 ? `قيمته ${plain(h.market, 0)} · يدخل بحصته` : h.sub.split(' · ')[0]) : <span style={{ color: 'var(--warn)' }}>بانتظار تأكيدك</span>}</span>
+                  </summary>
+                  <div className="w-more-body">
+                    {h.sub}. {h.source}. تملّك {gregText(h.acquired)}{h.auto ? ' (تلقائي من أول كشف)' : ''}.
+                    {!ok && <div style={{ marginTop: 8 }}><Btn className="sm" onClick={() => confirmHolding(h.id)}>تأكيد</Btn></div>}
+                  </div>
+                </details>
               );
             })}
             {assets.map(a => (
-              <div key={a.id} className="w-list-row" style={{ background: 'var(--warn-soft)', border: '1px solid #F3E2B8', borderRadius: 12, padding: '12px 14px' }}>
-                <span className="w-ico warn"><Icon as={ICON[a.kind] ?? Gem} /></span>
-                <span className="grow">
-                  <span className="t" style={{ display: 'block' }}>{a.title}</span>
-                  <span className="d">{a.result ? (a.result.status === 'NOT_YET' ? `تجب في ${hijriText(a.result.dueDate)}` : a.result.status === 'DUE' ? 'وجبت · تُخرج من جنسها' : a.result.headline) : a.detail}</span>
-                </span>
-                <span className="v">{a.result && !a.result.vaultValue ? (a.result.inKind ?? '—') : sar(a.value)}</span>
+              <div key={a.id} className="w-rowline">
+                <span className="t">{a.title}</span>
+                <span className="v">{a.result && !a.result.vaultValue ? (a.result.inKind ?? '—') : plain(a.value)}</span>
+                <span className="d">{a.result ? (a.result.status === 'NOT_YET' ? `تجب في ${hijriText(a.result.dueDate)}` : a.result.status === 'DUE' ? 'وجبت · تُخرج من جنسها' : a.result.headline) : a.detail}</span>
               </div>
-            ))}
-            {ADD_ROWS.map(([k, t, d, ic]) => (
-              <button key={k} className="w-list-row" style={{ border: '1px dashed var(--line-2)', borderRadius: 12, padding: '12px 14px', width: '100%' }} onClick={() => setTab(k)}>
-                <span className="w-ico"><Icon as={ic} /></span>
-                <span className="grow" style={{ textAlign: 'start' }}>
-                  <span className="t" style={{ display: 'block' }}>{t}</span>
-                  <span className="d">{d}</span>
-                </span>
-                <Icon as={Plus} />
-              </button>
             ))}
           </div>
           {assets.some(a => a.result?.inKind) && (
-            <p className="w-note" style={{ marginTop: 12 }}><span>زكاة المواشي والمحاصيل تُخرج من جنسها ولا تدخل وعاء النقود، وتُدفع عبر {ZATCA.channels.livestockCrops}.</span></p>
+            <p className="w-note" style={{ marginTop: 12 }}><span>زكاة المواشي والمحاصيل تُخرج من جنسها، وتُدفع عبر {ZATCA.channels.livestockCrops}.</span></p>
           )}
         </Card>
       </div>
