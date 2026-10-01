@@ -60,6 +60,12 @@ export function OffBank({ go, back }) {
 }
 
 const GOLD_KARATS = [24, 22, 21, 18];
+// الغرض: سبائك وادخار تُزكّى، والحلي المستعمل أو المعدّ للإعارة معفى (jewelryTreatment: EXCLUDE_PERSONAL_USE في المحرك)
+const PURPOSES = [
+  { value: 'INVESTMENT', label: 'ادخار أو استثمار (سبائك، جنيهات)', short: 'ادخار' },
+  { value: 'PERSONAL_USE', label: 'حلي ألبسه', short: 'الحلي المستعمل' },
+  { value: 'LENDING', label: 'حلي أعيره لغيري', short: 'الحلي المعدّ للإعارة' },
+];
 const SILVER_PURITY = [999, 925, 900, 800];
 
 export function Metals({ back }) {
@@ -68,6 +74,7 @@ export function Metals({ back }) {
   const [grams, setGrams] = useState('25');
   const [karat, setKarat] = useState(24);
   const [purity, setPurity] = useState(999);
+  const [purpose, setPurpose] = useState('INVESTMENT');   // حلي الاستعمال والإعارة لا تُزكّى حسب منهجية الفريق
   const [acquired, setAcquired] = useState(hijriToIso(1446, 8, 12));
   const g = parseNum(grams);
   const ok = g > 0;
@@ -76,18 +83,21 @@ export function Metals({ back }) {
   const isLive = metals.source !== 'fallback';
   const price = gold ? metals.goldPerGram : metals.silverPerGram;
   const engine = gold
-    ? { gold: [{ grams: ok ? g : 0, karat, pricePerGram: price }] }
-    : { silver: [{ grams: ok ? g : 0, purity, pricePerGram: price }] };
+    ? { gold: [{ grams: ok ? g : 0, karat, pricePerGram: price, purpose }] }
+    : { silver: [{ grams: ok ? g : 0, purity, pricePerGram: price, purpose }] };
   const value = zakatableOf({ engine });
+  const jewelry = purpose !== 'INVESTMENT';
+  const marketValue = ok ? g * (gold ? (price * karat) / 24 : (price * purity) / 1000) : 0;
   const unitPrice = gold ? (price * karat) / 24 : (price * purity) / 1000;
   const add = () => {
     addAsset({
       kind: metal, engine, value, acquired,
       // للوضع المباشر: يعاد تقييمه مع كل تحديث لسعر المعدن
-      live: gold ? { metal: 'gold', grams: g, karat } : { metal: 'silver', grams: g, purity },
-      title: gold ? `ذهب ${karat} قيراط` : `فضة ${purity}`,
-      short: `${num(g)} غرام ${gold ? 'ذهب' : 'فضة'}`,
-      detail: `${num(g)} غرام • ${isLive ? 'سعر السوق الآن' : `سعر ${gregText(metals.at)}`}`,
+      live: gold ? { metal: 'gold', grams: g, karat, purpose } : { metal: 'silver', grams: g, purity, purpose },
+      title: `${jewelry ? 'حلي ' : ''}${gold ? `ذهب ${karat} قيراط` : `فضة ${purity}`}`,
+      short: `${num(g)} غرام ${gold ? 'ذهب' : 'فضة'}${jewelry ? ' (حلي)' : ''}`,
+      detail: jewelry ? `${num(g)} غرام • ${PURPOSES.find(o => o.value === purpose).short}، لا يدخل الوعاء`
+        : `${num(g)} غرام • ${isLive ? 'سعر السوق الآن' : `سعر ${gregText(metals.at)}`}`,
     });
     back();
   };
@@ -103,9 +113,13 @@ export function Metals({ back }) {
           options={GOLD_KARATS.map(k => ({ value: k, label: `${k} قيراط` }))} />
         : <SelectField icon={Gem} label="النقاوة" value={purity} onChange={v => setPurity(Number(v))}
           options={SILVER_PURITY.map(p => ({ value: p, label: p === 999 ? '999 (خالصة)' : p === 925 ? '925 (استرليني)' : String(p) }))} />}
+      <SelectField icon={Info} label="الغرض" value={purpose} onChange={setPurpose}
+        options={PURPOSES.map(o => ({ value: o.value, label: o.label }))} />
       <DateField icon={Calendar} label="تاريخ التملك" value={acquired} onChange={setAcquired} max={view.today} />
-      <AmountCard label="القيمة وفق آخر سعر" amount={money(value)}
-        detail={`${num(ok ? g : 0)} غ × ${money(unitPrice, { decimals: 2 })}`} />
+      <AmountCard label={jewelry ? 'القيمة الداخلة للوعاء' : 'القيمة وفق آخر سعر'} amount={money(value)}
+        detail={jewelry
+          ? `قيمته ${money(marketValue)}، لكن ${PURPOSES.find(o => o.value === purpose).short} لا يُزكّى حسب منهجية التطبيق`
+          : `${num(ok ? g : 0)} غ × ${money(unitPrice, { decimals: 2 })} • زكاته ${money(value / 40, { decimals: 2 })} إذا حال عليه الحول`} />
       <Note icon={Clock3}>
         {loading ? 'نجلب سعر السوق الآن…'
           : isLive ? `سعر السوق المباشر لغرام ${gold ? 'الذهب عيار 24' : 'الفضة الخالصة'}: ${money(price, { decimals: 2 })}${timeOf(metals.at) ? ` • آخر تحديث ${timeOf(metals.at)}` : ''}.`

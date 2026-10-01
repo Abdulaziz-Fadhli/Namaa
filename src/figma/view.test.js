@@ -45,6 +45,17 @@ describe('format', () => {
 });
 
 describe('assets added in the prototype', () => {
+  it('excludes worn or lent jewelry, and counts gold kept for saving', () => {
+    const g = purpose => calculateAssetValue({ gold: [{ grams: 25, karat: 21, pricePerGram: 500, purpose }] });
+    expect(g('PERSONAL_USE')).toBe(0);
+    expect(g('LENDING')).toBe(0);
+    expect(g('INVESTMENT')).toBe(10937.5);
+  });
+  it('a trader in a Saudi company pays on market value; an investor does not', () => {
+    const v = intent => { const e = toEngineEntry(assess({ symbol: '1120', units: 10, price: 100, intent })); return calculateAssetValue({ [e.kind]: [e.entry] }); };
+    expect(v('INVEST')).toBe(0);
+    expect(v('TRADE')).toBe(1000);
+  });
   it('values metals, cash and trading property through the engine', () => {
     expect(calculateAssetValue({ gold: [{ grams: 25, karat: 21, pricePerGram: 400 }] })).toBe(8750);
     expect(calculateAssetValue({ silver: [{ grams: 600, purity: 999, pricePerGram: 4 }] })).toBeCloseTo(2397.6);
