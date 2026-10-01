@@ -26,7 +26,8 @@ export function buildView(persona, prices, settings = defaultSettings, options =
       bank: a.bank,
       type: a.type,
       product: a.product ?? null,
-      exempt: a.zakatExempt === true,
+      exempt: a.zakatExempt === true && a.fund !== true,
+      fund: a.fund === true,
       balance: round2(balance),
       lastActivity: txs.reduce((m, t) => (t.date > m ? t.date : m), ''),
     };
@@ -40,6 +41,9 @@ export function buildView(persona, prices, settings = defaultSettings, options =
     hijri: hijri(e.date),
     base: e.base ?? null,
     zakat: e.zakat == null ? null : round2(e.zakat),
+    // في الوجوب: كم من المبلغ نقد وكم أصول (مثل حصة صندوق أحمد)
+    cashBase: e.cashBase == null ? null : round2(e.cashBase),
+    assetsBase: e.otherAssetsBase == null ? null : round2(e.otherAssetsBase),
     total: round2(rowOf.get(iso(e.date))?.total ?? 0),
     nisab: round2(rowOf.get(iso(e.date))?.nisab ?? 0),
     explanation: e.explanation ?? '',
@@ -95,6 +99,8 @@ export function buildView(persona, prices, settings = defaultSettings, options =
     accounts,
     bankTotal: round2(last.cashBalance),
     exemptBalance: round2(accounts.filter((a) => a.exempt).reduce((s, a) => s + a.balance, 0)),
+    // مجموع المستحقات داخل الفترة (لا يعني سدادًا: لا يوجد سداد مسجل في البيانات)
+    totalDueInPeriod: round2(result.events.filter((e) => e.type === 'DUE').reduce((s, e) => s + e.zakat, 0)),
     total: round2(last.total),
     nisab: round2(last.nisab),
     nisabBasis: settings.nisabBasis,

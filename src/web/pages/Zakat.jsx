@@ -9,11 +9,11 @@ import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriText, hijriToIso } from '../../figma/format.js';
-import { ACCOUNTS, bothDates, hijriFromParts, plain, sar } from '../data.js';
+import { ACCOUNTS, accountInfo, bothDates, hijriFromParts, plain, sar, days } from '../data.js';
 
 // ---------- سجل الزكاة ----------
 export function History({ path }) {
-  const { view, payment } = useStore();
+  const { view, payment, personaMode } = useStore();
   const [year, setYear] = useState(view.todayHijri[0]);
   const [detail, setDetail] = useState(null);
   const today = view.today;
@@ -44,7 +44,7 @@ export function History({ path }) {
         <div className="w-kpi">
           <span className="row t12 sub"><Icon as={CalendarClock} size={15} />الوجوب القادم</span>
           <strong>{sar(upcoming?.zakat ?? 0)}</strong>
-          <span className="t11 muted">{upcoming ? `${hijriFromParts(upcoming.hijri)} · بعد ${upcoming.inDays} يومًا` : '—'}</span>
+          <span className="t11 muted">{upcoming ? `${hijriFromParts(upcoming.hijri)} · بعد ${days(upcoming.inDays)}` : '—'}</span>
         </div>
         <div className="w-kpi">
           <span className="row t12 sub"><Icon as={Receipt} size={15} />زكاة {view.todayHijri[0]}هـ حتى اليوم</span>
@@ -93,7 +93,7 @@ export function History({ path }) {
                   <td className="w-hide-m sub">{gregText(r.date)}</td>
                   <td className="w-hide-m sub">{sar(r.base)}</td>
                   <td className="b7" style={{ whiteSpace: 'nowrap' }}>{sar(r.zakat)}</td>
-                  <td>{r.kind === 'next' ? <Pill tone="info">متوقعة</Pill> : r.kind === 'today' ? (payment ? <Pill tone="ok">أُخرجت</Pill> : <Pill tone="warn">مستحقة اليوم</Pill>) : <Pill>وجبت</Pill>}</td>
+                  <td>{r.kind === 'next' ? <Pill tone="info">متوقعة</Pill> : r.kind === 'today' ? (payment ? <Pill tone="ok">أُخرجت</Pill> : <Pill tone="warn">مستحقة اليوم</Pill>) : personaMode ? <Pill tone="warn">وجبت · لا سداد مسجل</Pill> : <Pill>وجبت</Pill>}</td>
                   <td style={{ textAlign: 'left', whiteSpace: 'nowrap' }}>
                     {r.kind === 'today' && !payment
                       ? <Btn variant="primary" className="sm" onClick={() => go('/app/payout')}>إخراج</Btn>
@@ -107,7 +107,7 @@ export function History({ path }) {
           </table>
         </div>
         <div className="between" style={{ padding: '14px 24px', borderTop: '1px solid var(--line)', flexWrap: 'wrap' }}>
-          <span className="w-note"><Icon as={Info} size={14} />المبالغ السابقة محسوبة من كشف حساباتك منذ آخر زكاة سجّلتها.</span>
+          <span className="w-note"><Icon as={Info} size={14} />{personaMode ? 'محسوبة من كشف الحسابات · لا يوجد سداد مسجل في هذا السجل.' : 'المبالغ السابقة محسوبة من كشف حساباتك منذ آخر زكاة سجّلتها.'}</span>
           <span className="b7 t13">المجموع: {sar(sumOf(yearDues))} على {sar(yearDues.reduce((s, d) => s + d.base, 0))}</span>
         </div>
       </Card>
@@ -125,7 +125,9 @@ export function History({ path }) {
           <p className="t13 sub">{detail.kind === 'next'
             ? `إذا بقي رصيدك فوق النصاب، يكمل حول ${plain(detail.base)} ر.س في هذا اليوم وتجب فيه ${plain(detail.zakat)} ر.س.`
             : detail.explanation}</p>
-          {detail.kind === 'past' && <Btn onClick={() => go('/app/payout')}>إخراجها الآن</Btn>}
+          {detail.kind === 'past' && (personaMode
+            ? <p className="w-note"><Icon as={Info} size={14} /><span>لا يوجد سداد مسجل لهذا الحدث في نماء. المبلغ محسوب، ولا يعني أنه دُفع أو لم يُدفع خارج المنصة.</span></p>
+            : <Btn onClick={() => go('/app/payout')}>إخراجها الآن</Btn>)}
         </Modal>
       )}
     </Shell>
@@ -156,10 +158,10 @@ function NewBeneficiary({ onClose, onSave }) {
 }
 
 export function Payout({ path }) {
-  const { view, due, channel, setChannel, fromAccount, setFromAccount, pay, payment } = useStore();
+  const { view, due, channel, setChannel, fromAccount, setFromAccount, pay, payment, historical } = useStore();
   const [newBen, setNewBen] = useState(false);
   const [ben, setBen] = useState(null);
-  const accounts = view.accounts.filter(a => !a.exempt);
+  const accounts = view.accounts.filter(a => accountInfo(a).included);
   const from = accounts.find(a => a.id === fromAccount) ?? accounts[0];
   const ch = CHANNEL_UI[channel] ?? CHANNEL_UI.charity;
   const enough = from.balance >= due.zakat;
@@ -167,7 +169,7 @@ export function Payout({ path }) {
     return (
       <Shell path={path} title="إخراج الزكاة" desc="أخرجت زكاة اليوم">
         <Card><div className="col" style={{ gap: 12, alignItems: 'flex-start' }}>
-          <p>أخرجت {sar(payment.amount)} اليوم، والوجوب القادم بعد {view.nextDue?.inDays ?? '—'} يومًا.</p>
+          <p>أخرجت {sar(payment.amount)} اليوم، والوجوب القادم بعد {view.nextDue ? days(view.nextDue.inDays) : '—'}.</p>
           <Btn variant="primary" onClick={() => go('/app/receipt')}>عرض الإيصال</Btn>
         </div></Card>
       </Shell>
@@ -175,8 +177,36 @@ export function Payout({ path }) {
   }
   if (!due.today) {
     return (
-      <Shell path={path} title="إخراج الزكاة" desc="لا زكاة واجبة اليوم">
-        <Card><p className="sub">الوجوب القادم {view.nextDue ? `في ${hijriFromParts(view.nextDue.hijri)}: ${sar(view.nextDue.zakat)}` : 'غير محدد'}. يمكنك تعجيل الزكاة لسنتين كما في دليل الهيئة (§5).</p></Card>
+      <Shell path={path} title="إخراج الزكاة" desc={historical ? `لا زكاة واجبة في ${gregText(view.today)}` : 'لا زكاة واجبة اليوم'}>
+        <div className="w-cols c-wide">
+          <Card title={`لا شيء مستحق ${historical ? `في ${gregText(view.today)}` : 'اليوم'}`} desc="لا نطلب منك إخراج مبلغ لم يجب بعد">
+            <div className="w-amount md"><strong>0.00</strong><span>ر.س</span></div>
+            <p className="t12 sub" style={{ marginBottom: 16 }}>المستحق الآن · {bothDates(view.today)}</p>
+            {view.nextDue && (
+              <div className="w-soft" style={{ border: '1.5px dashed var(--line-2)' }}>
+                <div className="w-line"><span className="b7" style={{ color: 'var(--ink)' }}>القادم · توقّع</span><span className="b7" style={{ color: 'var(--ink)' }}>{sar(view.nextDue.zakat)}</span></div>
+                <div className="w-line" style={{ borderTop: '1px solid var(--line)' }}><span>التاريخ</span><span>{hijriFromParts(view.nextDue.hijri)} · {gregText(view.nextDue.date)}</span></div>
+                <div className="w-line" style={{ borderTop: '1px solid var(--line)' }}><span>الافتراض</span><span>إذا بقي الرصيد كما هو</span></div>
+              </div>
+            )}
+            <p className="w-note" style={{ marginTop: 12 }}><Icon as={Info} size={14} /><span>يجوز تعجيل الزكاة قبل وقتها (دليل الهيئة §5)، لكن نماء لا يضيف التوقع إلى المستحق.</span></p>
+          </Card>
+          <Card title="مستحقات الفترة" desc={`${view.dues.length} ${view.dues.length > 2 && view.dues.length < 11 ? 'أحداث' : 'حدثًا'} من الكشف · لا يوجد سداد مسجل`}>
+            {view.dues.length === 0 ? <p className="sub t13">لم يكتمل حول أي مبلغ في هذه الفترة.</p> : (
+              <div className="w-divide">
+                {view.dues.map(d => (
+                  <div key={d.date} className="w-list-row">
+                    <span className="w-ico warn"><Icon as={Receipt} /></span>
+                    <span className="grow"><span className="t" style={{ display: 'block' }}>{hijriFromParts(d.hijri)}</span><span className="d">{gregText(d.date)} · على {plain(d.base)}</span></span>
+                    <span className="v">{sar(d.zakat)}</span>
+                  </div>
+                ))}
+                <div className="w-line"><span className="b7">المجموع</span><span className="b7">{sar(view.totalDueInPeriod)}</span></div>
+              </div>
+            )}
+            <Btn className="block" icon={ArrowLeft} style={{ marginTop: 14 }} onClick={() => go('/app/timeline')}>الخط الزمني</Btn>
+          </Card>
+        </div>
       </Shell>
     );
   }
@@ -189,7 +219,7 @@ export function Payout({ path }) {
           <Card title="من حساب" desc="الرصيد المتاح يكفي للتحويل">
             <div className="col" style={{ gap: 10 }}>
               {accounts.map(a => (
-                <Option key={a.id} selected={from.id === a.id} onClick={() => setFromAccount(a.id)} icon={a.id === 'A1' ? Landmark : Building2}
+                <Option key={a.id} selected={from.id === a.id} onClick={() => setFromAccount(a.id)} icon={a.id.endsWith('1') ? Landmark : Building2}
                   title={`${ACCOUNTS[a.id].bank} · ${ACCOUNTS[a.id].kind}`} desc={`${ACCOUNTS[a.id].mask} ••••`}
                   trailing={<span style={{ textAlign: 'left' }}><span className="b7" style={{ display: 'block' }}>{sar(a.balance)}</span><span className="t11 sub">الرصيد المتاح</span></span>} />
               ))}
@@ -244,7 +274,7 @@ export function ReceiptPage({ path }) {
   if (!payment) {
     return (
       <Shell path={path} title="إيصال الإخراج">
-        <Card><div className="col" style={{ gap: 12, alignItems: 'flex-start' }}><p className="sub">لا يوجد إخراج مسجّل اليوم.</p><Btn variant="primary" onClick={() => go('/app/payout')}>إخراج الزكاة</Btn></div></Card>
+        <Card><div className="col" style={{ gap: 12, alignItems: 'flex-start' }}><p className="sub">لا يوجد سداد مسجل، فلا يوجد إيصال.</p><Btn variant="primary" onClick={() => go('/app/payout')}>إخراج الزكاة</Btn></div></Card>
       </Shell>
     );
   }
@@ -284,7 +314,7 @@ export function ReceiptPage({ path }) {
         <Card title="ما التالي" desc="حدّثنا حساباتك بعد الإخراج">
           <div className="w-divide">
             <div className="w-list-row"><span className="w-ico ok"><Icon as={CalendarPlus} /></span><span className="grow"><span className="t" style={{ display: 'block' }}>بدأ حول جديد</span><span className="d">لمبلغ {plain(payment.base)} ر.س من اليوم، ويكتمل في {nextHawl ? hijriText(nextHawl) : ''}</span></span></div>
-            {view.nextDue && <div className="w-list-row"><span className="w-ico sel"><Icon as={CalendarClock} /></span><span className="grow"><span className="t" style={{ display: 'block' }}>الوجوب القادم بعد {view.nextDue.inDays} يومًا</span><span className="d">{hijriFromParts(view.nextDue.hijri)} · {sar(view.nextDue.zakat)}</span></span></div>}
+            {view.nextDue && <div className="w-list-row"><span className="w-ico sel"><Icon as={CalendarClock} /></span><span className="grow"><span className="t" style={{ display: 'block' }}>الوجوب القادم بعد {days(view.nextDue.inDays)}</span><span className="d">{hijriFromParts(view.nextDue.hijri)} · {sar(view.nextDue.zakat)}</span></span></div>}
             <div className="w-list-row"><span className="w-ico"><Icon as={BellRing} /></span><span className="grow"><span className="t" style={{ display: 'block' }}>نذكّرك قبلها</span><span className="d">تنبيه قبل 3 أيام، وآخر يوم الوجوب.</span></span></div>
             <div className="w-list-row"><span className="w-ico"><Icon as={HistoryIcon} /></span><span className="grow"><span className="t" style={{ display: 'block' }}>سُجّلت في سجل الزكاة</span><span className="d">تظهر في سجل {y}هـ مع هذا الإيصال.</span></span></div>
           </div>

@@ -10,7 +10,7 @@ import { Shell, SignOut } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregShort, hijriText } from '../../figma/format.js';
 import { ZATCA } from '../../engine/zatca.js';
-import { ACCOUNTS, BANKS, hijriFromParts, plain, sar } from '../data.js';
+import { ACCOUNTS, BANKS, PERSONAS, linkedBanks, accountInfo, hijriFromParts, plain, sar, days } from '../data.js';
 
 const MENU = [
   ['profile', 'الملف الشخصي', UserRound],
@@ -84,7 +84,7 @@ function Methodology() {
 }
 
 function Linked() {
-  const { view, pendingBanks } = useStore();
+  const { view, pendingBanks, persona } = useStore();
   const [confirm, setConfirm] = useState(null);
   const [unlinked, setUnlinked] = useState([]);
   return (
@@ -92,15 +92,16 @@ function Linked() {
       <div className="w-divide">
         {view.accounts.filter(a => !unlinked.includes(a.id)).map(a => (
           <div key={a.id} className="w-list-row">
-            <span className="w-ico"><Icon as={a.id === 'A1' ? Landmark : Building2} /></span>
+            <span className="w-ico"><Icon as={a.id.endsWith('1') ? Landmark : Building2} /></span>
             <span className="grow">
-              <span className="t" style={{ display: 'block' }}>{a.exempt ? `محفظة ${a.product}` : `${ACCOUNTS[a.id].bank} · ${ACCOUNTS[a.id].kind}`}</span>
-              <span className="d">موافقة سارية حتى 3 أكتوبر 2027 · محدّث اليوم {ACCOUNTS[a.id].synced}</span>
+              <span className="t" style={{ display: 'block' }}>{accountInfo(a).title}</span>
+              <span className="d">{ACCOUNTS[a.id].bank} · {ACCOUNTS[a.id].mask} •••• · موافقة سارية حتى 3 أكتوبر 2027</span>
             </span>
+            {accountInfo(a).kind !== 'cash' && <Pill tone={accountInfo(a).pill[0]}>{accountInfo(a).pill[1]}</Pill>}
             <Btn variant="ghost" onClick={() => setConfirm(a)}>إلغاء الربط</Btn>
           </div>
         ))}
-        {pendingBanks.map(b => (
+        {pendingBanks.filter(b => !ACCOUNTS[b]).map(b => (
           <div key={b} className="w-list-row">
             <span className="w-ico"><Icon as={Building2} /></span>
             <span className="grow"><span className="t" style={{ display: 'block' }}>{b}</span><span className="d">تمت الموافقة · نقرأ الحركات الآن</span></span>
@@ -111,7 +112,7 @@ function Linked() {
       {confirm && (
         <Modal size="sm" title={`إلغاء ربط ${ACCOUNTS[confirm.id].bank}؟`} onClose={() => setConfirm(null)}
           foot={<><Btn onClick={() => setConfirm(null)}>تراجع</Btn><Btn variant="primary" onClick={() => { setUnlinked(u => [...u, confirm.id]); setConfirm(null); }}>إلغاء الربط</Btn></>}>
-          <p className="t13 sub">نحذف بيانات الحساب من نماء ونوقف القراءة فورًا. في نسخة العرض يبقى الحساب في الحساب الزكوي حتى لا تتغير أرقام أحمد.</p>
+          <p className="t13 sub">نحذف بيانات الحساب من نماء ونوقف القراءة فورًا. في نسخة العرض يبقى الحساب في الحساب الزكوي حتى لا تتغير أرقام {PERSONAS[persona].name}.</p>
         </Modal>
       )}
     </Card>
@@ -128,14 +129,16 @@ function ToggleRow({ on, onChange, title, desc }) {
 }
 
 function Simple({ id }) {
+  const { persona } = useStore();
+  const me = PERSONAS[persona];
   const [t, setT] = useState({ face: true, before3: true, onDue: true, nisab: true, monthly: false, push: true, email: true, sms: false });
   const tog = k => v => setT(s => ({ ...s, [k]: v }));
   if (id === 'profile') return (
     <Card title="الملف الشخصي" desc="بياناتك الأساسية">
       <div className="col" style={{ gap: 14 }}>
-        <TextInput label="الاسم الكامل" value="أحمد عبدالله السبيعي" onChange={() => {}} />
-        <TextInput label="البريد الإلكتروني" value="ahmad.alsubaie@gmail.com" onChange={() => {}} dir="ltr" />
-        <TextInput label="رقم الجوال" value="+966 55 012 3447" onChange={() => {}} dir="ltr" />
+        <TextInput label="الاسم الكامل" value={me.full} onChange={() => {}} />
+        <TextInput label="البريد الإلكتروني" value={me.email} onChange={() => {}} dir="ltr" />
+        <TextInput label="رقم الجوال" value={me.phone} onChange={() => {}} dir="ltr" />
       </div>
     </Card>
   );
@@ -170,15 +173,16 @@ function Simple({ id }) {
 
 export function SettingsPage({ path }) {
   const id = path.split('/')[3] || 'methodology';
-  const { view } = useStore();
+  const { view, persona } = useStore();
+  const me = PERSONAS[persona];
   return (
     <Shell path={path} title="الإعدادات" desc="منهجية الحساب، والحسابات، والأمان، والتنبيهات">
       <div className="w-cols c-settings">
         <div className="col" style={{ gap: 16 }}>
           <Card>
             <div className="row">
-              <span className="w-avatar" style={{ width: 48, height: 48, fontSize: 15 }}>أس</span>
-              <span><span className="b7" style={{ display: 'block' }}>أحمد عبدالله السبيعي</span><span className="t12 sub ltr">+966 55 012 3447</span></span>
+              <span className="w-avatar" style={{ width: 48, height: 48, fontSize: 15 }}>{me.avatar}</span>
+              <span><span className="b7" style={{ display: 'block' }}>{me.full}</span><span className="t12 sub ltr">{me.phone}</span></span>
             </div>
           </Card>
           <Card>
@@ -187,7 +191,7 @@ export function SettingsPage({ path }) {
                 <button key={k} className="row" onClick={() => go(`/app/settings/${k}`)}
                   style={{ height: 42, padding: '0 12px', borderRadius: 10, background: id === k ? 'var(--sel)' : undefined, fontWeight: id === k ? 700 : 500 }}>
                   <Icon as={ic} /><span className="grow">{l}</span>
-                  {k === 'linked' && <Pill>{view.accounts.filter(a => !a.exempt).length}</Pill>}
+                  {k === 'linked' && <Pill>{view.accounts.length}</Pill>}
                   <Icon as={ChevronLeft} size={14} className="muted" />
                 </button>
               ))}
@@ -203,7 +207,8 @@ export function SettingsPage({ path }) {
 
 // ---------- الإشعارات: مبنية من أحداث المحرك ----------
 export function Notifications({ path }) {
-  const { view, due, payment } = useStore();
+  const { view, due, payment, persona, historical, k4 } = useStore();
+  const me = PERSONAS[persona];
   const [tab, setTab] = useState('all');
   const [read, setRead] = useState(false);
   const [prefs, setPrefs] = useState({ before3: true, onDue: true, nisab: true, monthly: false, push: true, email: true, sms: false });
@@ -213,15 +218,16 @@ export function Notifications({ path }) {
   const items = [
     payment && { g: 'today', type: 'zakat', icon: CircleCheck, tone: 'ok', title: `أخرجت زكاة ${sar(payment.amount)}`, desc: `الرقم المرجعي ${payment.ref}`, time: payment.time, unread: !read, action: ['الإيصال', '/app/receipt'] },
     due.today && !payment && { g: 'today', type: 'zakat', icon: Receipt, tone: 'warn', title: `وجبت زكاة ${sar(due.zakat)}`, desc: `اكتمل حول ${plain(due.base)} ر.س دخلت حسابك قبل سنة هجرية.`, time: '9:00 ص', unread: !read, action: ['إخراج الزكاة', '/app/payout'] },
-    { g: 'today', type: 'account', icon: RefreshCw, title: 'حدّثنا أرصدتك', desc: `مزامنة ${view.accounts.filter(a => !a.exempt).map(a => ACCOUNTS[a.id].bank).join(' و')} · الوعاء الآن ${sar(view.total)}.`, time: '9:41 ص', unread: !read },
-    view.nextDue && { g: 'week', type: 'zakat', icon: Bell, title: `بعد ${view.nextDue.inDays} يومًا تجب زكاة ${sar(view.nextDue.zakat)}`, desc: `في ${hijriFromParts(view.nextDue.hijri)} إذا بقي رصيدك فوق النصاب.`, time: gregShort(view.today) },
-    weekAgo && { g: 'week', type: 'zakat', icon: Scale, title: `النصاب اليوم ${sar(view.nisab)}`, desc: `595 غ فضة × ${plain(view.prices.silverPerGram, 4)} ر.س · أدنى النصابين كما في دليل الهيئة.`, time: gregShort(weekAgo.date) },
-    last && { g: 'older', type: 'zakat', icon: CircleCheck, title: `وجبت زكاة ${sar(last.zakat)}`, desc: `اكتمل حول ${plain(last.base)} ر.س في ${hijriFromParts(last.hijri)}.`, time: gregShort(last.date) },
+    { g: 'today', type: 'account', icon: RefreshCw, title: 'حدّثنا أرصدتك', desc: `${historical ? 'كشف' : 'مزامنة'} ${[...new Set(view.accounts.map(a => ACCOUNTS[a.id].short))].join(' و')} · الوعاء ${historical ? `كما في ${hijriText(view.today)}` : 'الآن'} ${sar(view.total)}.`, time: '9:41 ص', unread: !read },
+    persona === 'khalid' && !k4 && { g: 'today', type: 'account', icon: Info, tone: 'warn', title: 'حساب يحتاج مراجعة', desc: 'محفظة نماء الاستثمارية (50,000 ر.س) خارج الحساب حتى تحدد نوعها.', time: '9:42 ص', unread: !read, action: ['إكمال المعلومات', '/app/account/K4'] },
+    view.nextDue && { g: 'week', type: 'zakat', icon: Bell, title: `بعد ${days(view.nextDue.inDays)} تجب زكاة ${sar(view.nextDue.zakat)}`, desc: `في ${hijriFromParts(view.nextDue.hijri)} إذا بقي رصيدك فوق النصاب.`, time: gregShort(view.today) },
+    weekAgo && { g: 'week', type: 'zakat', icon: Scale, title: `النصاب ${historical ? 'يومها' : 'اليوم'} ${sar(view.nisab)}`, desc: `595 غ فضة × ${plain(view.prices.silverPerGram, 4)} ر.س · أدنى النصابين كما في دليل الهيئة.`, time: gregShort(weekAgo.date) },
+    last && { g: 'older', type: 'zakat', icon: CircleCheck, title: `وجبت زكاة ${sar(last.zakat)}`, desc: `اكتمل حول ${plain(last.base)} ر.س في ${hijriFromParts(last.hijri)}.${historical || persona === 'khalid' ? ' لا يوجد سداد مسجل.' : ''}`, time: gregShort(last.date) },
   ].filter(Boolean).filter(n => tab === 'all' || n.type === tab);
-  const groups = [['today', `اليوم · ${hijriText(view.today)}`], ['week', 'هذا الأسبوع'], ['older', 'سابقًا']];
+  const groups = [['today', `${historical ? 'في' : 'اليوم ·'} ${hijriText(view.today)}`], ['week', 'هذا الأسبوع'], ['older', 'سابقًا']];
   const unread = items.filter(n => n.unread).length;
   return (
-    <Shell path={path} title="الإشعارات" desc={unread ? `${unread === 2 ? 'تنبيهان جديدان' : `${unread} تنبيهات جديدة`}` : 'لا تنبيهات جديدة'}>
+    <Shell path={path} title="الإشعارات" desc={unread ? (unread === 1 ? 'تنبيه جديد' : unread === 2 ? 'تنبيهان جديدان' : `${unread} تنبيهات جديدة`) : 'لا تنبيهات جديدة'}>
       <div className="w-cols c-wide">
         <Card flush>
           <div className="between" style={{ padding: '18px 24px' }}>
@@ -262,7 +268,7 @@ export function Notifications({ path }) {
           </div>
           <h3 className="t15 b7" style={{ margin: '16px 0 4px' }}>القنوات</h3>
           <div className="w-divide">
-            {[['push', 'إشعارات المتصفح والجوال', ''], ['email', 'البريد الإلكتروني', 'ahmad.alsubaie@gmail.com'], ['sms', 'رسالة نصية', '•••• 47']].map(([k, t, d]) => (
+            {[['push', 'إشعارات المتصفح والجوال', ''], ['email', 'البريد الإلكتروني', me.email], ['sms', 'رسالة نصية', '•••• 47']].map(([k, t, d]) => (
               <div key={k} className="between" style={{ padding: '12px 0' }}>
                 <span><span className="b6" style={{ display: 'block' }}>{t}</span>{d && <span className="t12 sub ltr">{d}</span>}</span>
                 <Switch on={prefs[k]} onChange={v => setPrefs(p => ({ ...p, [k]: v }))} label={t} />
@@ -277,11 +283,11 @@ export function Notifications({ path }) {
 
 // ---------- ربط بنك جديد: اختيار ← موافقة ← تم ----------
 export function LinkBank({ inline }) {
-  const { pendingBanks, addBank } = useStore();
+  const { view, pendingBanks, addBank } = useStore();
   const [q, setQ] = useState('');
   const [bank, setBank] = useState(null);
   const [stage, setStage] = useState('pick');
-  const linked = ['مصرف الإنماء', 'البنك الأهلي السعودي', ...pendingBanks];
+  const linked = linkedBanks(view, pendingBanks);
   const list = BANKS.filter(b => b.includes(q.trim()));
   const body = (
     <Card title="ربط حساب بنكي" desc="اختر بنكك، نقرأ الأرصدة والحركات فقط">
