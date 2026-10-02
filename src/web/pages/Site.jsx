@@ -11,6 +11,7 @@ import { useStore } from '../../figma/model.js';
 import { gregText, hijriMonthLength, hijriText, hijriToIso, HIJRI_MONTHS } from '../../figma/format.js';
 import { ACCOUNTS, BANKS, PERSONAS, hijriFromParts, linkedBanks, plain, sar, days } from '../data.js';
 import { ZATCA } from '../../engine/zatca.js';
+import logo from '../../assets/namaa-logo.png';
 import { PersonaCards } from './Personas.jsx';
 
 function ZakatCard({ compact }) {
@@ -207,7 +208,7 @@ export function Landing() {
       <footer className="w-footer">
         <div className="w-wrap">
           <div className="cols">
-            <div><div className="w-brand" style={{ color: '#fff', marginBottom: 12 }}><span>نماء</span></div><p>حاسبة زكاة تقرأ حساباتك البنكية وتتابع حول كل مبلغ، وتخبرك متى تجب الزكاة وكم مقدارها.</p></div>
+            <div><div className="w-brand" style={{ marginBottom: 12 }}><img src={logo} alt="نماء" /></div><p>حاسبة زكاة تقرأ حساباتك البنكية وتتابع حول كل مبلغ، وتخبرك متى تجب الزكاة وكم مقدارها.</p></div>
             <div><h4>المنتج</h4><a href="#features">المزايا</a><a href="#how">كيف يعمل</a><a href="#method">المنهجية</a><a href="#faq">الأسئلة الشائعة</a></div>
             <div><h4>الدعم</h4><a href="#faq">مركز المساعدة</a><a href="#/app/notifications">الدعم داخل التطبيق</a></div>
             <div><h4>قانوني</h4><a href="#/app/settings/terms">الشروط والأحكام</a><a href="#/app/settings/terms">سياسة الخصوصية</a></div>

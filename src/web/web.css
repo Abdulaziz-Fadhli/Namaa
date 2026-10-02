@@ -58,7 +58,7 @@ body:has(.w) { background: #F6F5F1; }
 
 /* ---------- عناصر مشتركة ---------- */
 .w-brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; line-height: 30px; }
-.w-brand img { height: 32px; width: 56px; object-fit: cover; border-radius: 3px; background: var(--primary); }
+.w-brand img { height: 42px; width: 74px; object-fit: cover; border-radius: 4px; background: var(--primary); display: block; }
 .w-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 24px; }
 .w-card.flush { padding: 0; overflow: hidden; }
 .w-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }

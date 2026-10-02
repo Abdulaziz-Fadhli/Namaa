@@ -15,7 +15,6 @@ export function Brand({ onClick }) {
   return (
     <button className="w-brand" onClick={onClick ?? (() => go('/'))} aria-label="نماء، الصفحة الرئيسية">
       <img src={logo} alt="" />
-      <span>نماء</span>
     </button>
   );
 }
