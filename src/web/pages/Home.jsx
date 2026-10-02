@@ -7,7 +7,7 @@ import { useStore } from '../../figma/model.js';
 import { gregText, hijriText, hijriToIso, money } from '../../figma/format.js';
 import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, kFmt, monthName, plain, sar, weekday, days } from '../data.js';
 import { AHMAD_V2 } from '../../engine/ahmad-v2.js';
-import { providerOf, summarize } from '../../engine/portfolio.js';
+import { summarize } from '../../engine/portfolio.js';
 import { K4Review } from './Assets.jsx';
 import { useState } from 'react';
 
@@ -30,7 +30,7 @@ function AccountsCard({ view, vault }) {
           const sm = summarize(p);
           return (
             <button key={p.id} className="w-rowline" style={{ width: '100%', textAlign: 'start' }} onClick={() => go(`/app/invest/${p.id}`)}>
-              <span className="t">{providerOf(p.provider).name}</span>
+              <span className="t">{p.name}</span>
               <span className="v">{plain(sm.base)}</span>
               <span className="d">محفظة استثمار · ما يدخل الوعاء منها</span>
             </button>

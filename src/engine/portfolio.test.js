@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyTrade, PROVIDERS, portfolioAssets, receiveNext, SCRIPTS, seedPortfolio, summarize, USD_SAR } from './portfolio.js';
+import { applyTrade, KINDS, PROVIDERS, portfolioAssets, receiveNext, seedPortfolio, summarize, USD_SAR } from './portfolio.js';
 import { calculateAssetValue } from './engine.js';
 
 const near = (a, b) => expect(Math.abs(a - b)).toBeLessThan(0.01);
@@ -82,16 +82,40 @@ describe('العمليات تحدّث الزكاة فورًا', () => {
 });
 
 describe('العمليات الواردة تلقائيًا من التطبيق', () => {
-  it('كل تطبيق: عملياته المجدولة تنطبق بالترتيب بدون خطأ، ثم تتوقف', () => {
+  const runAll = p => {
+    let cur = p;
+    for (let i = 0; i < p.script.length; i++) cur = receiveNext(cur, '2026-10-03', '9:00 ص').portfolio;
+    expect(receiveNext(cur, '2026-10-03', '9:00 ص')).toBeNull();
+    return cur;
+  };
+
+  it('كل التطبيقات (أكثر من 40): محفظة وعمليات ممكنة، ووعاء المتجر = وعاء المحفظة', () => {
+    expect(PROVIDERS.length).toBeGreaterThanOrEqual(40);
+    expect(new Set(PROVIDERS.map(p => p.id)).size).toBe(PROVIDERS.length);
     for (const { id } of PROVIDERS) {
-      let p = seedPortfolio(id, '2026-10-03');
-      for (let i = 0; i < SCRIPTS[id].length; i++) {
-        const r = receiveNext(p, '2026-10-03', '9:00 ص');
-        expect(r.trade.side).toBe(SCRIPTS[id][i][0]);
-        p = r.portfolio;
-      }
-      expect(receiveNext(p, '2026-10-03', '9:00 ص')).toBeNull();
-      expect(p.trades).toHaveLength(SCRIPTS[id].length);
+      const p = seedPortfolio(id, '2026-10-03');
+      expect(p.lots.length, id).toBeGreaterThan(0);
+      expect(p.script.length, id).toBeGreaterThanOrEqual(2);
+      const done = runAll(p);
+      expect(done.trades).toHaveLength(p.script.length);
+      near(portfolioAssets(done).reduce((x, a) => x + a.value, 0), summarize(done).base);
+    }
+  });
+
+  it('التمويل الجماعي: التمويل القائم دين يُزكّى أصله، والسداد نقد يكمل حوله', () => {
+    const p = seedPortfolio('lendo', '2026-10-03');
+    const s = summarize(p);
+    expect(s.holdings.every(h => h.zakatable && h.market === 'FIN')).toBe(true);
+    near(s.base, s.value);
+    const done = runAll(p);
+    near(summarize(done).base, summarize(p).base);   // تمويل جديد من النقد أو سداد إلى النقد: الوعاء لا يتغير
+  });
+
+  it('تطبيق يضيفه العميل باسمه: محفظة بحسب نوعه', () => {
+    for (const kind of Object.keys(KINDS)) {
+      const p = seedPortfolio(`custom:${kind}`, '2026-10-03', { name: 'تطبيقي', kind });
+      expect(p.name).toBe('تطبيقي');
+      runAll(p);
     }
   });
 });

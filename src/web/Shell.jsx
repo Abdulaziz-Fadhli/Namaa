@@ -6,6 +6,7 @@ import { go } from './nav.js';
 import { useStore } from '../figma/model.js';
 import { PERSONAS, clock, plain, sar } from './data.js';
 import { gregText } from '../figma/format.js';
+import { tradeLabel } from '../engine/portfolio.js';
 
 // أربعة أقسام فقط. الإخراج من زر الرئيسية، والإشعارات من الجرس، والخط الزمني داخل السجل.
 const NAV = [
@@ -71,7 +72,7 @@ function LiveToast() {
   return (
     <div className="w-live-toast" role="status">
       <div className="between"><span className="t12 sub"><span className="w-pulse" />وصلت من {e.provider} · {t.time}</span><button className="t12 muted" onClick={() => setShown(null)} aria-label="إغلاق">✕</button></div>
-      <b style={{ display: 'block', margin: '2px 0' }}>{t.side === 'BUY' ? 'شراء' : 'بيع'} {plain(t.units, Number.isInteger(t.units) ? 0 : 2)} {t.name}</b>
+      <b style={{ display: 'block', margin: '2px 0' }}>{tradeLabel(t)}</b>
       <span className="t13 sub" style={{ display: 'block' }}>
         الوعاء صار <b style={{ color: 'var(--ink)' }}>{sar(vault)}</b> ({Math.abs(d) < 0.005 ? 'بلا تغيير' : `${d > 0 ? '+' : '−'}${plain(Math.abs(d))}`})
       </span>
