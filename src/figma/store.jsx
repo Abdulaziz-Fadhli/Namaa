@@ -5,7 +5,7 @@
 // الوعاء = أرصدة البنوك من المحرك + calculateAssetValue على الأصول المضافة.
 import { useEffect, useMemo, useState } from 'react';
 import { calculateAssetValue, defaultSettings, isHawlComplete, resolveHawlDueDate } from '../engine/engine.js';
-import { nextScripted, portfolioAssets, providerOf, receiveNext, seedPortfolio } from '../engine/portfolio.js';
+import { nextScripted, portfolioAssets, receiveNext, seedPortfolio } from '../engine/portfolio.js';
 import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
 import { StoreContext } from './model.js';
@@ -99,13 +99,14 @@ export function StoreProvider({ children, personaMode = false }) {
   // العمليات تصل من التطبيق تلقائيًا: أول عملية بعد 5 ثوانٍ من الربط، ثم كل 9 ثوانٍ، حتى تنتهي
   useEffect(() => {
     if (feedPaused) return undefined;
-    const p = portfolios.find(x => nextScripted(x));
+    // بالتناوب بين التطبيقات المرتبطة: الأقل عمليات أولًا، فالتطبيق المربوط حديثًا ما ينتظر غيره
+    const p = portfolios.filter(x => nextScripted(x)).sort((x, y) => x.trades.length - y.trades.length)[0];
     if (!p) return undefined;
     const t = setTimeout(() => {
       const res = receiveNext(p, today0, clock12(new Date()));
       if (!res) return;
       setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).map(x => (x.id === p.id ? res.portfolio : x)) }));
-      setEvents(ev => [{ id: `${pkey}:${p.id}:${res.trade.id}`, pkey, portfolio: p.id, provider: providerOf(p.provider).name, trade: res.trade, at: Date.now() }, ...ev].slice(0, 20));
+      setEvents(ev => [{ id: `${pkey}:${p.id}:${res.trade.id}`, pkey, portfolio: p.id, provider: p.name, trade: res.trade, at: Date.now() }, ...ev].slice(0, 20));
     }, p.trades.length === 0 ? 5000 : 9000);
     return () => clearTimeout(t);
   }, [portfolios, feedPaused, pkey, today0]);
@@ -183,8 +184,8 @@ export function StoreProvider({ children, personaMode = false }) {
       linkedValue,
       upcoming,
       nextDue: upcoming[0] ?? null,
-      linkPortfolio: providerId => setPortfoliosBy(by => ((by[pkey] ?? []).some(x => x.id === providerId) ? by
-        : { ...by, [pkey]: [...(by[pkey] ?? []), seedPortfolio(providerId, view.today)] })),
+      linkPortfolio: (providerId, custom) => setPortfoliosBy(by => ((by[pkey] ?? []).some(x => x.id === providerId) ? by
+        : { ...by, [pkey]: [...(by[pkey] ?? []), seedPortfolio(providerId, view.today, custom)] })),
       unlinkPortfolio: id => setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).filter(x => x.id !== id) })),
       feedPaused,
       setFeedPaused,
