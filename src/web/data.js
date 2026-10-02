@@ -13,14 +13,12 @@ export const ACCOUNTS = {
   N1: { bank: 'مصرف الإنماء', short: 'الإنماء', kind: 'جاري', mask: '2087', synced: '9:41 ص' },
 };
 
-// الشخصيات الثلاث كما في وثيقة التسليم: نورة المشكلة، خالد الحل الحي، أحمد الإثبات عبر الزمن
+// الشخصيتان في الموقع: نورة المشكلة، وخالد الحل الحي
 export const PERSONAS = {
   noura: { key: 'noura', name: 'نورة', full: 'نورة', avatar: 'ن', email: 'noura@namaa.demo', phone: '+966 54 210 6618', role: 'المشكلة', tag: 'Problem',
     line: 'مصممة مستقلة بدخل غير منتظم. لا تعرف متى بدأ حول مالها.', asOfLabel: 'زمن توضيحي', entry: '/noura' },
   khalid: { key: 'khalid', name: 'خالد', full: 'خالد', avatar: 'خ', email: 'khalid@namaa.demo', phone: '+966 50 371 2290', role: 'الحل الحي', tag: 'Live',
     line: 'مستثمر لديه حسابات في ثلاثة بنوك، يسجّل في نماء لأول مرة.', asOfLabel: 'يوم العرض · 3 أكتوبر 2026', entry: '/khalid' },
-  ahmad: { key: 'ahmad', name: 'أحمد', full: 'أحمد عبدالله السبيعي', avatar: 'أس', email: 'ahmad.alsubaie@gmail.com', phone: '+966 55 012 3447', role: 'الإثبات عبر الزمن', tag: 'History',
-    line: 'موظف تابع راتبه ومصروفاته وادخاره واستثماره أكثر من سنة.', asOfLabel: 'كما في 26 سبتمبر 2026 · تاريخ مرجعي ثابت', entry: '/ahmad' },
 };
 
 export const accountTitle = a => (a.fund ? a.product : a.exempt ? `محفظة ${a.product}` : `${ACCOUNTS[a.id]?.bank ?? a.bank} · ${ACCOUNTS[a.id]?.kind ?? ''}`);

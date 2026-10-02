@@ -1,12 +1,9 @@
-// بيانات الشخصيات الثلاث للموقع (منفصلة عن ملف المتجر حتى يشتغل التحديث السريع في Vite).
-import ahmad from '../data/ahmad.json';
+// بيانات شخصيتي الموقع (منفصلة عن ملف المتجر حتى يشتغل التحديث السريع في Vite).
 import khalid from '../data/khalid.json';
 import noura from '../data/noura.json';
-import { AHMAD_V2, ahmadV2 } from '../engine/ahmad-v2.js';
 
-// الشخصيات الثلاث (وثيقة «ثلاث شخصيات»): لكل شخصية بياناتها وتاريخها المرجعي، ولا يتسرب شيء بينها
+// الشخصيتان: لكل شخصية بياناتها وتاريخها المرجعي، ولا يتسرب شيء بينها
 export const PERSONA_DATA = {
-  ahmad: { data: ahmadV2(ahmad), asOf: AHMAD_V2.asOf, historical: true },
   khalid: { data: khalid, asOf: khalid.period.end, historical: false },
   noura: { data: noura, asOf: noura.period.end, historical: false },
 };

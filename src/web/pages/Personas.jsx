@@ -1,4 +1,4 @@
-// الشخصيات الثلاث (وثيقة التسليم): نورة المشكلة، خالد رحلة التسجيل والربط الحية، أحمد الإثبات عبر الزمن.
+// الشخصيتان: نورة المشكلة، وخالد رحلة التسجيل والربط الحية.
 // كل رقم هنا من المحرك على بيانات الشخصية نفسها، ولا يتسرب شيء بين الشخصيات.
 import { useEffect, useState } from 'react';
 import {
@@ -16,12 +16,11 @@ import { AddAsset, K4Review } from './Assets.jsx';
 const STORY = {
   noura: { icon: Calculator, facts: ['حساب واحد · دخل غير منتظم', 'حاسبة تقليدية تسأل: متى يبدأ حولك؟', 'لا نتيجة بلا تاريخ موثّق'], cta: 'شاهد المشكلة' },
   khalid: { icon: RefreshCw, facts: ['تسجيل جديد وربط 3 بنوك', 'ذهب 100 غ ومحفظة أسهم', 'حساب استثماري يحتاج مراجعة'], cta: 'ابدأ الرحلة' },
-  ahmad: { icon: CalendarClock, facts: ['سجل 18 شهرًا من الحركات', 'زكاة مرة واحدة في السنة', 'صندوق يدخل بحصته الزكوية'], cta: 'افتح السجل' },
 };
 
 export function PersonaCards() {
   return (
-    <div className="w-grid3">
+    <div className="w-grid3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
       {Object.values(PERSONAS).map((p, i) => {
         const s = STORY[p.key];
         return (
@@ -64,8 +63,8 @@ export function PersonaChooser() {
       <section className="w-section gray" style={{ minHeight: 'calc(100vh - 72px)' }}>
         <div className="w-wrap">
           <p className="w-eyebrow">نسخة العرض</p>
-          <h2 style={{ marginBottom: 8 }}>ثلاث شخصيات، ثلاث قصص</h2>
-          <p className="sub" style={{ marginBottom: 28 }}>كل شخصية لها حساباتها وأصولها ونتيجتها وتاريخها المرجعي، ولا يتسرب شيء بينها. الترتيب المقترح: نورة ← خالد ← أحمد.</p>
+          <h2 style={{ marginBottom: 8 }}>شخصيتان، قصتان</h2>
+          <p className="sub" style={{ marginBottom: 28 }}>كل شخصية لها حساباتها وأصولها ونتيجتها وتاريخها المرجعي، ولا يتسرب شيء بينها. الترتيب المقترح: نورة ثم خالد.</p>
           <PersonaCards />
           <p className="w-note" style={{ marginTop: 20 }}><Icon as={ShieldCheck} size={14} />بيانات تعليمية للعرض. البريد والجوال وهميّان، والربط البنكي محاكاة.</p>
         </div>
@@ -92,7 +91,7 @@ export function NouraPage() {
   const next = view.nextDue;
   return (
     <div className="w w-site">
-      <SiteHead right={<><Pill tone="warn">1 من 3 · المشكلة</Pill><Btn className="sm" onClick={() => go('/personas')}>الشخصيات</Btn></>} />
+      <SiteHead right={<><Pill tone="warn">1 من 2 · المشكلة</Pill><Btn className="sm" onClick={() => go('/personas')}>الشخصيات</Btn></>} />
       <section className="w-section gray" style={{ paddingTop: 40 }}>
         <div className="w-wrap col" style={{ gap: 24 }}>
           <div>

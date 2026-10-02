@@ -1,5 +1,5 @@
 // الموقع العام: الصفحة الرئيسية، وتسجيل الدخول وإنشاء الحساب وتأكيد البريد، والتهيئة بثلاث خطوات.
-// أرقام البطاقات من المحرك نفسه (زكاة أحمد اليوم، الوعاء، النصاب، الوجوب القادم).
+// أرقام البطاقات من المحرك نفسه (الوعاء، النصاب، الزكاة القادمة).
 import { useEffect, useState } from 'react';
 import {
   ArrowRight, CalendarClock, CalendarDays, Check, ChevronDown, CircleCheck, Eye, EyeOff, FileText, Info, Landmark, Layers3,
@@ -15,21 +15,22 @@ import logo from '../../assets/namaa-logo-tight.png';
 import { PersonaCards } from './Personas.jsx';
 
 function ZakatCard({ compact }) {
-  const { view, historical } = useStore();
+  const { view } = useStore();
   const due = view.due;
+  const next = view.nextDue;
   if (!due) return (
     <div className={compact ? 'w-auth-card' : 'w-hero-card'}>
       <div className="between" style={{ marginBottom: 8 }}>
-        <span className="t13 sub">مستحقات الفترة · {view.name}</span>
-        <Pill tone="info">{historical ? `كما في ${gregText(view.today)}` : 'لا وجوب اليوم'}</Pill>
+        <span className="t13 sub">زكاتك القادمة · {view.name}</span>
+        <Pill tone="info">مرة واحدة في السنة</Pill>
       </div>
-      <div className="w-amount md"><strong>{plain(view.totalDueInPeriod)}</strong><span>ر.س</span></div>
-      <p className="t12 muted" style={{ marginBottom: compact ? 0 : 12 }}>وجبت {times(view.dues.length)} حسب الكشف · لا يوجد سداد مسجل</p>
+      <div className="w-amount md"><strong>{plain(next?.zakat ?? 0)}</strong><span>ر.س</span></div>
+      <p className="t12 muted" style={{ marginBottom: compact ? 0 : 12 }}>{next ? `${hijriFromParts(next.hijri)} · ${gregText(next.date)} · بعد ${days(next.inDays)}` : 'لم يبلغ المال النصاب بعد'}</p>
       {!compact && (
         <div className="w-divide">
-          <div className="w-line"><span>الوعاء في آخر يوم</span><span>{sar(view.total)}</span></div>
-          <div className="w-line"><span>النصاب يومها</span><span>{sar(view.nisab)}</span></div>
-          {view.nextDue && <div className="w-line"><span>القادم · توقّع</span><span>{sar(view.nextDue.zakat)} · {gregText(view.nextDue.date)}</span></div>}
+          <div className="w-line"><span>إجمالي الوعاء</span><span>{sar(view.total)}</span></div>
+          <div className="w-line"><span>النصاب اليوم</span><span>{sar(view.nisab)}</span></div>
+          <div className="w-line"><span>يوم زكاتك</span><span>{next ? hijriFromParts(next.hijri) : '—'}</span></div>
         </div>
       )}
     </div>
@@ -106,7 +107,7 @@ export function Landing() {
           </div>
           <div className="col" style={{ gap: 12 }}>
             <ZakatCard />
-            {next && (
+            {next && view.due && (
               <div className="w-hero-card row" style={{ padding: 16, maxWidth: 360 }}>
                 <span className="w-ico"><Icon as={CalendarClock} /></span>
                 <span><span className="b7 t13" style={{ display: 'block' }}>الوجوب القادم بعد {days(next.inDays)}</span><span className="t11 sub">{hijriFromParts(next.hijri)} · {sar(next.zakat)}</span></span>
@@ -121,8 +122,8 @@ export function Landing() {
       <section className="w-section gray" id="personas">
         <div className="w-wrap">
           <p className="w-eyebrow">شاهد كيف يعمل</p>
-          <h2 style={{ marginBottom: 8 }}>ثلاث شخصيات، ثلاث قصص</h2>
-          <p className="sub" style={{ marginBottom: 28 }}>نورة لا تعرف متى يبدأ حولها، وخالد يربط بنوكه لأول مرة، وأحمد سجل كامل عبر الزمن. كل شخصية منفصلة بحساباتها ونتيجتها.</p>
+          <h2 style={{ marginBottom: 8 }}>شخصيتان، قصتان</h2>
+          <p className="sub" style={{ marginBottom: 28 }}>نورة لا تعرف متى يبدأ حولها، وخالد يربط بنوكه واستثماراته لأول مرة. كل شخصية منفصلة بحساباتها ونتيجتها.</p>
           <PersonaCards />
         </div>
       </section>
