@@ -23,7 +23,7 @@ const section = path => {
   return '/app';
 };
 
-// «كما في 26 سبتمبر 2026» لأحمد، و«3 أكتوبر 2026» لخالد ونورة
+// التاريخ المرجعي للشخصية
 const asOfText = (persona, historical, today) => (historical ? `كما في ${gregText(today)} · تاريخ مرجعي ثابت` : PERSONAS[persona].asOfLabel);
 
 function PersonaSwitch() {

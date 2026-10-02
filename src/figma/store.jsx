@@ -44,11 +44,11 @@ function reprice(asset, feed) {
   return asset;
 }
 
-// personaMode: موقع الويب (ثلاث شخصيات). بدونه يبقى التطبيق القديم (#/phone) على قصة أحمد الأصلية كما هو.
+// personaMode: موقع الويب (نورة وخالد). بدونه يبقى التطبيق القديم (#/phone) على قصة أحمد الأصلية كما هو.
 export function StoreProvider({ children, personaMode = false }) {
   // الشخصية الحالية تبقى بعد تحديث الصفحة (تفضيل عرض لكل متصفح فقط)
   const [persona, setPersonaState] = useState(() => {
-    try { const p = sessionStorage.getItem('namaa.persona'); return PERSONA_DATA[p] ? p : 'ahmad'; } catch { return 'ahmad'; }
+    try { const p = sessionStorage.getItem('namaa.persona'); return PERSONA_DATA[p] ? p : 'khalid'; } catch { return 'khalid'; }
   });
   const setPersona = p => { setPersonaState(p); try { sessionStorage.setItem('namaa.persona', p); } catch { /* التخزين غير متاح */ } };
   const [modeState, setMode] = useState('story');       // 'story' | 'live'
@@ -59,7 +59,7 @@ export function StoreProvider({ children, personaMode = false }) {
   const [portfoliosBy, setPortfoliosBy] = useState({});  // تطبيقات الاستثمار المرتبطة لكل شخصية   // أصول الشخصية التي راجعها المستخدم وأكّدها
   const mode = personaMode ? (persona === 'khalid' && khalidLive ? 'live' : 'story') : modeState;
   const scope = personaMode ? `${persona}:${mode}` : mode;
-  // كل شخصية (وكل وجه) لها أصولها وإخراجها وبنوكها: ما يضيفه خالد ما يظهر عند أحمد
+  // كل شخصية (وكل وجه) لها أصولها وإخراجها وبنوكها: ما يضيفه خالد ما يظهر عند نورة
   const [assetsBy, setAssetsBy] = useState({});
   const [banksBy, setBanksBy] = useState({});
   const [paymentBy, setPaymentBy] = useState({});

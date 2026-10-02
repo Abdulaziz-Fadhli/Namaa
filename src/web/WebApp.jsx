@@ -17,8 +17,8 @@ import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Registe
 
 const PhoneApp = lazy(() => import('../App.jsx'));
 
-// الرابط يحدد الشخصية: /noura و/khalid/* و/ahmad. ما عداها يبقى على الشخصية الحالية.
-const personaOf = path => (path.startsWith('/noura') ? 'noura' : path.startsWith('/khalid') ? 'khalid' : path.startsWith('/ahmad') ? 'ahmad' : null);
+// الرابط يحدد الشخصية: /noura و/khalid/*. ما عداها يبقى على الشخصية الحالية.
+const personaOf = path => (path.startsWith('/noura') ? 'noura' : path.startsWith('/khalid') ? 'khalid' : null);
 
 const KHALID = { '/khalid': KhalidWelcome, '/khalid/register': KhalidRegister, '/khalid/banks': KhalidBanks, '/khalid/accounts': KhalidAccounts,
   '/khalid/assets': KhalidAssets, '/khalid/prices': KhalidPrices, '/khalid/sync': KhalidSync };
@@ -54,7 +54,7 @@ function Routed({ path }) {
   const want = personaOf(path);
   useEffect(() => {
     if (want && want !== persona) setPersona(want);
-    if (path === '/ahmad') go('/app');
+    if (path === '/ahmad') go('/personas');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [want, path]);
   if (want && want !== persona) return null;
