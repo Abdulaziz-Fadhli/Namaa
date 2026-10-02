@@ -1,5 +1,5 @@
 // هيكل صفحات التطبيق: قائمة جانبية هادئة على الكمبيوتر، وشريط سفلي على الجوال، ورأس بسيط لكل صفحة.
-import { ArrowLeft, Bell, ChevronDown, History, House, LogOut, RefreshCw, Settings, WalletCards } from 'lucide-react';
+import { ArrowLeft, Bell, ChevronDown, History, House, LogOut, MessageCircleQuestion, RefreshCw, Settings, WalletCards } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Brand, CompanyMark, Icon } from './kit.jsx';
 import { go } from './nav.js';
@@ -8,11 +8,12 @@ import { PERSONAS, clock, plain, sar } from './data.js';
 import { gregText } from '../figma/format.js';
 import { markOf, tradeLabel } from '../engine/portfolio.js';
 
-// أربعة أقسام فقط. الإخراج من زر الرئيسية، والإشعارات من الجرس، والخط الزمني داخل السجل.
+// خمسة أقسام. الإخراج من زر الرئيسية، والإشعارات من الجرس، والخط الزمني داخل السجل.
 const NAV = [
   { path: '/app', label: 'الرئيسية', icon: House },
   { path: '/app/assets', label: 'الأصول', icon: WalletCards },
   { path: '/app/history', label: 'السجل', icon: History },
+  { path: '/app/ask', label: 'اسأل نماء', icon: MessageCircleQuestion },
   { path: '/app/settings', label: 'الإعدادات', icon: Settings },
 ];
 
@@ -20,6 +21,7 @@ const section = path => {
   if (path.startsWith('/app/timeline') || path.startsWith('/app/history')) return '/app/history';
   if (['/app/assets', '/app/account', '/app/link', '/app/invest'].some(x => path.startsWith(x))) return '/app/assets';
   if (path.startsWith('/app/settings')) return '/app/settings';
+  if (path.startsWith('/app/ask')) return '/app/ask';
   return '/app';
 };
 
