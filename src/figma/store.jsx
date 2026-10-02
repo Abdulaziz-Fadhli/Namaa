@@ -15,6 +15,7 @@ import ahmad from '../data/ahmad.json';
 import { PERSONA_DATA, khalidWith } from './persona-data.js';
 import prices from '../data/prices.json';
 
+const ANNUAL = Object.freeze({ ...defaultSettings, acquiredMoneyMode: 'ANNUAL_ADVANCE' });
 const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
 const clock12 = d => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Riyadh' }).replace(' AM', ' ص').replace(' PM', ' م');
 
@@ -70,7 +71,8 @@ export function StoreProvider({ children, personaMode = false }) {
   const setPayment = p => setPaymentBy(by => ({ ...by, [pkey]: p }));
   const pendingBanks = banksBy[pkey] ?? [];
   // خيارات المنهجية من الإعدادات (كلاهما من دليل الهيئة): تغييرها يعيد تشغيل المحرك فعليًا
-  const [settings, setSettingsState] = useState(defaultSettings);
+  // الموقع: الزكاة مرة واحدة في السنة (يوم واحد، ويُعجَّل ما لم يكمل حوله). التطبيق القديم يبقى على حول كل مبلغ.
+  const [settings, setSettingsState] = useState(personaMode ? ANNUAL : defaultSettings);
   const [fromAccount, setFromAccount] = useState('A1');
 
   const live = mode === 'live';
@@ -150,6 +152,13 @@ export function StoreProvider({ children, personaMode = false }) {
       const g = groups.get(d) ?? { date: d, base: 0, zakat: 0 };
       groups.set(d, { ...g, base: g.base + a.value, zakat: round2(g.zakat + a.value / 40) });
     }
+    if (settings.acquiredMoneyMode === 'ANNUAL_ADVANCE' && groups.size > 1) {
+      // مرة واحدة في السنة: كل ما لم يجب بعد يُجمع في أقرب موعد
+      const all = [...groups.values()].sort((x, y) => (x.date < y.date ? -1 : 1));
+      const base = all.reduce((x, g) => x + g.base, 0);
+      groups.clear();
+      groups.set(all[0].date, { date: all[0].date, base, zakat: round2(base / 40) });
+    }
     const upcoming = [...groups.values()].sort((x, y) => (x.date < y.date ? -1 : 1))
       .map(u => ({ ...u, inDays: Math.round((new Date(`${u.date}T00:00:00Z`) - todayDate) / 86400000) }));
     return {
@@ -199,6 +208,7 @@ export function StoreProvider({ children, personaMode = false }) {
       settings,
       setSettings: patch => setSettingsState(s => {
         const next = { ...s, ...patch };
+        if (Object.entries(ANNUAL).every(([k, v]) => next[k] === v)) return ANNUAL;
         return Object.entries(defaultSettings).every(([k, v]) => next[k] === v) ? defaultSettings : next;
       }),
       fromAccount,

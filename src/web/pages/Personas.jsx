@@ -16,7 +16,7 @@ import { AddAsset, K4Review } from './Assets.jsx';
 const STORY = {
   noura: { icon: Calculator, facts: ['حساب واحد · دخل غير منتظم', 'حاسبة تقليدية تسأل: متى يبدأ حولك؟', 'لا نتيجة بلا تاريخ موثّق'], cta: 'شاهد المشكلة' },
   khalid: { icon: RefreshCw, facts: ['تسجيل جديد وربط 3 بنوك', 'ذهب 100 غ ومحفظة أسهم', 'حساب استثماري يحتاج مراجعة'], cta: 'ابدأ الرحلة' },
-  ahmad: { icon: CalendarClock, facts: ['سجل 18 شهرًا من الحركات', '7 أحداث وجوب · 765.95 ر.س', 'صندوق يدخل بحصته الزكوية'], cta: 'افتح السجل' },
+  ahmad: { icon: CalendarClock, facts: ['سجل 18 شهرًا من الحركات', 'زكاة مرة واحدة في السنة', 'صندوق يدخل بحصته الزكوية'], cta: 'افتح السجل' },
 };
 
 export function PersonaCards() {
@@ -482,7 +482,7 @@ export function KhalidSync() {
     [`${ACCOUNTS.K2.bank} · جاري`, `${count('K2')} حركات`, 40],
     [`${ACCOUNTS.K3.bank} · ادخار`, `${count('K3')} حركة`, 55],
     ['ربط التحويلات الداخلية', (n => `${n} ${n > 2 && n < 11 ? 'تحويلات' : 'تحويلًا'} بين حساباتك`)(personaData.transactions.filter(t => t.internal).length / 2), 72],
-    ['حول كل مبلغ والذهب والأسهم', 'بمحرك نماء', 100],
+    ['يوم زكاتك السنوي مع الذهب والأسهم', 'بمحرك نماء', 100],
   ];
   const next = view.nextDue;
   return (

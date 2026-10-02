@@ -68,6 +68,13 @@ export function buildView(persona, prices, settings = defaultSettings, options =
     if (d <= today) continue;
     groups.set(d, (groups.get(d) ?? 0) + lot.amount);
   }
+  // مرة واحدة في السنة: كل المال يُزكّى في أقرب موعد، وما لم يكمل حوله يُعجَّل معه
+  if (settings.acquiredMoneyMode === 'ANNUAL_ADVANCE' && groups.size > 1) {
+    const first = [...groups.keys()].sort()[0];
+    const all = [...groups.values()].reduce((x, y) => x + y, 0);
+    groups.clear();
+    groups.set(first, all);
+  }
   const upcoming = [...groups.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([d, base]) => ({
     date: d,
     hijri: hijri(new Date(`${d}T00:00:00Z`)),
