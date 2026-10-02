@@ -64,9 +64,33 @@ function VaultChart({ view }) {
   );
 }
 
+// إيجار اكتشفناه من حركات الحساب: نسأل المستخدم يأكده، ونشرح حكمه (دليل الهيئة §3.8)
+export function RentCard() {
+  const { rent, setRentStatus } = useStore();
+  const r = rent.find(x => x.status === 'new');
+  if (!r) return null;
+  const bank = ACCOUNTS[r.accountId]?.bank ?? r.accountId;
+  return (
+    <Card title="اكتشفنا دخل إيجار في حسابك" desc="من حركات الحساب، بدون ما تدخل شي" action={<Pill tone="info">جديد</Pill>}>
+      <div className="w-rows">
+        <div className="w-rowline"><span className="t">{r.desc}</span><span className="v">{plain(r.amount, 0)} ر.س</span><span className="d">{r.everyText} · {bank} · {r.count} دفعات منذ {gregText(r.first)}</span></div>
+        <div className="w-rowline"><span className="t">في السنة</span><span className="v">{plain(r.perYear, 0)} ر.س</span><span className="d">آخر دفعة {gregText(r.last)} · المتوقعة {gregText(r.next)}</span></div>
+      </div>
+      <p className="w-note" style={{ margin: '14px 0 16px' }}><Icon as={Info} size={14} />
+        <span>العقار المؤجر لا زكاة في قيمته، فلا تضيفه كأصل. والأجرة تصل حسابك نقدًا فهي داخلة في وعائك، ويُزكّى ما بقي منها حولًا (دليل الهيئة §3.8).</span>
+      </p>
+      <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+        <Btn variant="primary" className="sm" onClick={() => setRentStatus(r.key, 'rental')}>نعم، عقار مؤجر</Btn>
+        <Btn className="sm" onClick={() => setRentStatus(r.key, 'not')}>ليس إيجارًا</Btn>
+      </div>
+    </Card>
+  );
+}
+
 // ما نراه وما لا نراه: الحساب على ما ربطه المستخدم فقط، فنقول له صراحةً ما خارجه
 function Coverage({ view }) {
-  const { personaData, portfolios, assets } = useStore();
+  const { personaData, portfolios, assets, rent } = useStore();
+  const rented = rent.filter(r => r.status === 'rental');
   const first = personaData.transactions[0]?.date ?? view.start?.date;
   const has = k => assets.some(a => a.kind === k || (k === 'gold' && a.kind === 'silver'));
   const banks = view.accounts.length;
@@ -87,6 +111,7 @@ function Coverage({ view }) {
             {first && <li>كشف الحساب من {gregText(first)} ({hijriText(first)})</li>}
             {portfolios.length > 0 && <li>{portfolios.length === 1 ? 'محفظة استثمار واحدة' : `${portfolios.length} محافظ استثمار`}</li>}
             {assets.length > 0 && <li>{assets.length === 1 ? 'أصل واحد أضفته' : `${assets.length} أصول أضفتها`}</li>}
+            {rented.map(r => <li key={r.key}>إيجار عقار مؤجر · {plain(r.amount, 0)} ر.س {r.everyText}</li>)}
           </ul>
         </div>
         <div>
@@ -163,6 +188,7 @@ export function Dashboard({ path }) {
         </Card>
         <AccountsCard view={view} vault={vault} />
       </div>
+      <RentCard />
       <Coverage view={view} />
       {review && <K4Review onClose={() => setReview(false)} />}
     </Shell>

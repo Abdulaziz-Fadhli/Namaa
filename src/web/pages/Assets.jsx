@@ -508,7 +508,7 @@ export function K4Review({ onClose }) {
 }
 
 export function Assets({ path }) {
-  const { view, vault, assets, removeAsset, collectDebt, personaData, confirmed, confirmHolding, historical } = useStore();
+  const { view, vault, assets, removeAsset, collectDebt, personaData, confirmed, confirmHolding, historical, rent } = useStore();
   // /app/assets/add/cash يفتح نافذة الإضافة على النوع مباشرة (من بطاقة «ما لا نراه» في الرئيسية)
   const initial = path.startsWith('/app/assets/add/') ? path.split('/').pop() : null;
   const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : null);
@@ -573,6 +573,16 @@ export function Assets({ path }) {
                 </details>
               );
             })}
+            {rent.filter(r => r.status === 'rental').map(r => (
+              <details key={r.key} className="w-more">
+                <summary className="w-rowline">
+                  <span className="t">عقار مؤجر</span>
+                  <span className="v" style={{ color: 'var(--muted)', fontWeight: 500 }}>0.00</span>
+                  <span className="d">اكتشفناه من الإيجار · {plain(r.amount, 0)} ر.س {r.everyText}</span>
+                </summary>
+                <div className="w-more-body">قيمة العقار المؤجر لا تدخل الوعاء، والأجرة تصل {ACCOUNTS[r.accountId]?.bank ?? ''} نقدًا وتُحسب مع رصيده، ويُزكّى ما بقي منها حولًا (دليل الهيئة §3.8).</div>
+              </details>
+            ))}
             {assets.map(a => (
               <details key={a.id} className="w-more">
                 <summary className="w-rowline">

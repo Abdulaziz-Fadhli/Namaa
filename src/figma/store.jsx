@@ -9,6 +9,7 @@ import { nextScripted, portfolioAssets, receiveNext, seedPortfolio } from '../en
 import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
 import { ramadanPlan } from './zakatday.js';
+import { detectRent } from '../engine/rent.js';
 import { StoreContext } from './model.js';
 import { riyadhToday, useLiveFeed } from './live.js';
 import storyView from '../data/ahmad-view.json';
@@ -87,6 +88,8 @@ export function StoreProvider({ children, personaMode = false }) {
   const [selfPaidBy, setSelfPaidBy] = usePersisted(personaMode, 'selfPaid', {});
   // يوم الزكاة: 'hawl' يوم تمام الحول، أو 'ramadan' (بالتعجيل فقط، دليل الهيئة §4.2)
   const [zakatDayBy, setZakatDayBy] = usePersisted(personaMode, 'zakatDay', {});
+  // دخل إيجار اكتشفناه من الحركات، وتصنيف المستخدم له: 'rental' عقار مؤجر، 'not' ليس إيجارًا
+  const [rentBy, setRentBy] = usePersisted(personaMode, 'rent', {});
   const [lastZakat, setLastZakat] = useState(null);     // { calendar: 'hijri'|'gregorian', iso }
   const [remembers, setRemembers] = useState('yes');     // هل يتذكر تاريخ آخر زكاة؟
   const [channel, setChannel] = usePersisted(personaMode, 'channel', personaMode ? 'zakati' : 'charity');
@@ -186,6 +189,9 @@ export function StoreProvider({ children, personaMode = false }) {
     }
     const upcoming = [...groups.values()].sort((x, y) => (x.date < y.date ? -1 : 1))
       .map(u => ({ ...u, inDays: Math.round((new Date(`${u.date}T00:00:00Z`) - todayDate) / 86400000) }));
+    // الإيجار من حركات الحساب (§3.8): قيمة العقار المؤجر لا تدخل، والأجرة نقد في الوعاء أصلًا
+    const rentMarks = rentBy[pkey] ?? {};
+    const rent = personaMode ? detectRent(pd.data.transactions, view.today).map(r => ({ ...r, status: rentMarks[r.key] ?? 'new' })) : [];
     // سداد سجّله المستخدم بنفسه لوجوبات سابقة
     const selfPaid = selfPaidBy[pkey] ?? {};
     const unpaidDues = view.dues.filter(d => d.date !== view.today && !selfPaid[d.date]);
@@ -215,12 +221,13 @@ export function StoreProvider({ children, personaMode = false }) {
         setConfirmedBy(by => ({ ...by, [p]: {} }));
         setPortfoliosBy(by => ({ ...by, [p]: [] }));
         setSelfPaidBy(by => ({ ...by, [p]: {} }));
+        setRentBy(by => ({ ...by, [p]: {} }));
         setZakatDayBy(by => ({ ...by, [p]: 'hawl' }));
         if (p === 'khalid') { setK4(null); setKhalidLive(false); }
       },
       // «احذف بياناتي»: كل ما أضافه المستخدم أو ربطه أو سجّله في هذا المتصفح
       deleteAllData: () => {
-        setAssetsBy({}); setBanksBy({}); setPaymentBy({}); setConfirmedBy({}); setPortfoliosBy({}); setSelfPaidBy({}); setZakatDayBy({});
+        setAssetsBy({}); setBanksBy({}); setPaymentBy({}); setConfirmedBy({}); setPortfoliosBy({}); setSelfPaidBy({}); setZakatDayBy({}); setRentBy({});
         setK4(null); setKhalidLive(false); setEvents([]); setSettingsState(personaMode ? ANNUAL : defaultSettings);
         clearSavedState();
       },
@@ -241,6 +248,8 @@ export function StoreProvider({ children, personaMode = false }) {
       setZakatDay: d => setZakatDayBy(by => ({ ...by, [pkey]: d })),
       ramadanPlan: plan,
       selfPaid,
+      rent,
+      setRentStatus: (key, status) => setRentBy(by => ({ ...by, [pkey]: { ...(by[pkey] ?? {}), [key]: status } })),
       unpaidDues,
       unpaidTotal,
       recordSelfPaid: (date, amount) => setSelfPaidBy(by => ({ ...by, [pkey]: { ...(by[pkey] ?? {}), [date]: { on: view.today, amount } } })),
@@ -293,7 +302,7 @@ export function StoreProvider({ children, personaMode = false }) {
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, selfPaidBy, zakatDayBy, portfolios, feedPaused, events, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
+  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, selfPaidBy, zakatDayBy, rentBy, portfolios, feedPaused, events, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

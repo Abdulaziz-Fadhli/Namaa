@@ -11,6 +11,7 @@ import {
 } from './pages/Personas.jsx';
 import { Account, Assets } from './pages/Assets.jsx';
 import { InvestPage } from './pages/Invest.jsx';
+import { Ask } from './pages/Ask.jsx';
 import { History, Payout, ReceiptPage } from './pages/Zakat.jsx';
 import { LinkBank, Notifications, SettingsPage } from './pages/Settings.jsx';
 import { Forgot, Landing, Login, OnboardBanks, OnboardLast, OnboardSync, Register } from './pages/Site.jsx';
@@ -36,6 +37,7 @@ function page(path) {
   if (path === '/onboarding/last') return <OnboardLast />;
   if (path === '/onboarding/sync') return <OnboardSync />;
   if (path === '/app/explain') return <Explain path={path} />;
+  if (path === '/app/ask') return <Ask path={path} />;
   if (path === '/app/assets' || path.startsWith('/app/assets/add/')) return <Assets path={path} />;
   if (path.startsWith('/app/account/')) return <Account path={path} />;
   if (path.startsWith('/app/invest/')) return <InvestPage path={path} />;
