@@ -8,6 +8,7 @@ import { calculateAssetValue, defaultSettings, isHawlComplete, resolveHawlDueDat
 import { nextScripted, portfolioAssets, receiveNext, seedPortfolio } from '../engine/portfolio.js';
 import { assessCrop, assessLivestock } from '../engine/zatca.js';
 import { buildView } from '../engine/view.js';
+import { ramadanPlan } from './zakatday.js';
 import { StoreContext } from './model.js';
 import { riyadhToday, useLiveFeed } from './live.js';
 import storyView from '../data/ahmad-view.json';
@@ -16,6 +17,25 @@ import { PERSONA_DATA, khalidWith } from './persona-data.js';
 import prices from '../data/prices.json';
 
 const ANNUAL = Object.freeze({ ...defaultSettings, acquiredMoneyMode: 'ANNUAL_ADVANCE' });
+// الإعدادات المحفوظة ترجع لنفس الكائن الثابت إن طابقته (المحرك يعتمد على المقارنة بالمرجع)
+const normalizeSettings = next => {
+  if (Object.entries(ANNUAL).every(([k, v]) => next[k] === v)) return ANNUAL;
+  return Object.entries(defaultSettings).every(([k, v]) => next[k] === v) ? defaultSettings : next;
+};
+
+// حالة العرض تبقى بعد تحديث الصفحة (sessionStorage لكل تبويب): ما يضيع الربط أو التأكيد وسط العرض
+const KEY = 'namaa.state.v1';
+const saved = (() => { try { return JSON.parse(sessionStorage.getItem(KEY) ?? '{}') ?? {}; } catch { return {}; } })();
+function usePersisted(on, name, init) {
+  const [v, setV] = useState(() => (on && saved[name] !== undefined ? saved[name] : typeof init === 'function' ? init() : init));
+  useEffect(() => {
+    if (!on) return;
+    saved[name] = v;
+    try { sessionStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* التخزين غير متاح: يبقى في الذاكرة */ }
+  }, [on, name, v]);
+  return [v, setV];
+}
+const clearSavedState = () => { for (const k of Object.keys(saved)) delete saved[k]; try { sessionStorage.removeItem(KEY); } catch { /* */ } };
 const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
 const clock12 = d => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Riyadh' }).replace(' AM', ' ص').replace(' PM', ' م');
 
@@ -54,25 +74,30 @@ export function StoreProvider({ children, personaMode = false }) {
   const [modeState, setMode] = useState('story');       // 'story' | 'live'
   // الشخصيات للعرض فقط على أسعار محفوظة؛ خالد وحده يقدر يحدّث الأسعار الآن (مسار تقييم حالي منفصل)
   const [khalidLive, setKhalidLive] = useState(false);
-  const [k4, setK4] = useState(null);                   // حقائق حساب خالد K4 بعد مراجعته
-  const [confirmedBy, setConfirmedBy] = useState({});
-  const [portfoliosBy, setPortfoliosBy] = useState({});  // تطبيقات الاستثمار المرتبطة لكل شخصية   // أصول الشخصية التي راجعها المستخدم وأكّدها
+  const [k4, setK4] = usePersisted(personaMode, 'k4', null);                   // حقائق حساب خالد K4 بعد مراجعته
+  const [confirmedBy, setConfirmedBy] = usePersisted(personaMode, 'confirmed', {});
+  const [portfoliosBy, setPortfoliosBy] = usePersisted(personaMode, 'portfolios', {});  // تطبيقات الاستثمار المرتبطة لكل شخصية
   const mode = personaMode ? (persona === 'khalid' && khalidLive ? 'live' : 'story') : modeState;
   const scope = personaMode ? `${persona}:${mode}` : mode;
   // كل شخصية (وكل وجه) لها أصولها وإخراجها وبنوكها: ما يضيفه خالد ما يظهر عند نورة
-  const [assetsBy, setAssetsBy] = useState({});
-  const [banksBy, setBanksBy] = useState({});
-  const [paymentBy, setPaymentBy] = useState({});
+  const [assetsBy, setAssetsBy] = usePersisted(personaMode, 'assets', {});
+  const [banksBy, setBanksBy] = usePersisted(personaMode, 'banks', {});
+  const [paymentBy, setPaymentBy] = usePersisted(personaMode, 'payments', {});
+  // زكوات سابقة دفعها المستخدم بنفسه خارج نماء (يسجلها هو): { [تاريخ الوجوب]: { on, amount } }
+  const [selfPaidBy, setSelfPaidBy] = usePersisted(personaMode, 'selfPaid', {});
+  // يوم الزكاة: 'hawl' يوم تمام الحول، أو 'ramadan' (بالتعجيل فقط، دليل الهيئة §4.2)
+  const [zakatDayBy, setZakatDayBy] = usePersisted(personaMode, 'zakatDay', {});
   const [lastZakat, setLastZakat] = useState(null);     // { calendar: 'hijri'|'gregorian', iso }
   const [remembers, setRemembers] = useState('yes');     // هل يتذكر تاريخ آخر زكاة؟
-  const [channel, setChannel] = useState('charity');
+  const [channel, setChannel] = usePersisted(personaMode, 'channel', personaMode ? 'zakati' : 'charity');
   const pkey = personaMode ? persona : 'phone';
   const payment = paymentBy[pkey] ?? null;
   const setPayment = p => setPaymentBy(by => ({ ...by, [pkey]: p }));
   const pendingBanks = banksBy[pkey] ?? [];
   // خيارات المنهجية من الإعدادات (كلاهما من دليل الهيئة): تغييرها يعيد تشغيل المحرك فعليًا
   // الموقع: الزكاة مرة واحدة في السنة (يوم واحد، ويُعجَّل ما لم يكمل حوله). التطبيق القديم يبقى على حول كل مبلغ.
-  const [settings, setSettingsState] = useState(personaMode ? ANNUAL : defaultSettings);
+  const [settingsRaw, setSettingsState] = usePersisted(personaMode, 'settings', personaMode ? ANNUAL : defaultSettings);
+  const settings = useMemo(() => normalizeSettings(settingsRaw), [settingsRaw]);
   const [fromAccount, setFromAccount] = useState('A1');
 
   const live = mode === 'live';
@@ -111,7 +136,7 @@ export function StoreProvider({ children, personaMode = false }) {
       setEvents(ev => [{ id: `${pkey}:${p.id}:${res.trade.id}`, pkey, portfolio: p.id, provider: p.name, trade: res.trade, at: Date.now() }, ...ev].slice(0, 20));
     }, p.trades.length === 0 ? 5000 : 9000);
     return () => clearTimeout(t);
-  }, [portfolios, feedPaused, pkey, today0]);
+  }, [portfolios, feedPaused, pkey, today0, setPortfoliosBy]);
   const value = useMemo(() => {
     // المواشي والمحاصيل: يعاد الحكم بتاريخ اليوم (الحول في الأنعام)، وزكاتها عينية خارج وعاء النقود
     const priced = (live ? assets.map(a => reprice(a, feed)) : assets).map(a => (!a.agri ? a : {
@@ -161,6 +186,16 @@ export function StoreProvider({ children, personaMode = false }) {
     }
     const upcoming = [...groups.values()].sort((x, y) => (x.date < y.date ? -1 : 1))
       .map(u => ({ ...u, inDays: Math.round((new Date(`${u.date}T00:00:00Z`) - todayDate) / 86400000) }));
+    // سداد سجّله المستخدم بنفسه لوجوبات سابقة
+    const selfPaid = selfPaidBy[pkey] ?? {};
+    const unpaidDues = view.dues.filter(d => d.date !== view.today && !selfPaid[d.date]);
+    const unpaidTotal = round2(unpaidDues.reduce((x, d) => x + d.zakat, 0));
+    // يوم الزكاة في رمضان: تعجيل قبل الموعد فقط
+    const zakatDay = zakatDayBy[pkey] ?? 'hawl';
+    const plan = ramadanPlan(view.today, upcoming[0]?.date, { ownsNisab: vault >= view.nisab });
+    const ramadanDue = zakatDay === 'ramadan' && plan?.kind === 'ADVANCE' && upcoming[0]
+      ? { ...upcoming[0], date: plan.ramadan, inDays: Math.round((new Date(`${plan.ramadan}T00:00:00Z`) - todayDate) / 86400000), advanced: true, originalDate: upcoming[0].date }
+      : null;
     return {
       personaMode,
       persona,
@@ -179,7 +214,15 @@ export function StoreProvider({ children, personaMode = false }) {
         setPaymentBy(by => ({ ...by, [p]: null }));
         setConfirmedBy(by => ({ ...by, [p]: {} }));
         setPortfoliosBy(by => ({ ...by, [p]: [] }));
+        setSelfPaidBy(by => ({ ...by, [p]: {} }));
+        setZakatDayBy(by => ({ ...by, [p]: 'hawl' }));
         if (p === 'khalid') { setK4(null); setKhalidLive(false); }
+      },
+      // «احذف بياناتي»: كل ما أضافه المستخدم أو ربطه أو سجّله في هذا المتصفح
+      deleteAllData: () => {
+        setAssetsBy({}); setBanksBy({}); setPaymentBy({}); setConfirmedBy({}); setPortfoliosBy({}); setSelfPaidBy({}); setZakatDayBy({});
+        setK4(null); setKhalidLive(false); setEvents([]); setSettingsState(personaMode ? ANNUAL : defaultSettings);
+        clearSavedState();
       },
       mode,
       live,
@@ -192,9 +235,25 @@ export function StoreProvider({ children, personaMode = false }) {
       portfolios,
       linkedValue,
       upcoming,
-      nextDue: upcoming[0] ?? null,
+      nextDue: ramadanDue ?? upcoming[0] ?? null,
+      hawlDue: upcoming[0] ?? null,
+      zakatDay,
+      setZakatDay: d => setZakatDayBy(by => ({ ...by, [pkey]: d })),
+      ramadanPlan: plan,
+      selfPaid,
+      unpaidDues,
+      unpaidTotal,
+      recordSelfPaid: (date, amount) => setSelfPaidBy(by => ({ ...by, [pkey]: { ...(by[pkey] ?? {}), [date]: { on: view.today, amount } } })),
+      undoSelfPaid: date => setSelfPaidBy(by => ({ ...by, [pkey]: Object.fromEntries(Object.entries(by[pkey] ?? {}).filter(([k]) => k !== date)) })),
+      // دين متعثر قبضه المستخدم: يصير نقدًا يبدأ حوله من يوم القبض، ويُزكّى عن سنة واحدة إذا بقي سنة (§3.4)
+      collectDebt: id => setAssetsBy(by => ({ ...by, [scope]: (by[scope] ?? []).map(a => (a.id !== id ? a : {
+        ...a, kind: 'cash', debt: { ...a.debt, collected: view.today }, engine: { manualAssets: [{ value: a.debt.amount }] }, value: a.debt.amount, acquired: view.today,
+        title: a.title.replace('دين لك', 'دين مقبوض'), detail: `قبضته ${view.today} · يُزكّى إذا بقي عندك سنة`,
+      })) })),
       linkPortfolio: (providerId, custom) => setPortfoliosBy(by => ((by[pkey] ?? []).some(x => x.id === providerId) ? by
         : { ...by, [pkey]: [...(by[pkey] ?? []), seedPortfolio(providerId, view.today, custom)] })),
+      // كشف مستورد: يحل محل كشف سابق لنفس التطبيق
+      importPortfolio: p => setPortfoliosBy(by => ({ ...by, [pkey]: [...(by[pkey] ?? []).filter(x => x.id !== p.id), p] })),
       unlinkPortfolio: id => setPortfoliosBy(by => ({ ...by, [pkey]: (by[pkey] ?? []).filter(x => x.id !== id) })),
       feedPaused,
       setFeedPaused,
@@ -206,11 +265,7 @@ export function StoreProvider({ children, personaMode = false }) {
       channel,
       payment,
       settings,
-      setSettings: patch => setSettingsState(s => {
-        const next = { ...s, ...patch };
-        if (Object.entries(ANNUAL).every(([k, v]) => next[k] === v)) return ANNUAL;
-        return Object.entries(defaultSettings).every(([k, v]) => next[k] === v) ? defaultSettings : next;
-      }),
+      setSettings: patch => setSettingsState(s => normalizeSettings({ ...s, ...patch })),
       fromAccount,
       setFromAccount,
       due,
@@ -225,15 +280,20 @@ export function StoreProvider({ children, personaMode = false }) {
       setLastZakat,
       setRemembers,
       setChannel,
-      pay: () => {
+      // إخراج زكاة اليوم، أو زكاة سابقة لم تُخرج (target: وجوب من view.dues) بقيمتها يوم وجبت (§4.2)
+      pay: (target, extra = {}) => {
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, '0'), mm = String(now.getMinutes()).padStart(2, '0');
         const seq = String(Math.floor(1000 + Math.random() * 9000));
-        setPayment({ amount: due.zakat, base: due.base, channel, fromAccount, time: `${hh}:${mm}`, date: view.today, ref: `NM-${view.today.slice(2).replaceAll('-', '')}-${seq}` });
+        const rec = { amount: target ? target.zakat : due.zakat, base: target ? target.base : due.base, channel, fromAccount, time: `${hh}:${mm}`, date: view.today,
+          ref: `NM-${view.today.slice(2).replaceAll('-', '')}-${seq}`, ...extra, ...(target ? { dueDate: target.date } : {}) };
+        if (target) setSelfPaidBy(by => ({ ...by, [pkey]: { ...(by[pkey] ?? {}), [target.date]: { on: view.today, amount: target.zakat, receipt: rec } } }));
+        else setPayment(rec);
+        return rec;
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, portfolios, feedPaused, events, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
+  }, [personaMode, persona, pd, khalidLive, k4, confirmedBy, selfPaidBy, zakatDayBy, portfolios, feedPaused, events, mode, scope, pkey, live, feed, view, assets, pendingBanks, lastZakat, remembers, channel, payment, settings, fromAccount]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

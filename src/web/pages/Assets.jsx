@@ -2,7 +2,7 @@
 // قيمة كل أصل في الوعاء من المحرك (calculateAssetValue)، والأسهم من src/securities، والمواشي والمحاصيل من zatca.js.
 import { useMemo, useState } from 'react';
 import { Banknote, Check, ChartCandlestick, ChevronLeft, Info, PieChart, Plus, Search, TriangleAlert } from 'lucide-react';
-import { Btn, Card, Icon, Modal, NumberInput, Option, Pill, Seg, Select, TextInput } from '../kit.jsx';
+import { Btn, Card, CompanyMark, Icon, Modal, NumberInput, Option, Pill, Seg, Select, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { parseNum, useStore, zakatableOf } from '../../figma/model.js';
@@ -13,11 +13,12 @@ import {
   CROP_KINDS, CROP_UNITS, GRAZING, IRRIGATION, LIVESTOCK_PURPOSES, LIVESTOCK_TYPES, ZATCA, assessCrop, assessLivestock,
 } from '../../engine/zatca.js';
 import { assess, check, toEngineEntry } from '../../securities/securities.js';
-import { InvestCard } from './Invest.jsx';
+import { InvestCard, LinkInvest } from './Invest.jsx';
+import { PROVIDERS, markOf } from '../../engine/portfolio.js';
 import { ACCOUNTS, accountInfo, daysFrom, personaHoldings, plain, sar, days } from '../data.js';
 
 const TABS = [
-  ['gold', 'ذهب'], ['silver', 'فضة'], ['security', 'أسهم وصناديق'], ['cash', 'نقد'], ['property', 'عقار للبيع'], ['livestock', 'مواشي'], ['crop', 'محاصيل'],
+  ['apps', 'تطبيقات التداول'], ['gold', 'ذهب'], ['silver', 'فضة'], ['security', 'أسهم وصناديق'], ['cash', 'نقد'], ['debt', 'ديون'], ['property', 'عقار للبيع'], ['livestock', 'مواشي'], ['crop', 'محاصيل'],
 ];
 
 // يوم تمام الحول من تاريخ التملك (نفس دالة المحرك)
@@ -115,6 +116,8 @@ function SecurityForm({ today, frame }) {
   const [touched, setTouched] = useState(false);
   const [intent, setIntent] = useState('INVEST');
   const [acquired, setAcquired] = useState('2026-07-29');
+  const [zpu, setZpu] = useState('');       // زكاة الوحدة المعلنة من مدير الصندوق (§3.9)
+  const [ratio, setRatio] = useState('');   // نسبة الموجودات الزكوية من القوائم المالية (§3.6)
   const r = useMemo(() => (q.trim() ? check(q, { intent }) : null), [q, intent]);
   const found = r?.found;
   const saudiCompany = found && r.type === 'COMPANY' && (r.market === 'TASI' || r.market === 'NOMU') && intent === 'INVEST';
@@ -127,8 +130,16 @@ function SecurityForm({ today, frame }) {
   const shown = !touched && quote ? String(quote.price) : price;
   const u = parseNum(units), p = parseNum(shown);
   const isCompany = found && r.type === 'COMPANY';
+  const z = parseNum(zpu), ra = parseNum(ratio);
+  // دقة أكثر للمستثمر (لا المضارب): الصندوق بزكاة وحدته المعلنة، والسهم غير المزكّى بحصته من الموجودات الزكوية
+  const askZpu = found && !isCompany && intent === 'INVEST' && r.status !== 'COVERED_BY_HOLDINGS';
+  const askRatio = found && isCompany && !saudiCompany && intent === 'INVEST';
   const a = found && u > 0 && (saudiCompany || p > 0)
-    ? assess({ symbol: r.symbol || undefined, fundName: r.symbol ? undefined : r.name, category: r.symbol ? undefined : r.category, units: u, price: saudiCompany ? 0 : p, intent })
+    ? assess({
+      symbol: r.symbol || undefined, fundName: r.symbol ? undefined : r.name, category: r.symbol ? undefined : r.category, units: u, price: saudiCompany ? 0 : p, intent,
+      ...(askZpu && z > 0 ? { zakatPerUnit: z } : {}),
+      ...(askRatio && ra >= 0 && ra <= 100 && ratio.trim() !== '' ? { zakatableRatio: ra / 100 } : {}),
+    })
     : null;
   const e = a && toEngineEntry(a);
   const engine = e ? { [e.kind]: [e.entry] } : {};
@@ -181,6 +192,15 @@ function SecurityForm({ today, frame }) {
         <NumberInput label="سعر الوحدة" value={shown} unit={us ? '$' : 'ر.س'} onChange={v => { setPrice(v); setTouched(true); }}
           help={quote && !touched ? `سعر السوق${timeOf(quote.at) ? ` · ${timeOf(quote.at)}` : ''}${us ? ' · يُحوّل بسعر 3.75' : ''}` : 'أدخل السعر إن لم يظهر تلقائيًا'} />
       )}
+      {askZpu && (
+        <NumberInput label="زكاة الوحدة المعلنة (اختياري)" value={zpu} onChange={setZpu} unit={us ? '$' : 'ر.س'}
+          help={a?.calcMethod === 'FUND_BASE' ? `يدخل الوعاء ${sar(a.base)} بدل قيمته السوقية (دليل الهيئة §3.9)` : 'من إفصاح مدير الصندوق. بدونها نحسبه بقيمته السوقية كاملة احتياطًا'} />
+      )}
+      {askRatio && (
+        <NumberInput label="نسبة الموجودات الزكوية من القوائم المالية (اختياري)" value={ratio} onChange={setRatio} unit="٪"
+          warn={ratio.trim() !== '' && !(ra >= 0 && ra <= 100)}
+          help={a?.calcMethod === 'ZAKATABLE_ASSETS' ? `المستثمر يزكي حصته من النقد والمخزون والذمم: يدخل ${sar(a.base)} (دليل الهيئة §3.6)` : 'النقد والمخزون والذمم ÷ إجمالي الأصول. بدونها نحسبه بقيمته السوقية كاملة احتياطًا'} />
+      )}
       <DateInput label="تاريخ الشراء" value={acquired} onChange={setAcquired} max={today} />
       <Summary rows={[
         ['القيمة الآن', a ? sar(a.value) : '—'],
@@ -220,28 +240,77 @@ function CashForm({ today, frame }) {
   ));
 }
 
+// الديون (دليل الهيئة §3.4): الدين على قادر غير مماطل يُزكّى كل سنة كأنه في يدك؛
+// والدين على معسر أو مماطل لا يُزكّى حتى تقبضه وتمر عليه سنة، فيزكيه عن سنة واحدة؛ والدين الذي عليك لا يُخصم.
+function DebtForm({ today, frame }) {
+  const [dir, setDir] = useState('owed');            // owed: لك على غيرك · owe: عليك لغيرك
+  const [amount, setAmount] = useState('20,000');
+  const [who, setWho] = useState('سلفة لصديق');
+  const [recovery, setRecovery] = useState('SOLVENT');
+  const [acquired, setAcquired] = useState('2026-01-10');
+  const n = parseNum(amount);
+  const solvent = recovery === 'SOLVENT';
+  const ok = dir === 'owed' && n > 0 && who.trim().length > 1;
+  const engine = solvent ? { manualAssets: [{ value: n > 0 ? n : 0 }] } : {};
+  const value = solvent ? zakatableOf({ engine }) : 0;
+  const meta = ({
+    ok, cta: dir === 'owe' ? 'لا يُخصم من الوعاء' : solvent ? 'إضافة إلى الوعاء' : 'تسجيله خارج الوعاء',
+    asset: {
+      kind: 'debt', engine, value, acquired: solvent ? acquired : null, debt: { amount: n, recovery }, title: `دين لك · ${who.trim()}`, short: sar(n),
+      detail: solvent ? `مرجو السداد · يُزكّى كل سنة · يكمل حوله ${hijriText(hawlOf(acquired, today).date)}` : 'متعثر · لا يُزكّى حتى تقبضه',
+    },
+    toast: solvent ? `أضفنا دينك ${sar(n)} إلى وعائك؛ الدين على قادر غير مماطل يُزكّى كل سنة.` : `سجّلنا دينك ${sar(n)} خارج الوعاء. إذا قبضته سجّله، ويبدأ حوله من يوم القبض.`,
+  });
+  return frame(meta, (
+    <>
+      <div className="w-field">
+        <label>الدين</label>
+        <Seg block value={dir} onChange={setDir} options={[{ value: 'owed', label: 'لي عند غيري' }, { value: 'owe', label: 'علي لغيري' }]} />
+      </div>
+      {dir === 'owe' ? (
+        <p className="w-note"><Icon as={Info} size={14} /><span>الديون التي عليك لا تُخصم من الوعاء: تزكي مالك كاملًا كأنه لا دين عليك. من عنده 10,000 وعليه دين 2,000 يزكي العشرة آلاف كاملة (دليل الهيئة §3.4).</span></p>
+      ) : (
+        <>
+          <div className="w-grid2">
+            <NumberInput label="المبلغ" value={amount} onChange={setAmount} unit="ر.س" warn={amount !== '' && !(n > 0)} />
+            <TextInput label="وصف الدين" value={who} onChange={setWho} help="بدون أسماء: مثل «سلفة لقريب» أو «مستحق من عميل»" />
+          </div>
+          <div className="col" style={{ gap: 10 }}>
+            <Option selected={solvent} onClick={() => setRecovery('SOLVENT')} icon={Check} title="المدين قادر وغير مماطل"
+              desc="متى طلبته سدّده: يُزكّى كل سنة كأنه في يدك" />
+            <Option selected={!solvent} onClick={() => setRecovery('DOUBTFUL')} icon={TriangleAlert} title="المدين معسر أو مماطل"
+              desc="يغلب على ظنك أنه لن يسدد: لا زكاة فيه حتى تقبضه" />
+          </div>
+          {solvent && <DateInput label="بداية حوله" value={acquired} onChange={setAcquired} max={today} />}
+          <Summary rows={[
+            ['يدخل الوعاء', sar(value)],
+            solvent ? ['يكمل حوله', hawlText(acquired, today)] : ['بعد القبض', 'يُزكّى عن سنة واحدة إذا بقي عندك سنة'],
+            ['الزكاة عند الوجوب (2.5٪)', sar(value / 40)],
+          ]} />
+        </>
+      )}
+    </>
+  ));
+}
+
 function PropertyForm({ today, frame }) {
-  const [intent, setIntent] = useState('TRADING');
+  // العقار يدخل الحساب إذا كان معدًا للبيع فقط (دليل الهيئة §3.8): بيت السكن لا زكاة فيه، والإيجار يصل حسابك نقدًا
   const [type, setType] = useState('أرض سكنية · 600 م²');
   const [city, setCity] = useState('الرياض · حي النرجس');
   const [amount, setAmount] = useState('850,000');
   const [acquired, setAcquired] = useState('2026-01-29');
   const n = parseNum(amount);
   const ok = n > 0 && type.trim();
-  const engine = { properties: [{ intent, marketValue: n > 0 ? n : 0 }] };
+  const engine = { properties: [{ intent: 'TRADING', marketValue: n > 0 ? n : 0 }] };
   const value = zakatableOf({ engine });
   const meta = ({
     ok, cta: 'إضافة إلى الوعاء',
-    asset: { kind: 'property', engine, value, acquired, title: type.trim(), short: type.trim(),
-      detail: intent === 'TRADING' ? `معد للبيع · يكمل حوله ${hijriText(hawlOf(acquired, today).date)}` : intent === 'RENTAL' ? 'للإيجار · يُزكّى الإيجار فقط' : 'للسكن · لا زكاة فيه' },
-    toast: intent === 'TRADING' ? `أضفنا ${type.trim()} بقيمة ${sar(value)} إلى وعائك.` : `أضفنا ${type.trim()}. ${intent === 'RENTAL' ? 'لا زكاة في قيمته، والإيجار المقبوض يدخل نقدك.' : 'عقار السكن لا زكاة فيه.'}`,
+    asset: { kind: 'property', engine, value, acquired, title: type.trim(), short: type.trim(), detail: `معد للبيع · يكمل حوله ${hijriText(hawlOf(acquired, today).date)}` },
+    toast: `أضفنا ${type.trim()} بقيمة ${sar(value)} إلى وعائك.`,
   });
   return frame(meta, (
     <>
-      <div className="w-field">
-        <label>الغرض من العقار</label>
-        <Seg block value={intent} onChange={setIntent} options={[{ value: 'TRADING', label: 'للبيع' }, { value: 'RENTAL', label: 'للإيجار' }, { value: 'USE', label: 'للسكن' }]} />
-      </div>
+      <p className="t13 sub">عقار تملكه بنية بيعه: أرض أو شقة أو مساهمة عقارية.</p>
       <div className="w-grid2">
         <TextInput label="نوع العقار" value={type} onChange={setType} />
         <TextInput label="المدينة" value={city} onChange={setCity} />
@@ -252,10 +321,10 @@ function PropertyForm({ today, frame }) {
       </div>
       <Summary rows={[
         ['يدخل الوعاء بقيمته السوقية', sar(value)],
-        intent === 'TRADING' ? ['يكمل حوله', hawlText(acquired, today)] : null,
+        ['يكمل حوله', hawlText(acquired, today)],
         ['الزكاة عند الوجوب (2.5٪)', sar(value / 40)],
       ]} />
-      <p className="w-note"><span>المعدّ للسكن لا زكاة فيه، والمؤجَّر تُزكّى أجرته المقبوضة إذا بقيت حولًا (دليل الهيئة §3.8).</span></p>
+      <p className="w-note"><span>بيت السكن لا زكاة فيه فلا تضيفه، والعقار المؤجر لا زكاة في قيمته، وأجرته تدخل حسابك البنكي فنحسبها مع نقدك (دليل الهيئة §3.8).</span></p>
     </>
   ));
 }
@@ -350,26 +419,57 @@ function CropForm({ frame }) {
   ));
 }
 
-export function AddAsset({ tab, setTab, onClose, onAdded }) {
+// تطبيقات التداول: تربطها بدل إدخال الأسهم واحدًا واحدًا، وتتحدث الزكاة مع كل صفقة
+const POPULAR = ['alinma-invest', 'awaed', 'rajhi-capital', 'snb-capital', 'derayah', 'riyad-capital', 'sahm', 'aljazira-capital', 'albilad', 'malaa', 'abyan', 'drahim'];
+function AppsTab({ frame, onLink }) {
+  const { portfolios } = useStore();
+  const linked = new Set(portfolios.map(p => p.id));
+  const list = POPULAR.map(id => PROVIDERS.find(p => p.id === id)).filter(Boolean);
+  return frame({ ok: true, cta: `كل التطبيقات (${PROVIDERS.length})`, link: true }, (
+    <>
+      <p className="t13 sub">تستثمر عبر تطبيق تداول؟ اربطه وتدخل محفظتك كاملة، وتتحدث زكاتك مع كل شراء أو بيع. الأسهم السعودية تزكيها الشركات فلا تدخل الحساب (دليل الهيئة §3.6).</p>
+      <div className="w-provs">
+        {list.map(p => {
+          const on = linked.has(p.id);
+          return (
+            <button key={p.id} className="w-prov" aria-disabled={on} onClick={() => { if (!on) onLink(p); }}>
+              <CompanyMark mark={markOf(p)} size={36} />
+              <span className="grow" style={{ minWidth: 0 }}>
+                <span className="n">{p.name}</span>
+                <span className="k">{on ? 'مرتبط' : p.markets}</span>
+              </span>
+              {on && <Icon as={Check} size={15} className="green" />}
+            </button>
+          );
+        })}
+      </div>
+      <p className="w-note"><Icon as={Info} size={14} /><span>تطبيقك غير موجود؟ «كل التطبيقات» فيها {PROVIDERS.length} تطبيقًا، وتقدر تضيف تطبيقك باسمه أو تستورد كشف المحفظة.</span></p>
+    </>
+  ));
+}
+
+export function AddAsset({ tab, setTab, onClose, onAdded, onLink }) {
   const { view, addAsset } = useStore();
   const today = view.today;
   const agri = tab === 'livestock' || tab === 'crop';
   // كل نموذج يرسم حقوله داخل هذه النافذة، ويعطيها حالة الزر والأصل الجاهز للإضافة
   const frame = (meta, children) => (
     <Modal title="إضافة أصل" onClose={onClose}
-      desc={agri ? (tab === 'crop' ? 'تُزكّى عند الحصاد، ولا يشترط لها حول' : 'زكاتها بالرؤوس، ويبدأ حولها من تاريخ تملكها') : 'يدخل وعاءك، ويبدأ حوله من تاريخ تملكه'}
+      desc={tab === 'apps' ? 'اربط تطبيق التداول أو الصناديق اللي تستثمر فيه' : agri ? (tab === 'crop' ? 'تُزكّى عند الحصاد، ولا يشترط لها حول' : 'زكاتها بالرؤوس، ويبدأ حولها من تاريخ تملكها') : 'يدخل وعاءك، ويبدأ حوله من تاريخ تملكه'}
       tabs={<div className="w-tabs" role="tablist">{TABS.map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>{l}</button>)}</div>}
       foot={<>
         <Btn onClick={onClose}>إلغاء</Btn>
-        <Btn variant="primary" disabled={!meta.ok} onClick={() => onAdded(meta.toast, addAsset(meta.asset))}>{meta.cta}</Btn>
+        <Btn variant="primary" disabled={!meta.ok} onClick={() => (meta.link ? onLink(null) : onAdded(meta.toast, addAsset(meta.asset)))}>{meta.cta}</Btn>
       </>}>
       {children}
     </Modal>
   );
+  if (tab === 'apps') return <AppsTab frame={frame} onLink={onLink} />;
   if (tab === 'gold' || tab === 'silver') return <MetalForm key={tab} metal={tab} today={today} frame={frame} />;
   if (tab === 'security') return <SecurityForm today={today} frame={frame} />;
   if (tab === 'cash') return <CashForm today={today} frame={frame} />;
   if (tab === 'property') return <PropertyForm today={today} frame={frame} />;
+  if (tab === 'debt') return <DebtForm today={today} frame={frame} />;
   if (tab === 'livestock') return <LivestockForm today={today} frame={frame} />;
   return <CropForm frame={frame} />;
 }
@@ -388,7 +488,7 @@ export function K4Review({ onClose }) {
     onClose();
   };
   return (
-    <Modal size="sm" title="محفظة نماء الاستثمارية · 7720 ••••" desc="رصيدها 50,000 ر.س. نحتاج نوعها لنحسبها بدقة" onClose={onClose}
+    <Modal size="sm" title="المحفظة الاستثمارية · 7720 ••••" desc="رصيدها 50,000 ر.س. نحتاج نوعها لنحسبها بدقة" onClose={onClose}
       foot={<><Btn onClick={onClose}>إلغاء</Btn><Btn variant="primary" disabled={!ok} onClick={save}>{type === 'later' ? 'إبقاؤه للمراجعة' : 'حفظ وإعادة الحساب'}</Btn></>}>
       <div className="col" style={{ gap: 10 }}>
         <Option selected={type === 'cash'} onClick={() => setType('cash')} icon={Banknote} title="حساب نقدي أو ودائع"
@@ -408,15 +508,18 @@ export function K4Review({ onClose }) {
 }
 
 export function Assets({ path }) {
-  const { view, vault, assets, removeAsset, personaData, confirmed, confirmHolding, historical } = useStore();
-  const [tab, setTab] = useState(null);
+  const { view, vault, assets, removeAsset, collectDebt, personaData, confirmed, confirmHolding, historical } = useStore();
+  // /app/assets/add/cash يفتح نافذة الإضافة على النوع مباشرة (من بطاقة «ما لا نراه» في الرئيسية)
+  const initial = path.startsWith('/app/assets/add/') ? path.split('/').pop() : null;
+  const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : null);
   const [toast, setToast] = useState(null);
   const [review, setReview] = useState(false);
+  const [linking, setLinking] = useState(undefined);   // undefined: مغلق · null: كل التطبيقات · تطبيق محدد
   const infos = view.accounts.map(a => [a, accountInfo(a)]);
   const holdings = personaHoldings(personaData, view);
   return (
-    <Shell path={path} title="الأصول" desc={`الوعاء الزكوي ${sar(vault)}${historical ? ` كما في ${gregText(view.today)}` : ''}`}
-      actions={<Btn variant="primary" className="sm" icon={Plus} onClick={() => setTab('gold')}>إضافة أصل</Btn>}>
+    <Shell path="/app/assets" title="الأصول" desc={`الوعاء الزكوي ${sar(vault)}${historical ? ` كما في ${gregText(view.today)}` : ''}`}
+      actions={<Btn variant="primary" className="sm" icon={Plus} onClick={() => setTab(historical ? 'gold' : 'apps')}>إضافة أصل</Btn>}>
       {toast && (
         <div className="w-toast" role="status">
           <Icon as={Check} className="green" />
@@ -451,7 +554,7 @@ export function Assets({ path }) {
         <InvestCard />
         <Card title="خارج البنوك" action={<button className="w-link t13" onClick={() => setTab('gold')}>إضافة</button>}>
           {holdings.length === 0 && assets.length === 0 && (
-            <p className="w-quiet">لا أصول بعد. الذهب والأسهم والنقد والعقار المعد للبيع والمواشي والمحاصيل تُضاف من «إضافة أصل».</p>
+            <p className="w-quiet">لا أصول بعد. الذهب والأسهم والنقد والديون التي لك والعقار المعد للبيع والمواشي والمحاصيل تُضاف من «إضافة أصل».</p>
           )}
           <div className="w-rows">
             {holdings.map(h => {
@@ -471,11 +574,19 @@ export function Assets({ path }) {
               );
             })}
             {assets.map(a => (
-              <div key={a.id} className="w-rowline">
-                <span className="t">{a.title}</span>
-                <span className="v">{a.result && !a.result.vaultValue ? (a.result.inKind ?? '—') : plain(a.value)}</span>
-                <span className="d">{a.result ? (a.result.status === 'NOT_YET' ? `تجب في ${hijriText(a.result.dueDate)}` : a.result.status === 'DUE' ? 'وجبت · تُخرج من جنسها' : a.result.headline) : a.detail}</span>
-              </div>
+              <details key={a.id} className="w-more">
+                <summary className="w-rowline">
+                  <span className="t">{a.title}</span>
+                  <span className="v">{a.result && !a.result.vaultValue ? (a.result.inKind ?? '—') : plain(a.value)}</span>
+                  <span className="d">{a.result ? (a.result.status === 'NOT_YET' ? `تجب في ${hijriText(a.result.dueDate)}` : a.result.status === 'DUE' ? 'وجبت · تُخرج من جنسها' : a.result.headline) : a.detail}</span>
+                </summary>
+                <div className="w-more-body row" style={{ gap: 8, flexWrap: 'wrap' }}>
+                  {a.kind === 'debt' && a.debt?.recovery === 'DOUBTFUL' && (
+                    <Btn className="sm" onClick={() => collectDebt(a.id)}>قبضته اليوم</Btn>
+                  )}
+                  <Btn variant="ghost" className="sm" onClick={() => removeAsset(a.id)}>حذف</Btn>
+                </div>
+              </details>
             ))}
           </div>
           {assets.some(a => a.result?.inKind) && (
@@ -486,7 +597,9 @@ export function Assets({ path }) {
       </div>
 
       {tab && <AddAsset tab={tab} setTab={setTab} onClose={() => setTab(null)}
-        onAdded={(text, id) => { setTab(null); setToast({ text, id }); }} />}
+        onAdded={(text, id) => { setTab(null); setToast({ text, id }); }}
+        onLink={p => { setTab(null); setLinking(p); }} />}
+      {linking !== undefined && <LinkInvest initial={linking} onClose={() => setLinking(undefined)} />}
       {review && <K4Review onClose={() => setReview(false)} />}
     </Shell>
   );

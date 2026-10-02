@@ -64,9 +64,56 @@ function VaultChart({ view }) {
   );
 }
 
+// ما نراه وما لا نراه: الحساب على ما ربطه المستخدم فقط، فنقول له صراحةً ما خارجه
+function Coverage({ view }) {
+  const { personaData, portfolios, assets } = useStore();
+  const first = personaData.transactions[0]?.date ?? view.start?.date;
+  const has = k => assets.some(a => a.kind === k || (k === 'gold' && a.kind === 'silver'));
+  const banks = view.accounts.length;
+  const missing = [
+    ['cash', 'نقد خارج البنوك', 'في البيت أو محفظة رقمية', '/app/assets/add/cash'],
+    ['gold', 'ذهب وفضة', 'المعد للادخار أو التجارة يُزكّى، وحلي الاستعمال لا زكاة فيه (§3.1.2)', '/app/assets/add/gold'],
+    ['debt', 'ديون لك عند الناس', 'الدين على قادر غير مماطل يُزكّى كل سنة (§3.4)', '/app/assets/add/debt'],
+    ['bank', 'بنوك أخرى', 'أي حساب غير مربوط لا يدخل الحساب', '/app/link'],
+    ['invest', 'تطبيقات التداول', 'عوائد الأصول والراجحي المالية ودراية وغيرها', '/app/assets/add/apps'],
+  ].filter(([k]) => !(k === 'invest' ? portfolios.length > 1 : k === 'bank' ? false : has(k)));
+  return (
+    <Card title="ما نراه وما لا نراه" desc="نحسب على ما ربطته أو أضفته فقط">
+      <div className="w-cover">
+        <div>
+          <span className="t12 sub b6">نراه</span>
+          <ul className="w-cover-list">
+            <li>{banks === 1 ? 'حساب بنكي واحد' : `${banks} حسابات بنكية`} · قراءة فقط عبر الخدمات المصرفية المفتوحة</li>
+            {first && <li>كشف الحساب من {gregText(first)} ({hijriText(first)})</li>}
+            {portfolios.length > 0 && <li>{portfolios.length === 1 ? 'محفظة استثمار واحدة' : `${portfolios.length} محافظ استثمار`}</li>}
+            {assets.length > 0 && <li>{assets.length === 1 ? 'أصل واحد أضفته' : `${assets.length} أصول أضفتها`}</li>}
+          </ul>
+        </div>
+        <div>
+          <span className="t12 sub b6">لا نراه، إلا إذا أضفته</span>
+          <div className="w-rows">
+            {missing.map(([k, t, d, to]) => (
+              <button key={k} className="w-rowline" style={{ width: '100%', textAlign: 'start' }} onClick={() => go(to)}>
+                <span className="t">{t}</span>
+                <span className="v w-link t13">{k === 'bank' ? 'ربط' : 'إضافة'}</span>
+                <span className="d">{d}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      {first && (
+        <p className="w-note" style={{ marginTop: 14 }}><Icon as={Info} size={14} />
+          <span>الرصيد الموجود في أول يوم من الكشف اعتبرنا حوله يبدأ من ذلك اليوم. إن كان المال عندك قبله فحوله أقدم وقد تكون زكاته وجبت أبكر. والديون التي عليك لا تُخصم من الوعاء (دليل الهيئة §3.4).</span>
+        </p>
+      )}
+    </Card>
+  );
+}
+
 // الرئيسية تجاوب على سؤال واحد: كم عليّ، ومتى؟
 export function Dashboard({ path }) {
-  const { view, vault, due, payment, historical, persona, k4, nextDue: next } = useStore();
+  const { view, vault, due, payment, historical, persona, k4, nextDue: next, unpaidDues, unpaidTotal } = useStore();
   const [review, setReview] = useState(false);
   const today = view.today;
   const k4Pending = persona === 'khalid' && !k4;
@@ -78,7 +125,7 @@ export function Dashboard({ path }) {
       desc={historical ? `من ${gregText(view.start?.date ?? today)} إلى ${gregText(today)}` : `${weekday(today)} ${gregText(today)} · ${hijriText(today)}`}>
       {k4Pending && (
         <div className="w-banner" style={{ background: 'var(--warn-soft)', border: '1px solid #EADBB8' }}>
-          <span className="grow">محفظة نماء الاستثمارية (50,000 ر.س) غير محسوبة حتى تحدد نوعها، فالنتيجة جزئية.</span>
+          <span className="grow">المحفظة الاستثمارية (50,000 ر.س) غير محسوبة حتى تحدد نوعها، فالنتيجة جزئية.</span>
           <Btn className="sm" onClick={() => setReview(true)}>تحديد النوع</Btn>
         </div>
       )}
@@ -87,17 +134,20 @@ export function Dashboard({ path }) {
           <div className="w-hero-num">
             <span className="lbl">
               {state === 'paid' ? 'أخرجت زكاتك' : state === 'due' ? 'زكاتك مستحقة اليوم' : `لا شيء مستحق ${historical ? `في ${gregText(today)}` : 'اليوم'}. القادم:`}
-              {state === 'none' && <Pill>توقّع</Pill>}
+              {state === 'none' && <Pill>{next?.advanced ? 'رمضان · تعجيل' : 'توقّع'}</Pill>}
             </span>
             <div className="w-amount"><strong>{plain(amount)}</strong><span>ر.س</span></div>
             <p className="w-quiet">
               {state === 'none' && next ? `${hijriText(next.date)} · ${gregText(next.date)} · بعد ${days(next.inDays)}، إذا بقي الرصيد كما هو` : bothDates(today)}
+              {state === 'none' && next?.advanced && <><br />تعجيل قبل موعدها ({hijriText(next.originalDate)}) بـ{days(Math.round((new Date(`${next.originalDate}T00:00:00Z`) - new Date(`${next.date}T00:00:00Z`)) / 86400000))}، ثم يصير رمضان يوم زكاتك كل سنة.</>}
             </p>
           </div>
           <p className="w-quiet" style={{ margin: '18px 0 22px', lineHeight: '24px' }}>
             الوعاء <b>{sar(vault)}</b> · النصاب {historical ? 'يومها' : 'اليوم'} <b>{sar(view.nisab)}</b>
             {state === 'due' && <> · أكمل حولًا <b>{sar(due.base)}</b></>}
-            {view.dues.length > 0 && state !== 'due' && <><br />مستحقات الفترة <b>{sar(view.totalDueInPeriod)}</b> (وجبت {times(view.dues.length)})، ولا يوجد سداد مسجل.</>}
+            {view.dues.length > 0 && state !== 'due' && (unpaidDues.length > 0
+              ? <><br />زكاة سابقة لم تسجّل سدادها <b>{sar(unpaidTotal)}</b> (وجبت {times(unpaidDues.length)}). <button className="w-link" onClick={() => go('/app/history')}>دفعتها؟ سجّلها</button></>
+              : <><br />سجّلت سداد زكاة الفترة السابقة.</>)}
           </p>
           <div className="row" style={{ gap: 20 }}>
             {state === 'paid'
@@ -113,6 +163,7 @@ export function Dashboard({ path }) {
         </Card>
         <AccountsCard view={view} vault={vault} />
       </div>
+      <Coverage view={view} />
       {review && <K4Review onClose={() => setReview(false)} />}
     </Shell>
   );
@@ -241,6 +292,32 @@ export function RecordTabs({ tab }) {
   );
 }
 
+// زكاة وجبت في الماضي: هل سجّل المستخدم سدادها؟ (دليل الهيئة §4.2: من تركها لسنوات أخرجها عن كل سنة بقيمتها يوم وجبت)
+export function PastDue({ d }) {
+  const { selfPaid, recordSelfPaid, undoSelfPaid, historical } = useStore();
+  const rec = selfPaid[d.date];
+  if (rec) {
+    return (
+      <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+        <Pill tone="ok">{rec.receipt ? 'أُخرجت عبر نماء' : 'سجّلت أنك دفعتها'}</Pill>
+        <span className="t12 sub">في {gregText(rec.on)}</span>
+        {rec.receipt
+          ? <button className="w-link t12" onClick={() => go(`/app/receipt/${d.date}`)}>الإيصال</button>
+          : <button className="w-link t12" onClick={() => undoSelfPaid(d.date)}>تراجع</button>}
+      </div>
+    );
+  }
+  return (
+    <div style={{ marginTop: 10 }}>
+      <p className="t12 sub" style={{ marginBottom: 8 }}>لا يوجد سداد مسجل. إن كنت أخرجتها بنفسك فسجّلها، وإن لم تُخرجها فهي باقية عليك بقيمتها يوم وجبت (دليل الهيئة §4.2).</p>
+      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <Btn className="sm" onClick={() => recordSelfPaid(d.date, d.zakat)}>دفعتها بنفسي</Btn>
+        {!historical && <Btn variant="primary" className="sm" onClick={() => go(`/app/payout/${d.date}`)}>إخراجها الآن</Btn>}
+      </div>
+    </div>
+  );
+}
+
 function Ev({ when, what, amt, cls = '', children }) {
   return (
     <details className="w-more">
@@ -256,7 +333,7 @@ function Ev({ when, what, amt, cls = '', children }) {
 }
 
 export function Timeline({ path }) {
-  const { view, persona, personaData, settings } = useStore();
+  const { view, persona, personaData, settings, unpaidDues, unpaidTotal } = useStore();
   const annual = settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
   const transfer = personaData.transactions.find(t => t.internal && t.direction === 'debit');
   const transfers = personaData.transactions.filter(t => t.internal).length / 2;
@@ -291,7 +368,8 @@ export function Timeline({ path }) {
     </Ev>) });
   for (const d of view.dues) items.push({ date: d.date, el: (
     <Ev key={`d-${d.date}`} cls="due" when={gregText(d.date)} what={`وجبت زكاة ${plain(d.zakat)} ر.س`} amt={plain(d.base)}>
-      {hijriText(d.date)}: {annual ? `يوم الزكاة السنوي، فزُكّي الوعاء كله ${sar(d.base)}: ما أكمل حوله، والأحدث تعجيلًا` : `أكمل ${sar(d.base)} حولًا هجريًا`}{d.assetsBase ? ` (نقد ${plain(d.cashBase)} وحصة الصندوق ${plain(d.assetsBase)})` : ''}. النصاب يومها {sar(d.nisab)}. لا يوجد سداد مسجل.
+      {hijriText(d.date)}: {annual ? `يوم الزكاة السنوي، فزُكّي الوعاء كله ${sar(d.base)}: ما أكمل حوله، والأحدث تعجيلًا` : `أكمل ${sar(d.base)} حولًا هجريًا`}{d.assetsBase ? ` (نقد ${plain(d.cashBase)} وحصة الصندوق ${plain(d.assetsBase)})` : ''}. النصاب يومها {sar(d.nisab)}.
+      {d.date !== view.today && <PastDue d={d} />}
     </Ev>) });
   items.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
   return (
@@ -299,7 +377,7 @@ export function Timeline({ path }) {
       <RecordTabs tab="timeline" />
       <p className="w-quiet" style={{ lineHeight: '26px', maxWidth: 760 }}>
         {view.dues.length
-          ? <>وجبت الزكاة <b>{times(view.dues.length)}</b> مجموعها <b>{sar(view.totalDueInPeriod)}</b>، ولا يوجد سداد مسجل. </>
+          ? <>وجبت الزكاة <b>{times(view.dues.length)}</b> مجموعها <b>{sar(view.totalDueInPeriod)}</b>، {unpaidDues.length ? <>لم يُسجَّل سداد <b>{sar(unpaidTotal)}</b> منها. </> : 'وسُجّل سدادها كلها. '}</>
           : <>لم يكتمل حول أي مبلغ في هذه الفترة. </>}
         الوعاء في آخر يوم <b>{sar(last.total)}</b>{last.total - bank > 0.005 ? ` (نقد ${plain(bank)} وأصول ${plain(last.total - bank)})` : ''}، والنصاب {plain(view.nisab)}.
       </p>

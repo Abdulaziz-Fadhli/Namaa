@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyTrade, KINDS, PROVIDERS, portfolioAssets, receiveNext, seedPortfolio, summarize, USD_SAR } from './portfolio.js';
+import { applyTrade, KINDS, parseStatement, portfolioFromStatement, PROVIDERS, portfolioAssets, receiveNext, seedPortfolio, STATEMENT_SAMPLE, summarize, USD_SAR } from './portfolio.js';
 import { calculateAssetValue } from './engine.js';
 
 const near = (a, b) => expect(Math.abs(a - b)).toBeLessThan(0.01);
@@ -117,5 +117,31 @@ describe('العمليات الواردة تلقائيًا من التطبيق',
       expect(p.name).toBe('تطبيقي');
       runAll(p);
     }
+  });
+});
+
+describe('استيراد كشف المحفظة', () => {
+  it('الإنماء للاستثمار أول القائمة', () => {
+    expect(PROVIDERS[0].id).toBe('alinma-invest');
+  });
+
+  it('النموذج: كل الأسطر صالحة، والسهم السعودي للاستثمار لا يدخل الوعاء', () => {
+    const { rows, errors } = parseStatement(STATEMENT_SAMPLE);
+    expect(errors).toEqual([]);
+    expect(rows).toHaveLength(4);
+    const p = portfolioFromStatement('محفظتي', 'brokerUS', rows, '2026-10-03');
+    const s = summarize(p);
+    expect(s.holdings.find(h => h.key === '1150').base).toBe(0);
+    near(s.base, 1200 * 10.2 + 15 * 232 * USD_SAR + 4500);
+    expect(receiveNext(p, '2026-10-03', '9:00 ص')).toBeNull();
+    near(portfolioAssets(p).reduce((x, a) => x + a.value, 0), s.base);
+    expect(portfolioAssets(p).find(a => a.id.includes(':9404:')).acquired).toBe('2026-02-15');
+  });
+
+  it('يقبل الأرقام العربية ويرفض الأسطر الخاطئة برقم السطر', () => {
+    const { rows, errors } = parseStatement('الرمز,الكمية,السعر,التاريخ\n٩٤٠٤,١٠٠,١٠٫٢,2026-02-15\nZZZZ9,5,10,2026-02-15\n9404,-1,10,2026-02-15\nنقد,500,,2026/02/15');
+    expect(rows).toEqual([{ key: '9404', units: 100, price: 10.2, date: '2026-02-15' }]);
+    expect(errors).toHaveLength(3);
+    expect(errors[0]).toContain('السطر 3');
   });
 });

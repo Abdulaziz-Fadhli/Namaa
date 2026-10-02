@@ -55,11 +55,11 @@ export const clock = d => d.toLocaleTimeString('en-US', { hour: 'numeric', minut
 export function accountInfo(a) {
   const m = ACCOUNTS[a.id] ?? { bank: a.bank, kind: '', mask: '', synced: '' };
   if (a.fund) return {
-    title: a.id === 'K4' ? 'محفظة نماء الاستثمارية' : a.product ?? `صندوق · ${m.bank}`, sub: `صندوق استثماري · يدخل بحصته الزكوية`,
+    title: a.id === 'K4' ? 'المحفظة الاستثمارية' : a.product ?? `صندوق · ${m.bank}`, sub: `صندوق استثماري · يدخل بحصته الزكوية`,
     pill: ['info', 'بحصته الزكوية'], kind: 'fund', included: false, mask: m.mask, synced: m.synced,
   };
   if (a.exempt && a.id === 'K4') return {
-    title: 'محفظة نماء الاستثمارية', sub: 'منتج استثماري قديم · نحتاج نوعه قبل حسابه',
+    title: 'المحفظة الاستثمارية', sub: 'منتج استثماري قديم · نحتاج نوعه قبل حسابه',
     pill: ['warn', 'يحتاج مراجعة'], kind: 'review', included: false, mask: m.mask, synced: m.synced,
   };
   if (a.exempt) return { title: `محفظة ${a.product}`, sub: 'منتج معفى بدليل', pill: ['', 'معفى'], kind: 'exempt', included: false, mask: m.mask, synced: m.synced };
@@ -96,7 +96,7 @@ export function personaHoldings(data, view) {
     if (h.type === 'fund') {
       const k4 = h.id === 'K4-FUND';
       return { id: h.id ?? `fund-${i}`, kind: 'fund', acquired, auto: k4 || auto, market: h.marketValue, zakatable: h.zakatableValue,
-        title: k4 ? 'محفظة نماء الاستثمارية · صندوق' : data.accounts.find(a => a.fund)?.product ?? 'صندوق',
+        title: k4 ? 'المحفظة الاستثمارية · صندوق' : data.accounts.find(a => a.fund)?.product ?? 'صندوق',
         sub: `قيمة ${plain(h.marketValue, 0)} ر.س · يدخل بحصته الزكوية`,
         source: k4 ? 'الحصة الزكوية من إفصاح الصندوق (أدخلها المستخدم)' : 'إفصاح الصندوق · افتراض سيناريو معتمد' };
     }

@@ -1,7 +1,7 @@
 // الإعدادات (المنهجية تعيد تشغيل المحرك فعليًا)، والإشعارات، وربط بنك جديد.
 import { useState } from 'react';
 import {
-  Bell, BookOpen, Building2, Check, CheckCheck, ChevronLeft, CircleCheck, FileText, Info, Landmark, LockKeyhole,
+  Bell, BookOpen, Building2, CalendarHeart, Check, CheckCheck, ChevronLeft, CircleCheck, FileText, Info, Landmark, LockKeyhole,
   Receipt, RefreshCw, Scale, Search, ShieldCheck, UserRound,
 } from 'lucide-react';
 import { Btn, Card, Icon, Modal, Option, Pill, Seg, Switch, TextInput } from '../kit.jsx';
@@ -10,15 +10,19 @@ import { Shell, SignOut } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregShort, hijriText } from '../../figma/format.js';
 import { ZATCA } from '../../engine/zatca.js';
+import { MyData, Rules } from './Rules.jsx';
 import { ACCOUNTS, BANKS, PERSONAS, linkedBanks, accountInfo, hijriFromParts, plain, sar, days } from '../data.js';
 
 const MENU = [
   ['profile', 'الملف الشخصي', UserRound],
   ['methodology', 'منهجية الحساب', Scale],
+  ['zakatday', 'يوم زكاتك', CalendarHeart],
+  ['rules', 'الأحكام ومصادرها', BookOpen],
   ['linked', 'الحسابات المرتبطة', Landmark],
+  ['data', 'بياناتك وخصوصيتك', ShieldCheck],
   ['security', 'الأمان وتسجيل الدخول', LockKeyhole],
   ['alerts', 'التنبيهات', Bell],
-  ['terms', 'الشروط والخصوصية', FileText],
+  ['terms', 'الشروط', FileText],
 ];
 
 function Methodology() {
@@ -50,7 +54,7 @@ function Methodology() {
           <p className="t12 sub" style={{ marginBottom: 12 }}>كيف يُحسب حول المبالغ التي تدخل حسابك خلال السنة</p>
           <div className="w-grid2 stack-xs">
             <Option selected={draft.acquiredMoneyMode === 'ANNUAL_ADVANCE'} onClick={() => setDraft(d => ({ ...d, acquiredMoneyMode: 'ANNUAL_ADVANCE' }))}
-              title="مرة واحدة في السنة (الافتراضي)" desc="يوم زكاة واحد، وما لم يحل حوله يُعجَّل · دليل الهيئة §3.3" />
+              title="مرة واحدة في السنة (الافتراضي)" desc="يوم زكاة واحد، وما لم يحل حوله يُعجَّل · دليل الهيئة §2.2.5.1 و§3.3" />
             <Option selected={draft.acquiredMoneyMode === 'INDEPENDENT_HAWL'} onClick={() => setDraft(d => ({ ...d, acquiredMoneyMode: 'INDEPENDENT_HAWL' }))}
               title="حول مستقل لكل مبلغ" desc="أدق، لكن مواعيد أكثر · دليل الهيئة §2.2.5.1" />
           </div>
@@ -69,6 +73,8 @@ function Methodology() {
           <div className="w-line"><span>التقويم</span><span>هجري · أم القرى</span></div>
           <div className="w-line"><span>أسعار الذهب والفضة</span><span>gold-api.com · تُحدَّث عند كل فتح</span></div>
           <div className="w-line"><span>الأسهم والصناديق الأمريكية</span><span>Finnhub · متأخرة حتى 15 دقيقة</span></div>
+          <div className="w-line"><span>أسعار المحافظ المرتبطة</span><span>من التطبيق نفسه · آخر سعر (محاكاة في العرض)</span></div>
+          <div className="w-line"><span>إذا تعذّر التحديث</span><span>آخر سعر محفوظ مع تاريخه</span></div>
         </div>
       </div>
       <div className="between" style={{ borderTop: '1px solid var(--line)', paddingTop: 16, marginTop: 8, flexWrap: 'wrap' }}>
@@ -79,6 +85,38 @@ function Methodology() {
         </div>
       </div>
       <p className="t11 muted" style={{ marginTop: 12 }}>{ZATCA.statement} {ZATCA.disclaimer}</p>
+    </Card>
+  );
+}
+
+// يوم الزكاة في رمضان: تعجيل قبل الموعد فقط (دليل الهيئة §4.2 و§5)
+function ZakatDay() {
+  const { zakatDay, setZakatDay, ramadanPlan: plan, hawlDue } = useStore();
+  if (!hawlDue || !plan) return (
+    <Card title="يوم زكاتك"><p className="w-quiet">لا يوجد وجوب قادم بعد، فلا يوجد يوم لنقله.</p></Card>
+  );
+  const ramadanDesc = {
+    ADVANCE: `تُعجّلها في ${hijriText(plan.ramadan)} قبل موعدها بـ${days(plan.daysEarly ?? 0)}، ثم يصير رمضان يوم زكاتك كل سنة`,
+    SMALL_DELAY: `موعدك آخر شعبان، فيجوز تأخيرها اليسير إلى ${hijriText(plan.ramadan)}`,
+    PAY_THEN_ADVANCE: `رمضان القادم بعد موعدك بـ${days(plan.daysLate ?? 0)}، فلا تؤخرها إليه: أخرجها في ${hijriText(plan.due)}، ثم عجّل زكاة السنة التالية في ${hijriText(plan.ramadan)}`,
+    NO_NISAB: 'التعجيل يشترط أن تملك النصاب الآن',
+  }[plan.kind];
+  return (
+    <Card title="يوم زكاتك" desc="متى تُخرج زكاتك كل سنة">
+      <div className="col" style={{ gap: 10 }}>
+        <Option selected={zakatDay !== 'ramadan'} onClick={() => setZakatDay('hawl')} icon={Scale}
+          title="يوم تمام الحول (الافتراضي)" desc={`${hijriText(hawlDue.date)} · ${gregShort(hawlDue.date)} · تُخرج فور وجوبها`} />
+        <Option selected={zakatDay === 'ramadan'} onClick={() => plan.kind !== 'NO_NISAB' && setZakatDay('ramadan')} icon={CalendarHeart}
+          title="في رمضان" desc={ramadanDesc} />
+      </div>
+      {zakatDay === 'ramadan' && plan.kind === 'PAY_THEN_ADVANCE' && (
+        <div className="w-banner" style={{ background: 'var(--warn-soft)', border: '1px solid #EADBB8', marginTop: 14 }}>
+          <span>زكاة هذه السنة تبقى في موعدها {hijriText(plan.due)}. يبدأ رمضان يومًا لزكاتك من السنة التالية بالتعجيل.</span>
+        </div>
+      )}
+      <p className="w-note" style={{ marginTop: 14 }}><Icon as={Info} size={14} />
+        <span>لا يجوز تأخير الزكاة بعد وجوبها انتظارًا لرمضان أو عشر ذي الحجة إلا يسيرًا. ومن أراد رمضان أخرجها في رمضان قبل تمام السنة فتكون معجّلة، ثم يحسب سنة جديدة من رمضان (دليل الهيئة §4.2). والتعجيل لمن يملك النصاب، ولسنتين فأقل (§5).</span>
+      </p>
     </Card>
   );
 }
@@ -165,7 +203,8 @@ function Simple({ id }) {
       <div className="col t13 sub" style={{ gap: 12 }}>
         <p>{ZATCA.statement}</p>
         <p>{ZATCA.disclaimer}</p>
-        <p>نقرأ أرصدتك وحركاتك بموافقتك عبر الخدمات المصرفية المفتوحة، ولا نشارك بياناتك مع أي طرف، ولا نحوّل أي مبلغ إلا بتأكيد منك.</p>
+        <p>نقرأ أرصدتك وحركاتك بموافقتك عبر الخدمات المصرفية المفتوحة، ولا نشارك بياناتك مع أي طرف. نماء لا يحتفظ بأموالك ولا يحوّلها؛ الإخراج من تطبيق بنكك بموافقتك أو عبر منصة «زكاتي».</p>
+        <p><button className="w-link" onClick={() => go('/app/settings/data')}>بياناتك وخصوصيتك</button></p>
       </div>
     </Card>
   );
@@ -199,7 +238,7 @@ export function SettingsPage({ path }) {
           </Card>
           <SignOut />
         </div>
-        <div>{id === 'methodology' ? <Methodology /> : id === 'linked' ? <Linked /> : <Simple id={id} />}</div>
+        <div>{{ methodology: <Methodology />, linked: <Linked />, zakatday: <ZakatDay />, rules: <Rules />, data: <MyData /> }[id] ?? <Simple id={id} />}</div>
       </div>
     </Shell>
   );
@@ -219,7 +258,7 @@ export function Notifications({ path }) {
     payment && { g: 'today', type: 'zakat', icon: CircleCheck, tone: 'ok', title: `أخرجت زكاة ${sar(payment.amount)}`, desc: `الرقم المرجعي ${payment.ref}`, time: payment.time, unread: !read, action: ['الإيصال', '/app/receipt'] },
     due.today && !payment && { g: 'today', type: 'zakat', icon: Receipt, tone: 'warn', title: `وجبت زكاة ${sar(due.zakat)}`, desc: `اكتمل حول ${plain(due.base)} ر.س دخلت حسابك قبل سنة هجرية.`, time: '9:00 ص', unread: !read, action: ['إخراج الزكاة', '/app/payout'] },
     { g: 'today', type: 'account', icon: RefreshCw, title: 'حدّثنا أرصدتك', desc: `${historical ? 'كشف' : 'مزامنة'} ${[...new Set(view.accounts.map(a => ACCOUNTS[a.id].short))].join(' و')} · الوعاء ${historical ? `كما في ${hijriText(view.today)}` : 'الآن'} ${sar(view.total)}.`, time: '9:41 ص', unread: !read },
-    persona === 'khalid' && !k4 && { g: 'today', type: 'account', icon: Info, tone: 'warn', title: 'حساب يحتاج مراجعة', desc: 'محفظة نماء الاستثمارية (50,000 ر.س) خارج الحساب حتى تحدد نوعها.', time: '9:42 ص', unread: !read, action: ['إكمال المعلومات', '/app/account/K4'] },
+    persona === 'khalid' && !k4 && { g: 'today', type: 'account', icon: Info, tone: 'warn', title: 'حساب يحتاج مراجعة', desc: 'المحفظة الاستثمارية (50,000 ر.س) خارج الحساب حتى تحدد نوعها.', time: '9:42 ص', unread: !read, action: ['إكمال المعلومات', '/app/account/K4'] },
     view.nextDue && { g: 'week', type: 'zakat', icon: Bell, title: `بعد ${days(view.nextDue.inDays)} تجب زكاة ${sar(view.nextDue.zakat)}`, desc: `في ${hijriFromParts(view.nextDue.hijri)} إذا بقي رصيدك فوق النصاب.`, time: gregShort(view.today) },
     weekAgo && { g: 'week', type: 'zakat', icon: Scale, title: `النصاب ${historical ? 'يومها' : 'اليوم'} ${sar(view.nisab)}`, desc: `595 غ فضة × ${plain(view.prices.silverPerGram, 4)} ر.س · أدنى النصابين كما في دليل الهيئة.`, time: gregShort(weekAgo.date) },
     last && { g: 'older', type: 'zakat', icon: CircleCheck, title: `وجبت زكاة ${sar(last.zakat)}`, desc: `اكتمل حول ${plain(last.base)} ر.س في ${hijriFromParts(last.hijri)}.${historical || persona === 'khalid' ? ' لا يوجد سداد مسجل.' : ''}`, time: gregShort(last.date) },

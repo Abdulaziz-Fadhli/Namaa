@@ -91,7 +91,7 @@ export function Shell({ path, title, desc, crumb, actions, children }) {
   const unread = payment || due.today ? 1 : 0;
   const p = PERSONAS[persona];
   const priceLabel = !live ? 'تحديث الأسعار' : feed.loading ? 'نحدّث الأسعار…'
-    : feed.metalsLive ? `أسعار مباشرة · ${feed.receivedAt ? clock(new Date(feed.receivedAt)) : ''}` : 'تعذّر التحديث';
+    : feed.metalsLive ? `أسعار مباشرة · ${feed.receivedAt ? clock(new Date(feed.receivedAt)) : ''}` : `تعذّر التحديث · سعر ${gregText(view.prices.date)}`;
   return (
     <div className="w-app">
       <aside className="w-side" aria-label="القائمة">
