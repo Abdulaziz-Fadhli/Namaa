@@ -9,7 +9,7 @@ import { Brand, Btn, Checkbox, Icon, NamaaMark, Option, Pill, Select, Seg, Steps
 import { go } from '../nav.js';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriMonthLength, hijriText, hijriToIso, HIJRI_MONTHS } from '../../figma/format.js';
-import { ACCOUNTS, BANKS, PERSONAS, hijriFromParts, linkedBanks, plain, sar, days } from '../data.js';
+import { ACCOUNTS, BANKS, PERSONAS, hijriFromParts, linkedBanks, plain, sar, days, times } from '../data.js';
 import { ZATCA } from '../../engine/zatca.js';
 import logo from '../../assets/namaa-logo-tight.png';
 import { PersonaCards } from './Personas.jsx';
@@ -24,7 +24,7 @@ function ZakatCard({ compact }) {
         <Pill tone="info">{historical ? `كما في ${gregText(view.today)}` : 'لا وجوب اليوم'}</Pill>
       </div>
       <div className="w-amount md"><strong>{plain(view.totalDueInPeriod)}</strong><span>ر.س</span></div>
-      <p className="t12 muted" style={{ marginBottom: compact ? 0 : 12 }}>{view.dues.length} أحداث وجوب محسوبة من الكشف · لا يوجد سداد مسجل</p>
+      <p className="t12 muted" style={{ marginBottom: compact ? 0 : 12 }}>وجبت {times(view.dues.length)} حسب الكشف · لا يوجد سداد مسجل</p>
       {!compact && (
         <div className="w-divide">
           <div className="w-line"><span>الوعاء في آخر يوم</span><span>{sar(view.total)}</span></div>
@@ -57,7 +57,7 @@ function ZakatCard({ compact }) {
 
 const FAQ = [
   ['هل يستطيع نماء تحويل أموالي؟', 'لا. الربط بصلاحية قراءة فقط، وأي إخراج للزكاة لا يتم إلا بتأكيد منك.'],
-  ['كيف تحسبون الحول إذا كان دخلي يتغير كل شهر؟', 'لكل مبلغ يدخل حسابك حوله المستقل من يوم دخوله، كما في دليل هيئة الزكاة (§2.2.5.1). ولك أن تختار يومًا واحدًا في السنة تزكّي فيه كل المال، فيُعجَّل ما لم يحل حوله (§3.3).'],
+  ['كيف تحسبون الحول إذا كان دخلي يتغير كل شهر؟', 'تزكي مرة واحدة في السنة: يوم زكاتك هو ذكرى أول يوم بلغ فيه مالك النصاب، وفيه تزكي كل ما عندك، فيُعجَّل ما لم يحل حوله (دليل الهيئة §3.3). وإن أردت حولًا مستقلًا لكل مبلغ (§2.2.5.1) فاختره من الإعدادات.'],
   ['هل أزكي على أسهم الشركات السعودية؟', 'إن كنت مستثمرًا فلا، لأن هيئة الزكاة تجبي زكاة الشركات المساهمة في المملكة، فيكفيك إخراج الشركة عنك (§3.6). أما المضارب فيزكي القيمة السوقية.'],
   ['هل يحسب نماء زكاة المواشي والمحاصيل؟', 'نعم. الإبل والبقر والغنم بجداول الهيئة، والحبوب والثمار بنصاب خمسة أوسق، وزكاتها من جنسها وتُدفع عبر بوابة الهيئة.'],
   ['ماذا لو لم أتذكر تاريخ آخر زكاة أخرجتها؟', 'نبدأ الحساب من أول يوم بلغ فيه مالك النصاب حسب كشف حساباتك.'],
@@ -92,8 +92,8 @@ export function Landing() {
         <div className="w-wrap">
           <div>
             <Pill tone="info">لعملاء البنوك في السعودية</Pill>
-            <h1 style={{ marginTop: 14 }}>زكاة أموالك محسوبة بدقة،<br />كل مبلغ في حوله</h1>
-            <p className="lead">نماء يقرأ حساباتك البنكية بصلاحية قراءة فقط، ويتابع حول كل مبلغ من يوم دخوله حسابك، ثم يخبرك متى تجب الزكاة وكم مقدارها بالهللة.</p>
+            <h1 style={{ marginTop: 14 }}>زكاة أموالك محسوبة بدقة،<br />مرة واحدة في السنة</h1>
+            <p className="lead">نماء يقرأ حساباتك البنكية بصلاحية قراءة فقط، ويعرف متى بدأ حول مالك، ثم يحدد لك يوم زكاة واحدًا في السنة ويخبرك بمقدارها بالهللة.</p>
             <div className="row" style={{ gap: 12 }}>
               <Btn variant="primary" className="lg" onClick={() => go('/register')}>ابدأ مجانًا</Btn>
               <Btn className="lg" onClick={() => document.getElementById('personas')?.scrollIntoView({ behavior: 'smooth' })}>شاهد كيف يعمل</Btn>
@@ -134,7 +134,7 @@ export function Landing() {
           <div className="w-grid3">
             {[['ربط حساباتك', 'عبر الخدمات المصرفية المفتوحة بموافقة قراءة فقط لمدة 12 شهرًا، وتلغيها متى شئت.'],
               ['أضف ما خارج البنوك', 'الذهب والفضة والأسهم والصناديق والنقد والعقار المعد للبيع والمواشي والمحاصيل، بتاريخ تملك كل أصل.'],
-              ['اعرف موعدك ومقدارك', 'نحسب حول كل مبلغ على حدة، وننبهك قبل الوجوب بثلاثين يومًا ثم بسبعة أيام.']].map(([t, d], i) => (
+              ['اعرف موعدك ومقدارك', 'نحدد يوم زكاتك في السنة ونحسب مقدارها، وننبهك قبله بثلاثين يومًا ثم بسبعة أيام.']].map(([t, d], i) => (
               <div key={t} className="w-feature" style={{ background: 'var(--bg)', border: 0 }}>
                 <span className="w-step-n">{i + 1}</span><h3>{t}</h3><p>{d}</p>
               </div>
@@ -149,7 +149,7 @@ export function Landing() {
           <h2>مصمم لطريقة دخلك الحقيقية</h2>
           <div className="w-grid3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
             {[[Scale, 'النصاب بسعر اليوم', `نحدّث النصاب يوميًا بأدنى النصابين: 85 غرام ذهب أو 595 غرام فضة.`, `نصاب اليوم ${sar(view.nisab)}`],
-              [CalendarDays, 'حول مستقل لكل مبلغ', 'الراتب الذي دخل حسابك في شوال لا يُزكّى مع مبلغ دخل في رمضان. لكل مبلغ تاريخه وحوله.', view.due ? `${sar(view.due.base)} أكملت حولها اليوم` : `${view.dues.length} أحداث وجوب في سجل ${view.name}`],
+              [CalendarDays, 'يوم واحد في السنة', 'نعرف من كشف حساباتك متى بلغ مالك النصاب، فيصير يوم زكاتك. فيه تزكي كل مالك، والمال الأحدث يُعجَّل معه (دليل الهيئة §3.3).', view.due ? `${sar(view.due.base)} أكملت حولها اليوم` : `وجبت ${times(view.dues.length)} في سجل ${view.name}`],
               [Layers3, 'الأسهم والذهب والمواشي', 'نعرف إن كانت الشركة تزكي عنك، ونحسب الذهب والفضة بسعر السوق، والأنعام والزروع بجداول الهيئة.', 'سهم الراجحي للمستثمر: الشركة تزكي عنه'],
               [FileText, 'إخراج وإيصال موثّق', 'أخرج زكاتك لجهة مرخّصة من حسابك، واحتفظ بإيصال فيه الرقم المرجعي والتاريخ.', 'المرجع NM-261003-4236']].map(([ic, t, d, tag]) => (
               <div key={t} className="w-feature">
@@ -166,7 +166,7 @@ export function Landing() {
           <div>
             <p className="w-eyebrow" style={{ color: '#9DB3C4' }}>المنهجية</p>
             <h2 style={{ marginBottom: 16 }}>منهجية واضحة تقدر تراجعها بنفسك</h2>
-            <p style={{ color: '#DCE5EC', lineHeight: '28px' }}>{ZATCA.statement} نحسب حول كل مبلغ من يوم تملكه، ونعرض لك طريقة الحساب سطرًا بسطر: كم في الوعاء، وكم أكمل حوله، وكيف خرج المبلغ.</p>
+            <p style={{ color: '#DCE5EC', lineHeight: '28px' }}>{ZATCA.statement} نحدد يوم زكاتك السنوي من كشف حساباتك، ونعرض لك طريقة الحساب سطرًا بسطر: كم في الوعاء، وكم أكمل حوله، وكيف خرج المبلغ.</p>
             <p className="t12" style={{ color: '#9DB3C4', marginTop: 12 }}>{ZATCA.disclaimer}</p>
           </div>
           <div className="col" style={{ gap: 12 }}>
@@ -209,7 +209,7 @@ export function Landing() {
       <footer className="w-footer">
         <div className="w-wrap">
           <div className="cols">
-            <div><div className="w-brand" style={{ marginBottom: 12 }}><img src={logo} alt="نماء" /></div><p>حاسبة زكاة تقرأ حساباتك البنكية وتتابع حول كل مبلغ، وتخبرك متى تجب الزكاة وكم مقدارها.</p></div>
+            <div><div className="w-brand" style={{ marginBottom: 12 }}><img src={logo} alt="نماء" /></div><p>حاسبة زكاة تقرأ حساباتك البنكية، وتحدد لك يوم زكاتك في السنة وكم مقدارها.</p></div>
             <div><h4>المنتج</h4><a href="#features">المزايا</a><a href="#how">كيف يعمل</a><a href="#method">المنهجية</a><a href="#faq">الأسئلة الشائعة</a></div>
             <div><h4>الدعم</h4><a href="#faq">مركز المساعدة</a><a href="#/app/notifications">الدعم داخل التطبيق</a></div>
             <div><h4>قانوني</h4><a href="#/app/settings/terms">الشروط والأحكام</a><a href="#/app/settings/terms">سياسة الخصوصية</a></div>
@@ -233,11 +233,11 @@ function AuthLayout({ title, lead, children, side }) {
         </div>
       </div>
       <aside className="w-auth-side">
-        <div><h2>زكاتك بالهللة، وفي موعدها</h2><p>سجّل دخولك وتابع حول كل مبلغ في حساباتك، ومتى تجب زكاته.</p></div>
+        <div><h2>زكاتك بالهللة، وفي موعدها</h2><p>سجّل دخولك واعرف يوم زكاتك في السنة وكم مقدارها.</p></div>
         <ZakatCard compact />
         <ul>
           <li><Icon as={CircleCheck} size={16} />صلاحية قراءة فقط عبر الخدمات المصرفية المفتوحة</li>
-          <li><Icon as={CircleCheck} size={16} />حول مستقل لكل مبلغ وفق دليل هيئة الزكاة</li>
+          <li><Icon as={CircleCheck} size={16} />يوم زكاة واحد في السنة وفق دليل هيئة الزكاة</li>
           <li><Icon as={CircleCheck} size={16} />تنبيه قبل الوجوب بـ 30 و7 أيام</li>
         </ul>
       </aside>
@@ -423,7 +423,7 @@ export function OnboardSync() {
   const steps = [
     ...view.accounts.map((a, i, all) => [`${ACCOUNTS[a.id].bank} · ${ACCOUNTS[a.id].kind}`, `${personaData.transactions.filter(t => t.accountId === a.id).length.toLocaleString('en-US')} حركة`, Math.round(((i + 1) / all.length) * 60)]),
     ['حساب الوعاء والنصاب لكل يوم', `من ${hijriText(view.start?.date ?? view.today)} إلى اليوم`, 85],
-    ['تحديد حول كل مبلغ والمواعيد القادمة', 'بمحرك نماء', 100],
+    ['تحديد يوم زكاتك في السنة', 'بمحرك نماء', 100],
   ];
   return (
     <Flow step={2}>

@@ -5,7 +5,7 @@ import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriText, hijriToIso, money } from '../../figma/format.js';
-import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, kFmt, monthName, plain, sar, weekday, days } from '../data.js';
+import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, kFmt, monthName, plain, sar, weekday, days, times } from '../data.js';
 import { AHMAD_V2 } from '../../engine/ahmad-v2.js';
 import { markOf, summarize } from '../../engine/portfolio.js';
 import { K4Review } from './Assets.jsx';
@@ -97,7 +97,7 @@ export function Dashboard({ path }) {
           <p className="w-quiet" style={{ margin: '18px 0 22px', lineHeight: '24px' }}>
             الوعاء <b>{sar(vault)}</b> · النصاب {historical ? 'يومها' : 'اليوم'} <b>{sar(view.nisab)}</b>
             {state === 'due' && <> · أكمل حولًا <b>{sar(due.base)}</b></>}
-            {view.dues.length > 0 && state !== 'due' && <><br />مستحقات الفترة <b>{sar(view.totalDueInPeriod)}</b> في {view.dues.length} {view.dues.length > 2 && view.dues.length < 11 ? 'أحداث' : 'حدثًا'}، ولا يوجد سداد مسجل.</>}
+            {view.dues.length > 0 && state !== 'due' && <><br />مستحقات الفترة <b>{sar(view.totalDueInPeriod)}</b> (وجبت {times(view.dues.length)})، ولا يوجد سداد مسجل.</>}
           </p>
           <div className="row" style={{ gap: 20 }}>
             {state === 'paid'
@@ -152,7 +152,7 @@ export function Explain({ path }) {
             <StepRow n="1" title="إجمالي الوعاء الزكوي" desc={`الحسابات والأصول المضافة، بعد استبعاد المعفى`} value={plain(vault)} />
             <StepRow n="2" title="مقارنة بالنصاب" desc={`الوعاء ${vault >= view.nisab ? 'أعلى من' : 'أقل من'} النصاب (${plain(view.nisab)} ر.س)${vault >= view.nisab ? '، فالزكاة واجبة' : ''}`}
               value={vault >= view.nisab ? 'تجاوز النصاب' : 'دون النصاب'} tone={vault >= view.nisab ? 'ok' : 'dim'} />
-            <StepRow n="3" title="مبالغ لم يكمل حولها بعد" desc="لكل مبلغ حول مستقل من يوم دخوله إلى حسابك" value={`(${plain(newer)})`} tone="dim" />
+            <StepRow n="3" title="مبالغ لم يكمل حولها بعد" desc="تُزكّى معها تعجيلًا إذا اخترت مرة واحدة في السنة" value={`(${plain(newer)})`} tone="dim" />
             <StepRow n="4" title="مبالغ أكملت حولًا هجريًا اليوم" desc={`دخلت حسابك ${startIso ? hijriText(startIso) : ''}، ولم تُصرف`} value={plain(due.base)} />
             <StepRow n="5" title="نسبة الزكاة" desc="ربع العشر" value="2.5٪ ×" />
           </div>
@@ -256,7 +256,8 @@ function Ev({ when, what, amt, cls = '', children }) {
 }
 
 export function Timeline({ path }) {
-  const { view, persona, personaData } = useStore();
+  const { view, persona, personaData, settings } = useStore();
+  const annual = settings.acquiredMoneyMode === 'ANNUAL_ADVANCE';
   const transfer = personaData.transactions.find(t => t.internal && t.direction === 'debit');
   const transfers = personaData.transactions.filter(t => t.internal).length / 2;
   const holdings = personaData.holdings ?? [];
@@ -290,7 +291,7 @@ export function Timeline({ path }) {
     </Ev>) });
   for (const d of view.dues) items.push({ date: d.date, el: (
     <Ev key={`d-${d.date}`} cls="due" when={gregText(d.date)} what={`وجبت زكاة ${plain(d.zakat)} ر.س`} amt={plain(d.base)}>
-      {hijriText(d.date)}: أكمل {sar(d.base)} حولًا هجريًا{d.assetsBase ? ` (نقد ${plain(d.cashBase)} وحصة الصندوق ${plain(d.assetsBase)})` : ''}. النصاب يومها {sar(d.nisab)}. لا يوجد سداد مسجل.
+      {hijriText(d.date)}: {annual ? `يوم الزكاة السنوي، فزُكّي الوعاء كله ${sar(d.base)}: ما أكمل حوله، والأحدث تعجيلًا` : `أكمل ${sar(d.base)} حولًا هجريًا`}{d.assetsBase ? ` (نقد ${plain(d.cashBase)} وحصة الصندوق ${plain(d.assetsBase)})` : ''}. النصاب يومها {sar(d.nisab)}. لا يوجد سداد مسجل.
     </Ev>) });
   items.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
   return (
@@ -298,7 +299,7 @@ export function Timeline({ path }) {
       <RecordTabs tab="timeline" />
       <p className="w-quiet" style={{ lineHeight: '26px', maxWidth: 760 }}>
         {view.dues.length
-          ? <>وجبت الزكاة <b>{view.dues.length} {view.dues.length > 2 && view.dues.length < 11 ? 'مرات' : 'مرة'}</b> مجموعها <b>{sar(view.totalDueInPeriod)}</b>، ولا يوجد سداد مسجل. </>
+          ? <>وجبت الزكاة <b>{times(view.dues.length)}</b> مجموعها <b>{sar(view.totalDueInPeriod)}</b>، ولا يوجد سداد مسجل. </>
           : <>لم يكتمل حول أي مبلغ في هذه الفترة. </>}
         الوعاء في آخر يوم <b>{sar(last.total)}</b>{last.total - bank > 0.005 ? ` (نقد ${plain(bank)} وأصول ${plain(last.total - bank)})` : ''}، والنصاب {plain(view.nisab)}.
       </p>

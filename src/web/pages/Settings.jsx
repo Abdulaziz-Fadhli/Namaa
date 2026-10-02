@@ -49,10 +49,10 @@ function Methodology() {
           <h3 className="t15 b7">حول المال المستفاد</h3>
           <p className="t12 sub" style={{ marginBottom: 12 }}>كيف يُحسب حول المبالغ التي تدخل حسابك خلال السنة</p>
           <div className="w-grid2 stack-xs">
-            <Option selected={draft.acquiredMoneyMode === 'INDEPENDENT_HAWL'} onClick={() => setDraft(d => ({ ...d, acquiredMoneyMode: 'INDEPENDENT_HAWL' }))}
-              title="حول مستقل لكل مبلغ" desc="من يوم دخوله · دليل هيئة الزكاة §2.2.5.1" />
             <Option selected={draft.acquiredMoneyMode === 'ANNUAL_ADVANCE'} onClick={() => setDraft(d => ({ ...d, acquiredMoneyMode: 'ANNUAL_ADVANCE' }))}
-              title="يوم واحد في السنة لكل المال" desc="ما لم يحل حوله يُعجَّل · دليل الهيئة §3.3" />
+              title="مرة واحدة في السنة (الافتراضي)" desc="يوم زكاة واحد، وما لم يحل حوله يُعجَّل · دليل الهيئة §3.3" />
+            <Option selected={draft.acquiredMoneyMode === 'INDEPENDENT_HAWL'} onClick={() => setDraft(d => ({ ...d, acquiredMoneyMode: 'INDEPENDENT_HAWL' }))}
+              title="حول مستقل لكل مبلغ" desc="أدق، لكن مواعيد أكثر · دليل الهيئة §2.2.5.1" />
           </div>
         </div>
         <div style={{ padding: '20px 0' }}>
@@ -321,7 +321,7 @@ export function LinkBank({ inline }) {
           <div className="col" style={{ alignItems: 'center', textAlign: 'center', gap: 8, paddingTop: 12 }}>
             <span className="w-ico ok" style={{ width: 52, height: 52, borderRadius: 99 }}><Icon as={Check} size={24} /></span>
             <h2 className="b7" style={{ fontSize: 20 }}>تمت الموافقة على ربط {bank}</h2>
-            <p className="t13 sub">نقرأ حركات آخر 24 شهرًا الآن، ثم نضيف رصيده لوعائك ونحسب حول كل مبلغ فيه. نرسل لك إشعارًا عند الانتهاء.</p>
+            <p className="t13 sub">نقرأ حركات آخر 24 شهرًا الآن، ثم نضيف رصيده لوعائك ويدخل في زكاتك السنوية. نرسل لك إشعارًا عند الانتهاء.</p>
           </div>
         </Modal>
       )}
