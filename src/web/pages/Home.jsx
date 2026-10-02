@@ -1,5 +1,5 @@
 // الرئيسية وصفحة «كيف حُسبت زكاتك». كل رقم من المحرك: buildView (الوعاء والنصاب والوجوب والمواعيد) + أصول المستخدم.
-import { ArrowLeft, CalendarCheck2, ChevronLeft, CircleMinus, Clock3, Download, Info } from 'lucide-react';
+import { ArrowLeft, CalendarCheck2, ChevronLeft, CircleMinus, Clock3, Download, HandCoins, Info, ReceiptText } from 'lucide-react';
 import { Btn, Card, CompanyMark, Icon, Pill } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
@@ -136,6 +136,31 @@ function Coverage({ view }) {
   );
 }
 
+// زر «إخراج الزكاة» الكبير في الرئيسية: ظاهر دائمًا، ويذهب لما يجب إخراجه الآن
+// مستحقة اليوم ← إخراجها · زكاة سابقة لم تُخرج ← أقدمها بقيمتها يوم وجبت (§4.2) · أُخرجت ← الإيصال · لا شيء ← صفحة الإخراج تشرح ذلك
+function PayCta({ state, due, payment, unpaidDues, unpaidTotal, next }) {
+  const oldest = [...unpaidDues].sort((a, b) => (a.date < b.date ? -1 : 1))[0];
+  const [to, title, sub, tone] = state === 'paid'
+    ? ['/app/receipt', 'عرض إيصال الإخراج', `أخرجت ${sar(payment.amount)}`, 'done']
+    : state === 'due'
+      ? ['/app/payout', 'إخراج الزكاة الآن', `${sar(due.zakat)} مستحقة اليوم`, 'due']
+      : oldest
+        ? unpaidDues.length > 1
+          ? ['/app/payout', 'إخراج الزكاة', `زكوات متأخرة ${sar(unpaidTotal)} · منذ ${gregText(oldest.date)}`, 'due']
+          : [`/app/payout/${oldest.date}`, 'إخراج الزكاة', `زكاة متأخرة ${sar(oldest.zakat)} · وجبت ${gregText(oldest.date)}`, 'due']
+        : ['/app/payout', 'إخراج الزكاة', next ? `لا شيء مستحق اليوم · القادم ${gregText(next.date)}` : 'لا شيء مستحق اليوم', 'calm'];
+  return (
+    <button type="button" className={`w-paycta ${tone}`} onClick={() => go(to)}>
+      <span className="ic"><Icon as={state === 'paid' ? ReceiptText : HandCoins} size={24} /></span>
+      <span className="grow">
+        <span className="t">{title}</span>
+        <span className="s">{sub}</span>
+      </span>
+      <Icon as={ArrowLeft} size={22} />
+    </button>
+  );
+}
+
 // الرئيسية تجاوب على سؤال واحد: كم عليّ، ومتى؟
 export function Dashboard({ path }) {
   const { view, vault, due, payment, historical, persona, k4, nextDue: next, unpaidDues, unpaidTotal } = useStore();
@@ -174,13 +199,10 @@ export function Dashboard({ path }) {
               ? <><br />زكاة سابقة لم تسجّل سدادها <b>{sar(unpaidTotal)}</b> (وجبت {times(unpaidDues.length)}). <button className="w-link" onClick={() => go('/app/history')}>دفعتها؟ سجّلها</button></>
               : <><br />سجّلت سداد زكاة الفترة السابقة.</>)}
           </p>
-          <div className="row" style={{ gap: 20 }}>
-            {state === 'paid'
-              ? <Btn variant="primary" onClick={() => go('/app/receipt')}>عرض الإيصال</Btn>
-              : state === 'due'
-                ? <Btn variant="primary" onClick={() => go('/app/payout')}>إخراج الزكاة</Btn>
-                : <Btn variant="primary" onClick={() => go('/app/timeline')}>افتح السجل</Btn>}
+          <PayCta state={state} due={due} payment={payment} unpaidDues={unpaidDues} unpaidTotal={unpaidTotal} next={next} />
+          <div className="row" style={{ gap: 20, marginTop: 14, justifyContent: 'center' }}>
             <button className="w-link t13" onClick={() => go('/app/explain')}>كيف حُسبت؟</button>
+            <button className="w-link t13" onClick={() => go('/app/timeline')}>افتح السجل</button>
           </div>
           {due.inKind.length > 0 && (
             <p className="w-note" style={{ marginTop: 16 }}>وزكاة من جنس المال: {due.inKind.map(a => `${a.result.inKind} عن ${a.short}`).join('، ')}. تُدفع عبر بوابة هيئة الزكاة.</p>

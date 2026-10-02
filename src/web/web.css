@@ -480,3 +480,16 @@ details.w-more .w-more-body { font-size: 13px; line-height: 21px; color: var(--s
 .w-ask input { flex: 1; min-width: 0; height: 46px; border: 1px solid var(--line-2); border-radius: var(--r); padding: 0 14px; font: inherit; font-size: 14px; background: var(--surface); }
 .w-ask input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
 @media (max-width: 760px) { .w-chat { padding: 16px; max-height: calc(100vh - 420px); } .w-chips, .w-ask { padding-inline: 16px; } }
+
+/* زر «إخراج الزكاة» الكبير في الرئيسية */
+.w-paycta { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; padding: 14px 18px; border-radius: 12px; background: var(--primary); color: #fff; text-align: start; box-shadow: 0 6px 18px rgba(0, 33, 52, .18); transition: background .15s, transform .15s; }
+.w-paycta:hover { background: #0B3350; transform: translateY(-1px); }
+.w-paycta .ic { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(255, 255, 255, .12); color: #E9C46A; flex: none; }
+.w-paycta .t { display: block; font-size: 19px; font-weight: 700; line-height: 28px; }
+.w-paycta .s { display: block; font-size: 13px; line-height: 20px; color: rgba(255, 255, 255, .78); }
+.w-paycta > svg:last-child { flex: none; opacity: .9; }
+.w-paycta.calm { background: var(--primary); }
+.w-paycta.done { background: var(--ok); box-shadow: 0 6px 18px rgba(46, 107, 69, .18); }
+.w-paycta.done:hover { background: #255A39; }
+.w-paycta.done .ic { color: #fff; }
+@media (max-width: 640px) { .w-paycta .t { font-size: 17px; } .w-paycta { min-height: 66px; padding: 12px 14px; } }
