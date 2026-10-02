@@ -5,12 +5,14 @@ import {
   ArrowLeft, ArrowLeftRight, Building2, CalendarClock, CalendarX2, Check, CircleAlert, CircleCheck, Flag, Gem, HelpCircle, Landmark,
   Calculator, LoaderCircle, PieChart, Plus, Quote, RefreshCw, ShieldCheck, Sparkles, TriangleAlert, Wallet, X,
 } from 'lucide-react';
-import { Brand, Btn, Card, Checkbox, Icon, Modal, NumberInput, Pill, Steps, TextInput } from '../kit.jsx';
+import { Brand, Btn, Card, Checkbox, CompanyMark, Icon, Modal, NumberInput, Pill, Steps, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { useStore } from '../../figma/model.js';
 import { gregText } from '../../figma/format.js';
 import { ACCOUNTS, PERSONAS, accountInfo, bothDates, clock, hijriFromParts, personaHoldings, plain, sar, days } from '../data.js';
 import { AddAsset, K4Review } from './Assets.jsx';
+import { LinkInvest } from './Invest.jsx';
+import { PROVIDERS, markOf, summarize } from '../../engine/portfolio.js';
 
 // ---------- بطاقات اختيار الشخصية (الصفحة الرئيسية وصفحة /personas) ----------
 const STORY = {
@@ -366,7 +368,7 @@ export function KhalidAccounts() {
       {!k4 && (
         <div className="w-banner" style={{ background: 'var(--warn-bg)', border: '1px solid #F3E2B8' }}>
           <Icon as={TriangleAlert} />
-          <span className="t13"><b>محفظة نماء الاستثمارية</b> لا نعتبرها معفاة من اسمها. حدّد نوعها الآن أو لاحقًا؛ حتى ذلك تبقى النتيجة جزئية.</span>
+          <span className="t13"><b>المحفظة الاستثمارية</b> لا نعتبرها معفاة من اسمها. حدّد نوعها الآن أو لاحقًا؛ حتى ذلك تبقى النتيجة جزئية.</span>
           <Btn className="sm" onClick={() => setReview(true)}>تحديد النوع</Btn>
         </div>
       )}
@@ -387,8 +389,9 @@ export function KhalidAccounts() {
 }
 
 export function KhalidAssets() {
-  const { view, personaData, confirmed, confirmHolding, assets, removeAsset } = useStore();
+  const { view, personaData, confirmed, confirmHolding, assets, removeAsset, portfolios } = useStore();
   const [tab, setTab] = useState(null);
+  const [linking, setLinking] = useState(undefined);
   const [toast, setToast] = useState(null);
   const holdings = personaHoldings(personaData, view).filter(h => h.id !== 'K4-FUND');
   const all = holdings.every(h => confirmed[h.id]);
@@ -424,10 +427,32 @@ export function KhalidAssets() {
           <span className="v">{sar(a.value)}</span>
         </div>
       ))}
+      <div className="w-card col" style={{ gap: 12 }}>
+        <div>
+          <b style={{ display: 'block' }}>عندك تطبيق تداول؟</b>
+          <span className="t13 sub">اربط محفظتك من عوائد الأصول أو الراجحي المالية أو دراية أو غيرها ({PROVIDERS.length} تطبيقًا)، وتتحدث زكاتك مع كل صفقة. الأسهم السعودية تزكيها الشركات فلا تدخل الحساب.</span>
+        </div>
+        {portfolios.map(p => (
+          <div key={p.id} className="w-list-row" style={{ padding: 0 }}>
+            <CompanyMark mark={markOf(p)} size={32} />
+            <span className="grow"><span className="t" style={{ display: 'block' }}>{p.name}</span><span className="d">مرتبط · يدخل حساب الزكاة {sar(summarize(p).base)}</span></span>
+          </div>
+        ))}
+        <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+          {['awaed', 'alinma-invest', 'rajhi-capital', 'derayah'].map(id => PROVIDERS.find(x => x.id === id)).filter(p => !portfolios.some(x => x.id === p.id)).map(p => (
+            <button key={p.id} className="w-prov" style={{ width: 'auto', paddingInlineEnd: 14 }} onClick={() => setLinking(p)}>
+              <CompanyMark mark={markOf(p)} size={28} /><span className="n">{p.name}</span>
+            </button>
+          ))}
+          <Btn className="sm" onClick={() => setTab('apps')}>كل التطبيقات</Btn>
+        </div>
+      </div>
       <Btn icon={Plus} onClick={() => setTab('gold')}>إضافة أصل خارج البنوك</Btn>
       {!all && <p className="w-help warn">أكّد الأصلين للمتابعة.</p>}
       <div className="between"><Btn onClick={() => go('/khalid/accounts')}>رجوع</Btn><Btn variant="primary" className="lg" disabled={!all} onClick={() => go('/khalid/prices')}>متابعة إلى الأسعار</Btn></div>
-      {tab && <AddAsset tab={tab} setTab={setTab} onClose={() => setTab(null)} onAdded={(text, id) => { setTab(null); setToast({ text, id }); }} />}
+      {tab && <AddAsset tab={tab} setTab={setTab} onClose={() => setTab(null)} onAdded={(text, id) => { setTab(null); setToast({ text, id }); }}
+        onLink={p => { setTab(null); setLinking(p); }} />}
+      {linking !== undefined && <LinkInvest initial={linking} onClose={() => setLinking(undefined)} />}
     </KFlow>
   );
 }
@@ -509,7 +534,7 @@ export function KhalidSync() {
             <div className="w-kpi"><span className="t12 sub">المستحق الآن</span><strong>{sar(due.zakat)}</strong><span className="t11 muted">{due.today ? 'وجبت اليوم' : `لا وجوب في ${gregText(view.today)}`}</span></div>
             <div className="w-kpi"><span className="t12 sub">القادم · توقّع</span><strong>{next ? sar(next.zakat) : '—'}</strong><span className="t11 muted">{next ? `${gregText(next.date)} · بعد ${days(next.inDays)}` : ''}</span></div>
             <div className="w-kpi"><span className="t12 sub">لم يحل حوله بعد</span><strong>{sar(vault)}</strong><span className="t11 muted">الوعاء كاملًا · فوق النصاب {plain(view.nisab)}</span></div>
-            <div className="w-kpi"><span className="t12 sub">يحتاج معلومات</span><strong>{k4 ? 'لا شيء' : 'حساب واحد'}</strong><span className="t11 muted">{k4 ? 'كل الحسابات محسوبة' : 'محفظة نماء الاستثمارية · 50,000'}</span></div>
+            <div className="w-kpi"><span className="t12 sub">يحتاج معلومات</span><strong>{k4 ? 'لا شيء' : 'حساب واحد'}</strong><span className="t11 muted">{k4 ? 'كل الحسابات محسوبة' : 'المحفظة الاستثمارية · 50,000'}</span></div>
           </div>
           <div className="w-soft row" style={{ gap: 10, padding: '14px 16px', alignItems: 'flex-start' }}>
             <Icon as={Quote} className="muted" /><b>«ربطت حساباتي وأصولي، ونماء عرف المستحق والقادم»</b>

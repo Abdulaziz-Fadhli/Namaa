@@ -57,12 +57,14 @@ function ZakatCard({ compact }) {
 }
 
 const FAQ = [
-  ['هل يستطيع نماء تحويل أموالي؟', 'لا. الربط بصلاحية قراءة فقط، وأي إخراج للزكاة لا يتم إلا بتأكيد منك.'],
+  ['هل يستطيع نماء تحويل أموالي؟', 'لا. الربط قراءة فقط، ونماء لا يحتفظ بأموالك ولا يحوّلها: تُخرج زكاتك من تطبيق بنكك بموافقتك، أو عبر منصة «زكاتي» من هيئة الزكاة (دليل الهيئة §4.1)، وبنيتك أنت (§4).'],
+  ['هل أقدر أخرج زكاتي في رمضان؟', 'نعم بالتعجيل لا بالتأخير: لا يجوز تأخيرها بعد وجوبها انتظارًا لرمضان إلا يسيرًا، ومن أراد رمضان أخرجها فيه قبل تمام السنة ثم صار رمضان يوم زكاته (دليل الهيئة §4.2). نماء يحسب لك هل رمضان القادم قبل موعدك أو بعده.'],
+  ['ماذا عن المال الذي لا يراه نماء؟', 'نحسب على ما ربطته أو أضفته فقط، ونقول لك ذلك صراحةً في الرئيسية: النقد في البيت، والذهب، والديون التي لك، والبنوك والمحافظ غير المربوطة تضيفها في دقيقة. والديون التي عليك لا تُخصم من الوعاء (§3.4).'],
   ['كيف تحسبون الحول إذا كان دخلي يتغير كل شهر؟', 'تزكي مرة واحدة في السنة: يوم زكاتك هو ذكرى أول يوم بلغ فيه مالك النصاب، وفيه تزكي كل ما عندك، فيُعجَّل ما لم يحل حوله (دليل الهيئة §3.3). وإن أردت حولًا مستقلًا لكل مبلغ (§2.2.5.1) فاختره من الإعدادات.'],
   ['هل أزكي على أسهم الشركات السعودية؟', 'إن كنت مستثمرًا فلا، لأن هيئة الزكاة تجبي زكاة الشركات المساهمة في المملكة، فيكفيك إخراج الشركة عنك (§3.6). أما المضارب فيزكي القيمة السوقية.'],
   ['هل يحسب نماء زكاة المواشي والمحاصيل؟', 'نعم. الإبل والبقر والغنم بجداول الهيئة، والحبوب والثمار بنصاب خمسة أوسق، وزكاتها من جنسها وتُدفع عبر بوابة الهيئة.'],
   ['ماذا لو لم أتذكر تاريخ آخر زكاة أخرجتها؟', 'نبدأ الحساب من أول يوم بلغ فيه مالك النصاب حسب كشف حساباتك.'],
-  ['هل الخدمة مجانية؟', 'نعم، الحساب والتذكير مجانيان، ولا رسوم على إخراج الزكاة.'],
+  ['هل الخدمة مجانية؟', 'نعم للعميل: الحساب والتذكير مجانيان، ولا رسوم على إخراج الزكاة. ويقدمها البنك لعملائه داخل تطبيقه.'],
 ];
 
 export function Landing() {
@@ -79,6 +81,7 @@ export function Landing() {
             <a href="#personas" onClick={e => { e.preventDefault(); document.getElementById('personas')?.scrollIntoView({ behavior: 'smooth' }); }}>الشخصيات</a>
             <a href="#how" onClick={e => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }}>كيف يعمل</a>
             <a href="#method" onClick={e => { e.preventDefault(); document.getElementById('method')?.scrollIntoView({ behavior: 'smooth' }); }}>المنهجية</a>
+            <a href="#bank" onClick={e => { e.preventDefault(); document.getElementById('bank')?.scrollIntoView({ behavior: 'smooth' }); }}>للبنوك</a>
             <a href="#faq" onClick={e => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }); }}>الأسئلة الشائعة</a>
           </nav>
           <div className="row">
@@ -169,6 +172,7 @@ export function Landing() {
             <h2 style={{ marginBottom: 16 }}>منهجية واضحة تقدر تراجعها بنفسك</h2>
             <p style={{ color: '#DCE5EC', lineHeight: '28px' }}>{ZATCA.statement} نحدد يوم زكاتك السنوي من كشف حساباتك، ونعرض لك طريقة الحساب سطرًا بسطر: كم في الوعاء، وكم أكمل حوله، وكيف خرج المبلغ.</p>
             <p className="t12" style={{ color: '#9DB3C4', marginTop: 12 }}>{ZATCA.disclaimer}</p>
+            <button className="w-link" style={{ color: '#fff', marginTop: 14 }} onClick={() => go('/app/settings/rules')}>كل الأحكام برقم فقرتها في دليل الهيئة ←</button>
           </div>
           <div className="col" style={{ gap: 12 }}>
             {[[Eye, 'قراءة فقط', 'لا نستطيع تحويل أي مبلغ من حساباتك، والإخراج لا يتم إلا بتأكيدك.'],
@@ -180,7 +184,30 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="w-section" id="faq">
+      <section className="w-section" id="bank">
+        <div className="w-wrap">
+          <p className="w-eyebrow">للبنوك · مقترح الهاكاثون</p>
+          <h2 style={{ marginBottom: 8 }}>ليش يقدّم البنك نماء لعملائه؟</h2>
+          <p className="sub" style={{ maxWidth: 720, marginBottom: 28 }}>مجاني للعميل، ويُقدَّم داخل تطبيق البنك. هذه فرضياتنا للعرض، وتُختبر مع البنك الشريك قبل الإطلاق.</p>
+          <div className="w-grid3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+            {[['سبب سنوي ليرجع العميل', 'يوم زكاة محدد كل سنة، وتنبيهات قبله، وحسابات مربوطة تبقيه في تطبيق البنك.'],
+              ['الإخراج من حساب العميل', 'الزكاة تُدفع من حسابه في البنك بموافقته، أو عبر «زكاتي»؛ لا يحتفظ نماء بأي مبلغ.'],
+              ['ميزة شرعية موثقة', 'كل حكم برقم فقرته في دليل هيئة الزكاة، لا اجتهاد داخلي يحتاج دفاعًا.'],
+              ['يربط ذراع الاستثمار', 'محافظ الوساطة والصناديق تدخل الحساب، ويرى العميل أثر كل صفقة على زكاته.']].map(([t, d]) => (
+              <div key={t} className="w-card" style={{ padding: 20 }}><b style={{ display: 'block', marginBottom: 6 }}>{t}</b><span className="t13 sub">{d}</span></div>
+            ))}
+          </div>
+          <div className="w-rows" style={{ marginTop: 28, maxWidth: 760 }}>
+            {[['المرحلة 1 · متاح الآن', 'حساب من كشف الحساب، واستيراد كشف المحفظة من أي تطبيق، وإضافة الأصول يدويًا.'],
+              ['المرحلة 2 · الخدمات المصرفية المفتوحة', 'خدمة معلومات الحساب من البنوك المرخّصة لدى البنك المركزي السعودي، بموافقة قراءة فقط.'],
+              ['المرحلة 3 · بالشراكة', 'بدء الدفع من تطبيق البنك، وربط مباشر مع شركة الوساطة التابعة للبنك.']].map(([t, d]) => (
+              <div key={t} className="w-rowline"><span className="t">{t}</span><span /><span className="d">{d}</span></div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="w-section gray" id="faq">
         <div className="w-wrap w-grid3" style={{ gridTemplateColumns: 'minmax(220px, 1fr) minmax(0, 2fr)', gap: 48 }}>
           <div>
             <p className="w-eyebrow">الأسئلة الشائعة</p>
@@ -200,7 +227,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="w-section gray" style={{ padding: '56px 0' }}>
+      <section className="w-section" style={{ padding: '56px 0', borderTop: '1px solid var(--line)' }}>
         <div className="w-wrap between" style={{ flexWrap: 'wrap' }}>
           <div><h2 style={{ marginBottom: 4, fontSize: 28 }}>جاهز تعرف زكاتك بالضبط؟</h2><p className="sub">إنشاء الحساب يأخذ دقيقة، والربط دقيقتين.</p></div>
           <div className="row"><Btn variant="primary" className="lg" onClick={() => go('/register')}>إنشاء حساب</Btn><Btn className="lg" onClick={() => go('/login')}>تسجيل الدخول</Btn></div>
@@ -213,7 +240,7 @@ export function Landing() {
             <div><div className="w-brand" style={{ marginBottom: 12 }}><img src={logo} alt="نماء" /></div><p>حاسبة زكاة تقرأ حساباتك البنكية، وتحدد لك يوم زكاتك في السنة وكم مقدارها.</p></div>
             <div><h4>المنتج</h4><a href="#features">المزايا</a><a href="#how">كيف يعمل</a><a href="#method">المنهجية</a><a href="#faq">الأسئلة الشائعة</a></div>
             <div><h4>الدعم</h4><a href="#faq">مركز المساعدة</a><a href="#/app/notifications">الدعم داخل التطبيق</a></div>
-            <div><h4>قانوني</h4><a href="#/app/settings/terms">الشروط والأحكام</a><a href="#/app/settings/terms">سياسة الخصوصية</a></div>
+            <div><h4>قانوني</h4><a href="#/app/settings/rules">الأحكام ومصادرها</a><a href="#/app/settings/data">بياناتك وخصوصيتك</a><a href="#/app/settings/terms">الشروط</a></div>
           </div>
           <div className="legal"><span>© 2026 نماء. نسخة العرض لهاكاثون VentureX.</span><span>الحساب استرشادي ولا يغني عن سؤال أهل العلم.</span></div>
         </div>

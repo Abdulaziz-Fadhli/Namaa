@@ -23,11 +23,12 @@ export const KINDS = {
 };
 export const GROUPS = [['شركات الوساطة', ['brokerUS', 'broker']], ['المستشارون الآليون', ['robo']], ['التمويل الجماعي بالدين', ['crowd']], ['منصات دولية', ['intl']]];
 
-// التطبيقات للعرض: شركات الوساطة التي يتداول عبرها الأفراد (ترتيب أرقام لشركات الوساطة 2025)،
+// التطبيقات للعرض: الإنماء للاستثمار أولًا (شريك المنصة المقترح)، ثم شركات الوساطة بترتيب أرقام 2025،
 // والمستشارون الآليون، ومنصات التمويل الجماعي بالدين، ومنصات دولية. الربط هنا محاكاة لا اتصال حقيقي.
 export const PROVIDERS = [
+  ['alinma-invest', 'الإنماء للاستثمار', 'brokerUS'],
   ['rajhi-capital', 'الراجحي المالية', 'brokerUS'], ['snb-capital', 'الأهلي المالية', 'brokerUS'], ['derayah', 'دراية المالية', 'brokerUS'],
-  ['alinma-invest', 'الإنماء للاستثمار', 'brokerUS'], ['riyad-capital', 'الرياض المالية', 'brokerUS'], ['sahm', 'سهم كابيتال', 'brokerUS'],
+  ['riyad-capital', 'الرياض المالية', 'brokerUS'], ['sahm', 'سهم كابيتال', 'brokerUS'],
   ['aljazira-capital', 'الجزيرة كابيتال', 'brokerUS'], ['albilad', 'البلاد المالية', 'brokerUS'], ['sab-invest', 'ساب إنفست', 'brokerUS'],
   ['bsf-capital', 'السعودي الفرنسي كابيتال', 'brokerUS'], ['anb-capital', 'العربي المالية', 'brokerUS'], ['alistithmar', 'الاستثمار كابيتال', 'brokerUS'],
   ['awaed', 'عوائد الأصول', 'brokerUS'], ['yaqeen', 'يقين كابيتال', 'brokerUS'], ['alkhabeer', 'الخبير المالية', 'brokerUS'],
@@ -180,7 +181,9 @@ export function markOf(p) {
   const words = String(p.name ?? '').split(/\s+/).filter(Boolean);
   const w = words.find(x => !GENERIC.has(x)) ?? words[0] ?? '؟';
   const core = w.startsWith('ال') && w.length > 3 ? w.slice(2) : w;
-  return { letter: core[0], color: MARK_COLORS[hashOf(p.id ?? p.name) % MARK_COLORS.length] };
+  // الألف وحدها تُقرأ كعلامة ترقيم في المربع الصغير، فنأخذ الحرف الذي بعدها (الإنماء ← ن)
+  const letter = /^[اأإآ]/.test(core) && core.length > 1 ? core[1] : core[0];
+  return { letter, color: MARK_COLORS[hashOf(p.id ?? p.name) % MARK_COLORS.length] };
 }
 
 const fmt = n => n.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -193,7 +196,7 @@ export function tradeLabel(t) {
 export function tradeNote(t) {
   if (isFin(t.key)) return t.side === 'BUY' ? 'من نقد المحفظة إلى تمويل، والحول مستمر' : 'السداد نقد يكمل حول التمويل';
   return t.side === 'BUY'
-    ? (t.zakatable ? 'تكمل حول النقد' : 'تزكيه الشركة، فخرج المبلغ من الوعاء')
+    ? (t.zakatable ? 'تكمل حول النقد' : 'سهم تزكيه الشركة: لا يدخل حساب الزكاة')
     : (t.zakatable ? 'النقد يكمل حولها' : 'نقد جديد يبدأ حوله اليوم');
 }
 
@@ -348,4 +351,53 @@ export function portfolioAssets(p) {
     });
   }
   return out;
+}
+
+// ---------- استيراد كشف المحفظة (المسار المتاح اليوم بلا شراكة) ----------
+// ملف CSV يصدّره العميل من تطبيقه: الرمز، الكمية، السعر الحالي، تاريخ الشراء. وسطر «نقد» للنقد غير المستثمر.
+export const STATEMENT_SAMPLE = [
+  'الرمز,الكمية,السعر,تاريخ الشراء',
+  '1150,300,26.4,2025-11-02',
+  '9404,1200,10.2,2026-02-15',
+  'AAPL,15,232,2026-05-20',
+  'نقد,4500,,2026-06-01',
+].join('\n');
+
+const latin = s => String(s ?? '').trim().replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٬]/g, '').replace('٫', '.');
+const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(`${s}T00:00:00Z`));
+
+// يرجع { rows, errors }: كل سطر صالح { key, units, price, date } أو { cash, date }
+export function parseStatement(text) {
+  const rows = [];
+  const errors = [];
+  const lines = String(text).replace(/^\uFEFF/, '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  lines.forEach((line, i) => {
+    const [k, u, p, d] = line.split(/[,;\t]/).map(latin);
+    if (i === 0 && !(Number(u) > 0)) return;   // سطر العناوين
+    const n = i + 1;
+    if (!isDate(d)) { errors.push(`السطر ${n}: التاريخ بصيغة 2026-05-20`); return; }
+    if (k === 'نقد' || k.toUpperCase() === 'CASH') {
+      if (Number(u) > 0) rows.push({ cash: Number(u), date: d }); else errors.push(`السطر ${n}: مبلغ النقد`);
+      return;
+    }
+    const key = k.toUpperCase();
+    if (!(Number(u) > 0) || !(Number(p) > 0)) { errors.push(`السطر ${n}: الكمية والسعر أرقام أكبر من صفر`); return; }
+    try { judge(key, Number(u), Number(p)); } catch { errors.push(`السطر ${n}: لم نتعرف على «${k}»`); return; }
+    rows.push({ key, units: Number(u), price: Number(p), date: d });
+  });
+  return { rows, errors };
+}
+
+// محفظة من كشف: نفس شكل المحفظة المرتبطة، بلا عمليات لحظية (تُحدّث باستيراد كشف جديد)
+export function portfolioFromStatement(name, kind, rows, linkedAt) {
+  if (!KINDS[kind]) throw new Error('تطبيق غير مدعوم');
+  const id = `statement-${hashOf(name).toString(36)}`;
+  const prices = {};
+  for (const r of rows) if (r.key) prices[r.key] = r.price;
+  return {
+    id, provider: id, name, kind, custom: true, source: 'statement', linkedAt, prices, names: {},
+    lots: rows.filter(r => r.key).map(r => ({ key: r.key, units: r.units, hawlFrom: r.date })),
+    cash: rows.filter(r => r.cash).map(r => ({ amount: r.cash, hawlFrom: r.date })),
+    trades: [], script: [], scriptAt: 0,
+  };
 }

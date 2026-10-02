@@ -444,3 +444,18 @@ details.w-more .w-more-body { font-size: 13px; line-height: 21px; color: var(--s
   .w-bottom-nav button { color: rgba(255, 255, 255, .55); }
   .w-bottom-nav button[aria-current="page"] { color: #fff; }
 }
+
+/* ما نراه وما لا نراه */
+.w-cover { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; margin-top: 12px; }
+.w-cover-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; font-size: 13px; }
+.w-cover-list li { padding-inline-start: 14px; position: relative; }
+.w-cover-list li::before { content: ''; position: absolute; inset-inline-start: 0; top: 8px; width: 5px; height: 5px; border-radius: 99px; background: var(--ok); }
+@media (max-width: 760px) { .w-cover { grid-template-columns: 1fr; gap: 18px; } }
+
+/* تأكيد النية قبل الإخراج */
+.w-intent { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r); cursor: pointer; font-size: 13px; line-height: 20px; }
+.w-intent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--primary); flex-shrink: 0; }
+
+/* صفحة الأحكام: رقم الفقرة ثم الحكم */
+.w-rule { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 12px 0; font-size: 13px; line-height: 22px; }
+.w-sec { font-size: 12px; font-weight: 600; color: var(--primary); direction: ltr; text-align: right; padding-top: 1px; font-variant-numeric: tabular-nums; }

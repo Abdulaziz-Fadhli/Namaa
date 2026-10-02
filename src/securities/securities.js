@@ -221,9 +221,11 @@ function assess(holding, prices = {}, settings = {}) {
   // FUND_BASE_OR_MARKET: زكاة الوحدة المنشورة من المدير، وإلا القيمة السوقية (الأحوط)
   const zpu = holding.zakatPerUnit ?? prices.zakatPerUnit?.[key];
   let base = value, method = 'MARKET', needsZakatPerUnit = false;
-  if (zakatable && zpu != null && st.method.startsWith('FUND_BASE')) { base = holding.units * zpu * fx * 40; method = 'FUND_BASE'; }
+  // زكاة الوحدة المعلنة من مدير الصندوق (§3.9): تُعتمد لأي صندوق استثماري إذا أدخلها المستخدم
+  if (zakatable && zpu != null && (st.method.startsWith('FUND_BASE') || (holding.zakatPerUnit != null && st.type !== 'COMPANY' && st.intent !== 'TRADE'))) { base = holding.units * zpu * fx * 40; method = 'FUND_BASE'; }
   else if (zakatable && sec?.category === 'REIT' && sec.market !== 'US' && st.method !== 'MARKET') needsZakatPerUnit = true;   // الحد الأعلى
-  else if (zakatable && holding.zakatableRatio != null) { base = value * holding.zakatableRatio; method = 'ZAKATABLE_ASSETS'; }
+  // §3.6: المستثمر يزكي حصته من الموجودات الزكوية للشركة
+  else if (zakatable && holding.zakatableRatio != null && st.intent !== 'TRADE') { base = value * holding.zakatableRatio; method = 'ZAKATABLE_ASSETS'; }
   return { ...st, units: holding.units, price: px, value, zakatable, base: zakatable ? base : 0, zakat: zakatable ? base / 40 : 0,
     calcMethod: zakatable ? method : 'NONE', needsZakatPerUnit };
 }

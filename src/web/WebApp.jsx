@@ -36,13 +36,13 @@ function page(path) {
   if (path === '/onboarding/last') return <OnboardLast />;
   if (path === '/onboarding/sync') return <OnboardSync />;
   if (path === '/app/explain') return <Explain path={path} />;
-  if (path === '/app/assets') return <Assets path={path} />;
+  if (path === '/app/assets' || path.startsWith('/app/assets/add/')) return <Assets path={path} />;
   if (path.startsWith('/app/account/')) return <Account path={path} />;
   if (path.startsWith('/app/invest/')) return <InvestPage path={path} />;
   if (path === '/app/link') return <LinkBank path={path} />;
   if (path === '/app/history') return <History path={path} />;
-  if (path === '/app/payout') return <Payout path={path} />;
-  if (path === '/app/receipt') return <ReceiptPage path={path} />;
+  if (path === '/app/payout' || path.startsWith('/app/payout/')) return <Payout path={path} />;
+  if (path === '/app/receipt' || path.startsWith('/app/receipt/')) return <ReceiptPage path={path} />;
   if (path.startsWith('/app/settings')) return <SettingsPage path={path} />;
   if (path === '/app/notifications') return <Notifications path={path} />;
   if (path.startsWith('/app')) return <Dashboard path="/app" />;

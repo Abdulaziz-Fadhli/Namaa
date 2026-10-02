@@ -6,8 +6,8 @@ export const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
 
 export const CHANNELS = {
-  fund: { title: 'صندوق زكاة موثوق', detail: 'تحويل مباشر', time: 'فوري', fee: 'بدون رسوم', receipt: 'يصدر فورًا', transfer: true },
-  charity: { title: 'جمعية مرخصة', detail: 'توزيع محلي على المستحقين', time: 'يوم عمل', fee: 'بدون رسوم', receipt: 'يصدر فورًا', transfer: true },
+  fund: { title: 'منصة «زكاتي»', detail: 'هيئة الزكاة · للضمان الاجتماعي', time: 'فوري', fee: 'بدون رسوم', receipt: 'يصدر فورًا', transfer: true },
+  charity: { title: 'جمعية مرخصة (وكيل)', detail: 'توصلها لمصارف الزكاة الثمانية', time: 'يوم عمل', fee: 'بدون رسوم', receipt: 'يصدر فورًا', transfer: true },
   beneficiary: { title: 'حساب مستفيد', detail: 'أدخل رقم الآيبان يدويًا', time: 'فوري', fee: 'حسب البنك', receipt: 'يصدر بعد التحويل', transfer: true },
   self: { title: 'سأخرجها بنفسي', detail: 'نماء يسجل الإخراج ويبدأ الحول الجديد دون تنفيذ تحويل.', time: 'لا يوجد تحويل', fee: 'بدون رسوم', receipt: 'سجل داخلي', transfer: false },
 };
