@@ -1,12 +1,12 @@
 // هيكل صفحات التطبيق: قائمة جانبية هادئة على الكمبيوتر، وشريط سفلي على الجوال، ورأس بسيط لكل صفحة.
 import { ArrowLeft, Bell, ChevronDown, History, House, LogOut, RefreshCw, Settings, WalletCards } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Brand, Icon } from './kit.jsx';
+import { Brand, CompanyMark, Icon } from './kit.jsx';
 import { go } from './nav.js';
 import { useStore } from '../figma/model.js';
 import { PERSONAS, clock, plain, sar } from './data.js';
 import { gregText } from '../figma/format.js';
-import { tradeLabel } from '../engine/portfolio.js';
+import { markOf, tradeLabel } from '../engine/portfolio.js';
 
 // أربعة أقسام فقط. الإخراج من زر الرئيسية، والإشعارات من الجرس، والخط الزمني داخل السجل.
 const NAV = [
@@ -33,7 +33,7 @@ function PersonaSwitch() {
   return (
     <div style={{ position: 'relative', marginTop: 24 }}>
       <span className="t11 muted" style={{ display: 'block', padding: '0 12px 4px' }}>تعرض الآن</span>
-      <button className="row" style={{ width: '100%', padding: '6px 12px', borderRadius: 6 }} onClick={() => setOpen(o => !o)} aria-expanded={open}>
+      <button className="row w-persona" onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <span className="grow" style={{ textAlign: 'start' }}><b className="b6">{p.name}</b> <span className="sub t13">· {p.role}</span></span>
         <Icon as={ChevronDown} size={15} className="muted" />
       </button>
@@ -72,7 +72,10 @@ function LiveToast() {
   return (
     <div className="w-live-toast" role="status">
       <div className="between"><span className="t12 sub"><span className="w-pulse" />وصلت من {e.provider} · {t.time}</span><button className="t12 muted" onClick={() => setShown(null)} aria-label="إغلاق">✕</button></div>
-      <b style={{ display: 'block', margin: '2px 0' }}>{tradeLabel(t)}</b>
+      <div className="row" style={{ gap: 10, margin: '6px 0 4px', alignItems: 'flex-start' }}>
+        <CompanyMark mark={markOf({ id: e.portfolio, name: e.provider })} size={32} />
+        <b>{tradeLabel(t)}</b>
+      </div>
       <span className="t13 sub" style={{ display: 'block' }}>
         الوعاء صار <b style={{ color: 'var(--ink)' }}>{sar(vault)}</b> ({Math.abs(d) < 0.005 ? 'بلا تغيير' : `${d > 0 ? '+' : '−'}${plain(Math.abs(d))}`})
       </span>

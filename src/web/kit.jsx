@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 import { parseNum } from '../figma/model.js';
-import logo from '../assets/namaa-logo.png';
+import logo from '../assets/namaa-logo-tight.png';
 
 import { go } from './nav.js';
 
@@ -17,6 +17,22 @@ export function Brand({ onClick }) {
       <img src={logo} alt="" />
     </button>
   );
+}
+
+// علامة نماء (المربع المستدير والحرف) للزخرفة، مرسومة من شعار نماء نفسه
+export function NamaaMark({ className, tile = '#fff', ink = 'var(--primary)' }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="2" y="2" width="60" height="60" rx="14" fill={tile} />
+      <path d="M22.3 21.7 A16.5 16.5 0 1 0 47.0 36 L47.0 21" fill="none" stroke={ink} strokeWidth="10" strokeLinecap="round" />
+      <ellipse cx="48.5" cy="10.5" rx="4.2" ry="7.6" transform="rotate(40 48.5 10.5)" fill={ink} />
+    </svg>
+  );
+}
+
+// علامة شركة: مربع مستدير بأول حرف من اسمها ولون ثابت لها (ليست الشعار الرسمي)
+export function CompanyMark({ mark, size = 40 }) {
+  return <span className="w-mark" style={{ width: size, height: size, background: mark.color, fontSize: Math.round(size * 0.42) }} aria-hidden="true">{mark.letter}</span>;
 }
 
 export function Card({ title, desc, action, children, className = '', flush }) {

@@ -1,13 +1,13 @@
 // تطبيقات الاستثمار: ربط المحفظة (محاكاة)، وصفحة المحفظة، وعمليات الشراء والبيع التي تحدّث الزكاة فورًا.
 import { useEffect, useState } from 'react';
-import { ChevronLeft, LoaderCircle, Search, ShieldCheck } from 'lucide-react';
-import { Btn, Card, Icon, Modal, Select, TextInput } from '../kit.jsx';
+import { Check, ChevronLeft, Link2, LoaderCircle, Search, ShieldCheck } from 'lucide-react';
+import { Btn, Card, CompanyMark, Icon, Modal, NamaaMark, Select, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregText } from '../../figma/format.js';
 import { resolveHawlDueDate } from '../../engine/engine.js';
-import { GROUPS, KINDS, PROVIDERS, nextScripted, seedPortfolio, summarize, tradeLabel, tradeNote } from '../../engine/portfolio.js';
+import { GROUPS, KINDS, PROVIDERS, markOf, nextScripted, seedPortfolio, summarize, tradeLabel, tradeNote } from '../../engine/portfolio.js';
 import { plain, sar } from '../data.js';
 
 const hawlEnd = iso => resolveHawlDueDate(new Date(`${iso}T00:00:00Z`)).toISOString().slice(0, 10);
@@ -34,67 +34,89 @@ export function LinkInvest({ onClose }) {
   const term = pick?.kind === 'crowd' ? fins : papers;
   const query = q.trim();
   const matches = PROVIDERS.filter(p => !query || p.name.includes(query));
+  const ownName = own || (query && !matches.length ? query : '');
+
+  const head = (state) => (
+    <div className="w-prov-head">
+      <div className="w-prov-link">
+        <NamaaMark className="w-mark-svg" tile="var(--primary)" ink="#fff" />
+        <span className="dash" />
+        {state === 'linking' ? <Icon as={LoaderCircle} className="w-spin muted" /> : state === 'done' ? <span className="w-mark" style={{ width: 26, height: 26, background: 'var(--ok)' }}><Icon as={Check} size={15} /></span> : <Icon as={Link2} className="muted" />}
+        <span className="dash" />
+        <CompanyMark mark={markOf(pick)} size={52} />
+      </div>
+      <div>
+        <b className="t16" style={{ display: 'block' }}>{pick.name}</b>
+        <span className="t12 muted">{KINDS[pick.kind].label} · {pick.markets}</span>
+      </div>
+    </div>
+  );
 
   if (stage === 'pick') return (
-    <Modal title="ربط تطبيق استثمار" desc={`${PROVIDERS.length} تطبيقًا: الوساطة والمستشارون الآليون والتمويل الجماعي والمنصات الدولية`} onClose={onClose}>
+    <Modal title="ربط تطبيق استثمار" desc={`اختر من ${PROVIDERS.length} تطبيقًا، أو أضف تطبيقك`} onClose={onClose}>
       <TextInput value={q} onChange={setQ} icon={Search} placeholder="ابحث باسم التطبيق أو الشركة" />
       {GROUPS.map(([label, kinds]) => {
         const list = matches.filter(p => kinds.includes(p.kind));
         if (!list.length) return null;
         return (
-          <div key={label}>
-            <div className="t12 muted" style={{ padding: '4px 0', borderBottom: '1px solid var(--line)' }}>{label} · {list.length}</div>
-            <div className="w-rows">
-              {list.map(p => (
-                <div key={p.id} className="w-list-row" style={{ padding: '10px 0' }}>
-                  <span className="grow"><span className="t" style={{ display: 'block' }}>{p.name}</span><span className="d">{p.markets}</span></span>
-                  {linked.has(p.id) ? <span className="t12 sub">مرتبط</span> : <Btn className="sm" onClick={() => { setPick(p); setStage('consent'); }}>ربط</Btn>}
-                </div>
-              ))}
+          <div key={label} className="col" style={{ gap: 8 }}>
+            <span className="t12 muted">{label} · {list.length}</span>
+            <div className="w-provs">
+              {list.map(p => {
+                const on = linked.has(p.id);
+                return (
+                  <button key={p.id} className="w-prov" aria-disabled={on} onClick={() => { if (!on) { setPick(p); setStage('consent'); } }}>
+                    <CompanyMark mark={markOf(p)} size={36} />
+                    <span className="grow" style={{ minWidth: 0 }}>
+                      <span className="n">{p.name}</span>
+                      <span className="k">{on ? 'مرتبط' : p.markets}</span>
+                    </span>
+                    {on && <Icon as={Check} size={15} className="green" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
         );
       })}
       {query && !matches.length && <p className="w-quiet">ما لقينا «{query}» في القائمة. أضفه تحت.</p>}
-      <div className="w-soft" style={{ padding: '12px 14px' }}>
+      <div className="w-soft" style={{ padding: '14px 16px' }}>
         <b className="t13" style={{ display: 'block', marginBottom: 8 }}>ما لقيت تطبيقك؟</b>
-        <div className="w-grid2">
-          <TextInput label="اسم التطبيق" value={own || (query && !matches.length ? query : '')} onChange={setOwn} placeholder="مثال: تطبيق الوساطة اللي أستخدمه" />
+        <div className="w-grid2 stack-xs">
+          <TextInput label="اسم التطبيق" value={ownName} onChange={setOwn} placeholder="اسم التطبيق اللي تستخدمه" />
           <Select label="نوعه" value={ownKind} onChange={setOwnKind}
             options={Object.entries(KINDS).map(([k, x]) => ({ value: k, label: `${x.label} · ${x.markets}` }))} />
         </div>
-        {(() => {
-          const name = (own || (query && !matches.length ? query : '')).trim();
-          return (
-            <Btn className="sm" style={{ marginTop: 10 }} disabled={name.length < 2}
-              onClick={() => { setPick({ id: customId(name), name, kind: ownKind, markets: KINDS[ownKind].markets, custom: true }); setStage('consent'); }}>ربط {name || 'تطبيقي'}</Btn>
-          );
-        })()}
+        <Btn className="sm" style={{ marginTop: 10 }} disabled={ownName.trim().length < 2}
+          onClick={() => { const name = ownName.trim(); setPick({ id: customId(name), name, kind: ownKind, markets: KINDS[ownKind].markets, custom: true }); setStage('consent'); }}>ربط {ownName.trim() || 'تطبيقي'}</Btn>
       </div>
-      <p className="w-note"><Icon as={ShieldCheck} size={14} /><span>محاكاة للعرض: لا اتصال حقيقي بالتطبيقات، والمحافظ والأسعار توضيحية.</span></p>
+      <p className="w-note"><Icon as={ShieldCheck} size={14} /><span>محاكاة للعرض: لا اتصال حقيقي بالتطبيقات، والمحافظ والأسعار توضيحية. الحروف في المربعات علامات من نماء، وليست شعارات الشركات.</span></p>
     </Modal>
   );
   if (stage === 'consent') return (
-    <Modal size="sm" title={`ربط ${pick.name}`} desc="موافقة قراءة فقط" onClose={onClose}
-      foot={<><Btn onClick={() => setStage('pick')}>رجوع</Btn><Btn variant="primary" onClick={() => setStage('linking')}>موافق · ربط</Btn></>}>
+    <Modal size="sm" title="موافقة قراءة فقط" onClose={onClose}
+      foot={<><Btn onClick={() => setStage('pick')}>رجوع</Btn><Btn variant="primary" onClick={() => setStage('linking')}>موافق · ربط {pick.name}</Btn></>}>
+      {head('consent')}
       <div className="w-rows t13">
         <div className="w-line"><span>{pick.kind === 'crowd' ? 'التمويلات القائمة' : 'المراكز والأسعار'}</span><span>{pick.kind === 'crowd' ? 'المبالغ ومواعيد السداد' : pick.kind === 'robo' ? 'الصناديق في محفظتك' : 'أسهم وصناديق'}</span></div>
         <div className="w-line"><span>النقد في المحفظة</span><span>مع تاريخ إيداعه</span></div>
         <div className="w-line"><span>العمليات</span><span>{pick.kind === 'crowd' ? 'لحظيًا عند كل تمويل أو سداد' : 'لحظيًا عند كل شراء أو بيع'}</span></div>
         <div className="w-line"><span>مدة الموافقة</span><span>12 شهرًا</span></div>
       </div>
-      <p className="t13 sub">لا نستطيع البيع أو الشراء أو التحويل من محفظتك، ولا نرى كلمة مرورك في التطبيق.</p>
+      <p className="w-note"><Icon as={ShieldCheck} size={14} /><span>لا نستطيع البيع أو الشراء أو التحويل من محفظتك، ولا نرى كلمة مرورك في التطبيق.</span></p>
     </Modal>
   );
   if (stage === 'linking') return (
-    <Modal size="sm" title={`ربط ${pick.name}`} onClose={onClose}>
-      <div className="row" style={{ padding: '24px 0', justifyContent: 'center' }}><Icon as={LoaderCircle} className="w-spin" /><span className="sub">نقرأ المحفظة والعمليات…</span></div>
+    <Modal size="sm" title="جارٍ الربط" onClose={onClose}>
+      {head('linking')}
+      <p className="sub t13" style={{ textAlign: 'center', paddingBottom: 8 }}>نقرأ المحفظة والعمليات من {pick.name}…</p>
     </Modal>
   );
   const zak = preview.holdings.filter(h => h.zakatable).length;
   return (
-    <Modal size="sm" title={`ربطنا ${pick.name}`} desc="العمليات تصل من التطبيق تلقائيًا، وتتحدث زكاتك مع كل واحدة" onClose={onClose}
+    <Modal size="sm" title="تم الربط" onClose={onClose}
       foot={<><Btn onClick={onClose}>إغلاق</Btn><Btn variant="primary" onClick={() => { onClose(); go(`/app/invest/${pick.id}`); }}>عرض المحفظة</Btn></>}>
+      {head('done')}
       <div className="w-rows t13">
         <div className="w-line"><span>استوردنا</span><span>{term(preview.holdings.length)} ونقد {sar(preview.cash, 0)}</span></div>
         <div className="w-line"><span>قيمة المحفظة</span><span>{sar(preview.value)}</span></div>
@@ -105,6 +127,7 @@ export function LinkInvest({ onClose }) {
           ? 'التمويلات القائمة ديون مرجوة السداد فزكاتها عليك، ونقد المحفظة كذلك'
           : <>{zak ? `${papers(zak)} زكاتها عليك، ونقد المحفظة كذلك` : 'نقد المحفظة زكاته عليك'}
             {preview.holdings.length - zak ? `، و${papers(preview.holdings.length - zak)} تزكيها الشركة عنك فلا تدخل الوعاء` : ''}</>}.
+        {' '}العمليات تصل من التطبيق تلقائيًا، وتتحدث زكاتك مع كل واحدة.
       </p>
     </Modal>
   );
@@ -124,7 +147,7 @@ export function InvestPage({ path }) {
   const waiting = Boolean(nextScripted(p));
   const zakNext = s.holdings.filter(h => h.zakatable).flatMap(h => h.lots).map(l => l.hawlFrom).concat(s.cashLots.map(c => c.hawlFrom)).sort()[0];
   return (
-    <Shell path="/app/assets" title={p.name}
+    <Shell path="/app/assets" title={<span className="row" style={{ gap: 12 }}><CompanyMark mark={markOf(p)} size={40} />{p.name}</span>}
       crumb={<><button onClick={() => go('/app/assets')}>الأصول</button><Icon as={ChevronLeft} size={12} /><span>تطبيقات الاستثمار</span></>}
       desc={`مرتبط منذ ${gregText(p.linkedAt)}`}>
       <div className="w-live">
@@ -218,7 +241,7 @@ export function InvestCard() {
             const s = summarize(p);
             return (
               <button key={p.id} className="w-rowline" style={{ width: '100%', textAlign: 'start' }} onClick={() => go(`/app/invest/${p.id}`)}>
-                <span className="t">{p.name}</span>
+                <span className="t row" style={{ gap: 10 }}><CompanyMark mark={markOf(p)} size={28} />{p.name}</span>
                 <span className="v">{plain(s.base)}</span>
                 <span className="d">قيمتها {plain(s.value, 0)} · {(p.kind === 'crowd' ? fins : papers)(s.holdings.length)} · {p.trades.length ? `آخر عملية ${p.trades[0].time}` : 'مرتبط'}</span>
               </button>

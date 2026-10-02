@@ -173,6 +173,16 @@ function generateScript(p, kind, h) {
 
 export const providerOf = id => PROVIDERS.find(p => p.id === id);
 
+// علامة نصية للشركة (ليست شعارها الرسمي): أول حرف من الكلمة المميزة في اسمها، بلون ثابت لها
+const MARK_COLORS = ['#002134', '#0F5257', '#2C4A6E', '#2E6B45', '#7A2E3A', '#6B5B1E', '#4B3A6E', '#6E4A2E', '#1F5F8B', '#5A3E5D'];
+const GENERIC = new Set(['المالية', 'كابيتال', 'للاستثمار', 'الاستثمار', 'السعودية', 'العربية', 'الوطني', 'الذكية', 'تطبيق']);
+export function markOf(p) {
+  const words = String(p.name ?? '').split(/\s+/).filter(Boolean);
+  const w = words.find(x => !GENERIC.has(x)) ?? words[0] ?? '؟';
+  const core = w.startsWith('ال') && w.length > 3 ? w.slice(2) : w;
+  return { letter: core[0], color: MARK_COLORS[hashOf(p.id ?? p.name) % MARK_COLORS.length] };
+}
+
 const fmt = n => n.toLocaleString('en-US', { maximumFractionDigits: 2 });
 // وصف العملية للعرض: «شراء 3 أبل» أو «تمويل جديد 2,400 ر.س · ...» أو «سداد 3,200 ر.س من ...»
 export function tradeLabel(t) {

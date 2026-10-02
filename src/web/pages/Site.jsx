@@ -5,13 +5,13 @@ import {
   ArrowRight, CalendarClock, CalendarDays, Check, ChevronDown, CircleCheck, Eye, EyeOff, FileText, Info, Landmark, Layers3,
   LockKeyhole, Plus, RefreshCw, Scale, Search, ShieldCheck, X,
 } from 'lucide-react';
-import { Brand, Btn, Checkbox, Icon, Option, Pill, Select, Seg, Steps, TextInput } from '../kit.jsx';
+import { Brand, Btn, Checkbox, Icon, NamaaMark, Option, Pill, Select, Seg, Steps, TextInput } from '../kit.jsx';
 import { go } from '../nav.js';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriMonthLength, hijriText, hijriToIso, HIJRI_MONTHS } from '../../figma/format.js';
 import { ACCOUNTS, BANKS, PERSONAS, hijriFromParts, linkedBanks, plain, sar, days } from '../data.js';
 import { ZATCA } from '../../engine/zatca.js';
-import logo from '../../assets/namaa-logo.png';
+import logo from '../../assets/namaa-logo-tight.png';
 import { PersonaCards } from './Personas.jsx';
 
 function ZakatCard({ compact }) {
@@ -88,6 +88,7 @@ export function Landing() {
       </header>
 
       <section className="w-hero">
+        <NamaaMark className="w-hero-mark" tile="#fff" ink="var(--primary)" />
         <div className="w-wrap">
           <div>
             <Pill tone="info">لعملاء البنوك في السعودية</Pill>
