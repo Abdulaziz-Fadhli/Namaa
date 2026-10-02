@@ -1,13 +1,13 @@
 // الرئيسية وصفحة «كيف حُسبت زكاتك». كل رقم من المحرك: buildView (الوعاء والنصاب والوجوب والمواعيد) + أصول المستخدم.
 import { ArrowLeft, CalendarCheck2, ChevronLeft, CircleMinus, Clock3, Download, Info } from 'lucide-react';
-import { Btn, Card, Icon, Pill } from '../kit.jsx';
+import { Btn, Card, CompanyMark, Icon, Pill } from '../kit.jsx';
 import { go } from '../nav.js';
 import { Shell } from '../Shell.jsx';
 import { useStore } from '../../figma/model.js';
 import { gregText, hijriText, hijriToIso, money } from '../../figma/format.js';
 import { ACCOUNTS, accountInfo, bothDates, daysFrom, greeting, kFmt, monthName, plain, sar, weekday, days } from '../data.js';
 import { AHMAD_V2 } from '../../engine/ahmad-v2.js';
-import { summarize } from '../../engine/portfolio.js';
+import { markOf, summarize } from '../../engine/portfolio.js';
 import { K4Review } from './Assets.jsx';
 import { useState } from 'react';
 
@@ -30,7 +30,7 @@ function AccountsCard({ view, vault }) {
           const sm = summarize(p);
           return (
             <button key={p.id} className="w-rowline" style={{ width: '100%', textAlign: 'start' }} onClick={() => go(`/app/invest/${p.id}`)}>
-              <span className="t">{p.name}</span>
+              <span className="t row" style={{ gap: 10 }}><CompanyMark mark={markOf(p)} size={24} />{p.name}</span>
               <span className="v">{plain(sm.base)}</span>
               <span className="d">محفظة استثمار · ما يدخل الوعاء منها</span>
             </button>

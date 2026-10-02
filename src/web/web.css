@@ -3,8 +3,8 @@
   --bg: #F6F5F1;
   --surface: #FFFFFF;
   --soft: #F3F2EE;
-  --ink: #15222C;
-  --primary: #0B2638;
+  --ink: #0F2230;
+  --primary: #002134;
   --sub: #5E6A72;
   --muted: #8C949A;
   --line: #E8E6E0;
@@ -19,8 +19,8 @@
   --red: #B3392B;
   --bar: #D9DDD8;
   --gold: #A87522;
-  --r-card: 12px;
-  --r: 8px;
+  --r-card: 14px;
+  --r: 10px;
   font-family: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', system-ui, sans-serif;
   color: var(--ink);
   background: var(--bg);
@@ -58,7 +58,7 @@ body:has(.w) { background: #F6F5F1; }
 
 /* ---------- عناصر مشتركة ---------- */
 .w-brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; line-height: 30px; }
-.w-brand img { height: 42px; width: 74px; object-fit: cover; border-radius: 4px; background: var(--primary); display: block; }
+.w-brand img { height: 40px; width: auto; border-radius: 8px; background: var(--primary); display: block; }
 .w-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 24px; }
 .w-card.flush { padding: 0; overflow: hidden; }
 .w-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -66,7 +66,7 @@ body:has(.w) { background: #F6F5F1; }
 .w-card-head p { font-size: 12px; line-height: 18px; color: var(--sub); }
 .w-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: var(--r); font-weight: 500; font-size: 14px; white-space: nowrap; transition: background .15s, opacity .15s; }
 .w-btn.primary { background: var(--primary); color: #fff; }
-.w-btn.primary:hover { background: #163a52; }
+.w-btn.primary:hover { background: #0B3350; }
 .w-btn.outline { background: var(--surface); border: 1px solid var(--line-2); color: var(--ink); }
 .w-btn.outline:hover { background: var(--soft); }
 .w-btn.ghost { height: 34px; padding: 0 10px; font-size: 13px; }
@@ -380,3 +380,67 @@ details.w-more .w-more-body { font-size: 13px; line-height: 21px; color: var(--s
 .w-new { animation: w-hl 2.4s ease; }
 @keyframes w-hl { from { background: var(--ok-bg); } to { background: transparent; } }
 @media (max-width: 960px) { .w-live-toast { bottom: 84px; inset-inline-end: 16px; } }
+
+/* ---------- هوية الشعار: كحلي الشعار، والمربع المستدير، والقائمة بلون الشعار ---------- */
+.w-avatar { border-radius: 30%; }
+.w-side { background: var(--primary); border-inline-start: 0; color: #fff; }
+.w-side .sub, .w-side .muted { color: rgba(255, 255, 255, .55); }
+.w-side nav button { color: rgba(255, 255, 255, .62); }
+.w-side nav button:hover { color: #fff; }
+.w-side nav button[aria-current="page"] { color: #fff; background: rgba(255, 255, 255, .08); box-shadow: inset -3px 0 0 #fff; font-weight: 600; }
+.w-side .w-user { border-top: 1px solid rgba(255, 255, 255, .1); color: #fff; }
+.w-side .w-avatar { background: rgba(255, 255, 255, .12); color: #fff; }
+.w-side .w-card { color: var(--ink); }
+.w-side .w-card .muted { color: var(--muted); }
+.w-side .w-brand img { height: 46px; }
+.w-persona { width: 100%; padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, .06); }
+.w-persona:hover { background: rgba(255, 255, 255, .1); }
+
+/* شريط الموقع ورأس الرحلات بلون الشعار، فيندمج الشعار معه */
+.w-nav-wrap, .w-nav-wrap .w-nav { background: var(--primary); border-color: transparent; }
+.w-nav .links { color: rgba(255, 255, 255, .7); }
+.w-nav .links a:hover { color: #fff; }
+.w-nav .w-btn.primary, .w-hero .w-btn.primary, .w-flow-head .w-btn.primary { background: #fff; color: var(--primary); }
+.w-nav .w-btn.primary:hover, .w-hero .w-btn.primary:hover { background: #E9EEF2; }
+.w-nav .w-btn.outline, .w-hero .w-btn.outline { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .35); }
+.w-nav .w-btn.outline:hover, .w-hero .w-btn.outline:hover { background: rgba(255, 255, 255, .08); }
+.w-nav .w-pill { background: rgba(255, 255, 255, .12); color: #fff; }
+.w-flow-head { background: var(--primary); border-bottom: 0; color: #fff; }
+.w-flow-head .w-steps { color: rgba(255, 255, 255, .6); }
+.w-flow-head .w-steps .s.on { color: #fff; }
+.w-flow-head .w-steps .s i { background: rgba(255, 255, 255, .12); color: rgba(255, 255, 255, .8); }
+.w-flow-head .w-steps .s.on i { background: #fff; color: var(--primary); }
+.w-flow-head .w-steps hr { border-top-color: rgba(255, 255, 255, .2); }
+.w-flow-head .sub { color: rgba(255, 255, 255, .7); }
+.w-flow-head .w-pill { background: rgba(255, 255, 255, .12); color: #fff; }
+
+/* الصفحة الرئيسية: البطل بلون الشعار، وعلامة الشعار خلفه */
+.w-hero { background: var(--primary); color: #fff; position: relative; overflow: hidden; }
+.w-hero h1 { color: #fff; }
+.w-hero .lead { color: rgba(255, 255, 255, .72); }
+.w-hero .w-trust { color: rgba(255, 255, 255, .7); }
+.w-hero .w-trust .green { color: #8FD3A8; }
+.w-hero .w-pill { background: rgba(255, 255, 255, .1); color: #fff; }
+.w-hero .w-hero-card { color: var(--ink); border: 0; box-shadow: 0 24px 60px rgba(0, 0, 0, .25); }
+.w-hero-mark { position: absolute; inset-inline-start: -80px; bottom: -120px; width: 420px; opacity: .06; pointer-events: none; }
+.w-hero .w-wrap { position: relative; }
+.w-step-n { border-radius: 30%; }
+
+/* علامة الشركة في الربط: مربع مستدير مثل علامة نماء */
+.w-mark { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 28%; color: #fff; font-weight: 700; line-height: 1; }
+.w-provs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.w-prov { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); text-align: start; width: 100%; transition: border-color .15s, background .15s; }
+.w-prov:hover { border-color: var(--line-2); background: #FBFBF9; }
+.w-prov .n { font-size: 13px; font-weight: 600; line-height: 18px; display: block; }
+.w-prov .k { font-size: 11px; color: var(--muted); line-height: 16px; display: block; }
+.w-prov[aria-disabled="true"] { opacity: .6; cursor: default; }
+.w-prov-head { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 6px 0 2px; }
+.w-prov-link { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.w-prov-link .dash { width: 40px; border-top: 2px dashed var(--line-2); }
+@media (max-width: 960px) { .w-provs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.w-mark-svg { width: 52px; height: 52px; display: block; }
+@media (max-width: 960px) {
+  .w-bottom-nav { background: var(--primary); border-top: 0; }
+  .w-bottom-nav button { color: rgba(255, 255, 255, .55); }
+  .w-bottom-nav button[aria-current="page"] { color: #fff; }
+}
