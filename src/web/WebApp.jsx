@@ -1,5 +1,6 @@
 // موقع نماء وتطبيق الويب (من شاشات فيجما «موقع نماء»)، مربوط بمحرك الزكاة عبر StoreProvider.
 // التطبيق القديم بإطار الجوال باقٍ على الرابط #/phone.
+import { Links } from './pages/Links.jsx';
 import { Suspense, lazy, useEffect } from 'react';
 import './web.css';
 import { StoreProvider } from '../figma/store.jsx';
@@ -27,6 +28,7 @@ const KHALID = { '/khalid': KhalidWelcome, '/khalid/register': KhalidRegister, '
 function page(path) {
   if (path === '/' || path === '') return <Landing />;
   if (path === '/personas') return <PersonaChooser />;
+  if (path === '/links') return <Links />;
   if (path === '/noura') return <NouraPage />;
   if (KHALID[path]) { const P = KHALID[path]; return <P />; }
   if (path === '/app/timeline') return <Timeline path={path} />;
