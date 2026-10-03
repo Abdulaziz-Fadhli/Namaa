@@ -1,5 +1,5 @@
 // صفحة الروابط (/links): رابط واحد يشاركه الفريق، فيه المنصة والكود
-import { ArrowLeft, CodeXml, MonitorSmartphone } from 'lucide-react';
+import { ArrowLeft, CirclePlay, CodeXml, MonitorSmartphone } from 'lucide-react';
 import { Icon } from '../kit.jsx';
 import { go } from '../nav.js';
 import logo from '../../assets/namaa-logo-tight.png';
@@ -19,6 +19,11 @@ export function Links() {
             <span className="grow"><b>جرّب المنصة</b><small>namaa-nu.vercel.app</small></span>
             <Icon as={ArrowLeft} size={20} />
           </button>
+          <a className="w-links-btn" href="/video/">
+            <span className="ic"><Icon as={CirclePlay} size={22} /></span>
+            <span className="grow"><b>شاهد المقطع</b><small style={{ direction: 'rtl' }}>عرض المنصة في 40 ثانية</small></span>
+            <Icon as={ArrowLeft} size={20} />
+          </a>
           <a className="w-links-btn" href={REPO} target="_blank" rel="noreferrer">
             <span className="ic"><Icon as={CodeXml} size={22} /></span>
             <span className="grow"><b>الكود على GitHub</b><small className="ltr">github.com/Abdulaziz-Fadhli/Namaa</small></span>
