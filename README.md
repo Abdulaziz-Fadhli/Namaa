@@ -1,16 +1,50 @@
-# React + Vite
+# نماء
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**زكاتك في وقتها، بمقدارها.**
 
-Currently, two official plugins are available:
+نماء يجمع أموالك من البنوك وتطبيقات الاستثمار وما خارجها، ويتتبّع حول كل ريال يومًا بيوم، وينبّهك يوم وجوب زكاتك بالمبلغ الصحيح.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+مسار التقنية المالية · هاكاثون VentureX
 
-## React Compiler
+**جرّب النموذج:** [namaa-nu.vercel.app](https://namaa-nu.vercel.app)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## المشكلة
 
-## Expanding the ESLint configuration
+لا أحد يعرف بدقة متى تجب زكاته، ولا كم مقدارها:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **المال متفرّق** بين عدة بنوك وتطبيقات استثمار ومحافظ ذهب، ولا مكان واحد يجمعه.
+- **كل ريال له موعد:** لكل مبلغ مدّخر حول مستقل يبدأ من يوم ملكه.
+- **النصاب يتحرك يوميًا** مع سعر الذهب والفضة.
+- **لكل مال حكمه:** أسهم تزكّيها شركاتها وأخرى لا، وذهب وعقار ومواشٍ ومحاصيل.
+
+في استبيان أجراه الفريق على 120 شخصًا: **84%** لا يعرفون بالضبط يوم بداية حولهم، و**63%** يخرجون زكاتهم في رمضان لا في يوم وجوبها، و**87%** سيستخدمون تطبيقًا يحسبها وينبّههم.
+
+## الحل
+
+| | الأدوات الحالية | نماء |
+|---|---|---|
+| الصورة الكاملة | كل بنك وتطبيق على حدة | كل أموالك في مكان واحد |
+| أنواع المال | لا تعرف هل تزكّي أسهمك وذهبك | يعرف حكم كل نوع، ويستبعد ما زكّته الشركة عنك |
+| الوضوح | رقم نهائي لا تعرف كيف حُسب | يشرح كل رقم: أي مبلغ، ومتى بدأ حوله، وأي حكم طُبّق |
+
+**يشمل:** الحسابات والودائع، وتطبيقات الاستثمار، والذهب والفضة، والأسهم والصناديق، والعقار المعد للبيع، والمواشي والمحاصيل.
+
+**المنهجية:** الدليل الإرشادي لهيئة الزكاة والضريبة والجمارك، وفتاوى اللجنة الدائمة. والمسائل الخلافية إعدادات قابلة للتغيير.
+
+**الربط:** عبر المصرفية المفتوحة، بموافقة العميل، وقراءة فقط بلا صلاحية تحويل. في النموذج الحالي الربط البنكي محاكاة، والأسعار حقيقية.
+
+## التشغيل
+
+```bash
+npm install
+npm run dev     # التطبيق محليًا
+npm test        # اختبارات محرك الزكاة
+```
+
+مفاتيح الأسعار اللحظية (`SAHMK_API_KEY` و`FINNHUB_API_KEY`) تُوضع في ملف `.env.local`.
+
+## الفريق
+
+- **عبدالعزيز الفضلي:** المنتج والتجربة والعرض
+- **فهد:** محرك الزكاة والمنهجية الشرعية
+- **فيصل العريفي:** البيانات والربط
